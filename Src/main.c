@@ -98,8 +98,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   for(;;){
-	  	  HAL_Delay(1000);
-ITM_SendChar('a');
+  	  HAL_Delay(1000);
+  	  HAL_Delay(1000);
+ITM_SendChar('b');
 	 	  HAL_GPIO_TogglePin(TP1_GPIO_Port, TP1_Pin);
 
 	 	  HAL_Delay(1000);
