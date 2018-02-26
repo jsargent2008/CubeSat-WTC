@@ -44,11 +44,10 @@
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-I2C_HandleTypeDef hi2c1;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+I2C_HandleTypeDef hi2c1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -73,8 +72,6 @@ static void MX_I2C1_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	SetupLTC(&hi2c1, NULL);
-
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -87,6 +84,9 @@ int main(void)
   if(var  == HAL_ERROR){
 
   }
+  //WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *data2write)
+  uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
+  WriteLTC(&hi2c1, 0x90, 0x01, &data2write);
 
   /* USER CODE END Init */
 
@@ -111,6 +111,24 @@ ITM_SendChar('a');
 	 	  HAL_Delay(1000);
 
 	 	  HAL_GPIO_TogglePin(TP1_GPIO_Port, TP1_Pin);
+
+	 	  //ReadLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t StartMemAddress, uint8_t *pData01, uint16_t Size)
+	 	  uint8_t Size = 16;
+	 	  uint8_t ReadData[Size];
+	 	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
+
+	 	  float V1 = (ReadData[0]<<8)+ReadData[1]; //V1 voltage
+
+	 	  Size = 4;
+	 	  uint8_t ReadIntData[Size];
+	 	  ReadLTC(&hi2c1, 0x90, 0x1A, ReadIntData, Size); //Read all Internal Temperature and Vcc (4 bytes total, on device 0x90) and stores in ReadIntData
+
+	 	  uint16_t IntTempReg = (ReadIntData[0]<<8)+ReadIntData[1];
+	 	  uint16_t VccReg = (ReadIntData[2]<<8)+ReadIntData[3];
+	 	  float Tint, Vcc;
+	 	  Tint = LTC2991_IntTemp(IntTempReg);
+	 	  Vcc = LTC2991_Vcc(VccReg);
+
   }
   /* USER CODE END 2 */
 
