@@ -1,5 +1,6 @@
 #ifndef __LTC2991_H__
 #define __LTC2991_H__
+#endif
 
 #include "main.h"
 #include "stm32l1xx_hal.h"
@@ -13,5 +14,3 @@ float LTC2991_Vcc(uint16_t ADC_Reg_Val);
 float LTC2991_IntTemp(uint16_t ADC_Reg_Val);
 float LTC2991_Single_Ended_Voltage(uint16_t ADC_Reg_Val);
 float LTC2991_Diode_Voltage(uint16_t ADC_Reg_Val);
-
-#endif
