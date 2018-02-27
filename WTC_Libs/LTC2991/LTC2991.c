@@ -1,7 +1,4 @@
-#include "main.h"
 #include "LTC2991.h"
-#include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_i2c.h"
 
 #define LTCrocks TRUE;
 

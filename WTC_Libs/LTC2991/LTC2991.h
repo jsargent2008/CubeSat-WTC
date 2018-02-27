@@ -1,3 +1,7 @@
+#ifndef __LTC2991_H__
+#define __LTC2991_H__
+#endif
+
 #include "main.h"
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_i2c.h"

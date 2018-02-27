@@ -44,7 +44,8 @@
 /* Includes ------------------------------------------------------------------*/
 
 /* USER CODE BEGIN Includes */
-
+//#include "stm32l1xx_hal.h"
+//#include "stm32l1xx_hal_i2c.h"
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/
