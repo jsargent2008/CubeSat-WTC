@@ -117,7 +117,9 @@ ITM_SendChar('a');
 	 	  uint8_t ReadData[Size];
 	 	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
 
-	 	  float V1 = (ReadData[0]<<8)+ReadData[1]; //V1 voltage
+	 	  //float V1 = (ReadData[0]<<8)+ReadData[1]; //V1 voltage
+	 	  float V1 = LTC2991_Single_Ended_Voltage(((ReadData[0]<<8)+ReadData[1]));
+
 
 	 	  Size = 4;
 	 	  uint8_t ReadIntData[Size];
