@@ -59,6 +59,7 @@ static void MX_I2C1_Init(void);
 /* Private function prototypes -----------------------------------------------*/
 
 /* USER CODE END PFP */
+int foobar = 7;
 
 /* USER CODE BEGIN 0 */
 
