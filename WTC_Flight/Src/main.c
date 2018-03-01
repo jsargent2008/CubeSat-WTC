@@ -72,6 +72,7 @@ static void MX_ADC_Init(void);
 /* Private function prototypes -----------------------------------------------*/
 
 /* USER CODE END PFP */
+int foobar = 7;
 
 /* USER CODE BEGIN 0 */
 
