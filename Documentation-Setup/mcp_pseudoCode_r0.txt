@@ -1,0 +1,217 @@
+// master control program
+// pseudo code r0
+// 2-3-18
+// Theodore Cox
+
+
+//[Initial program]
+
+void main(int argc, char* argv)
+{
+
+	call initPins
+	call rstBP
+	call measBP
+	call mon_3v3
+	call initRX
+	call dplyAnt
+	call waitRSS
+	call rxCom
+	call txCom
+}
+
+/***
+	function prototypes
+
+		initialize pins
+			int initPins(int command)
+
+		reset battery power
+			boolean rstBP(int nBatteries)
+
+		measure battery power
+			double[] measBP(int bat1, int bat2,...)
+
+		3.3v monitor
+			double[] mon_3v3(int n)
+
+		Enable RX
+			boolean initRX(int command)
+
+		deploy antenna
+			int dplyAnt(int time)
+
+		trigger Rx mode on interupt pin RSS
+			boolean waitRSS()
+			
+		Rx mode - interupt on Rx
+			int rxCom(char* str)
+
+		TX mode
+			int txCom(char*, int device)
+***/
+
+// initialize pins
+	int initPins(int command)
+	{
+
+		// set input/output lines
+		// either analog or digital
+		// uart, i2c
+		// timers, interupts
+
+		return status;
+	}
+
+// reset battery power
+	boolean rstBP(int nBatteries)
+	{
+		for(i=0; i< nBatteries; i++)
+			// turn on each reset pin
+			digitalout[rstBP_pin_i] = 1;
+			delay(1);
+			//turn off trigger? will the batteries remain on?
+			digitalout[rstBP_pin_i] = 0;
+
+			//check battery pgood, if on return true (successfull)
+			// else return false
+			if pgood == true;
+				return truel
+			else
+				return false;
+	}
+// measure battery power
+	double[] measBP(int bat1, int bat2,...)
+	{
+		// if pgood is on continue
+		// else, batteries are off.
+		// might do this for all batteries
+		if (pgood != 1)
+			return 0;
+
+		int n = argsc;
+		double[] measBP = new double[n];
+		for(int i = 0; i < n; i++)
+		{
+			measBP[i] = analog.read(battPin+i); 
+		}
+		
+		return measBP;
+	}
+
+// 3.3v monitor
+	double[] mon_3v3(int n)
+	{
+		// n = 0 (bat 1)
+		// n = 1 (bat 2)
+		// n = 2 (bat 1 & bat 2)
+
+		double[] mon_3v3 = analog.read(bat_pin+n);
+
+		return mon_3v3;
+	}
+
+// move to "Enable RX"
+
+//[Enable RX]
+	boolean initRX(int command)
+	{
+		// where command may allow us to select different 
+		// initialization commands.
+
+		digitalOut rxINIT = pin#
+		//...
+
+		if(successful)
+			return true
+		else
+			return false;
+	}
+
+// deploy antenna
+	int dplyAnt(int time)
+	{
+		// two deployement switches
+		// time in ms?
+		// confirm that deploy heating element
+		// is on for a period of time.
+		int tempT = system.time;
+		dplyPin1.output(1);
+		dplyPin2.output(1);		
+		
+		for(int i = 0; i < time; i++)
+		{
+			if(dplyInterupt) // was set
+				break;
+		}
+
+		//count how long it took for Antenna to deploy.
+		tempT = system.time - tempT;
+
+		// or use value of i;
+
+		return tempT;
+	}
+// move to "RX mode"
+// trigger Rx mode on interupt pin RSS
+	boolean waitRSS()
+	{
+		if RSS		
+			call RX mode;
+			return true
+		else
+			return false;
+	}
+//[Rx mode]
+// interupt on Rx
+// move to "TX mode"
+	int rxCom(char* str)
+	{
+		if forWTC
+			// continue reading char*
+			// return status
+		else if forPi1
+			// send Pi1 char*
+			txCom(str, 1)
+			// return status
+		else if for Pi2
+			// send Pi2 char*
+			txCom(str, 2)
+			// return status
+		else
+			// return flag
+
+		return status;
+	}
+
+
+//[TX mode]
+	int txCom(char*, int device)
+	{
+		int status
+		if(device == 1)
+		{
+		//pi 1
+		// UART tx char* to Pi1
+		// return status
+		}
+
+		if(device == 2)
+		{
+		//pi 2
+		// UART tx char* to Pi2
+		// return status
+		}
+
+		status = flag
+		else
+			return status;
+
+	}
+	
+// return to "Rx mode"
+
+
+
+// comments
+// is there a interupt for uart when we recieve something from the rx line?
