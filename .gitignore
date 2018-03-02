@@ -1,3 +1,8 @@
 Debug/
 .metadata/
+language.settings.xml
 /language.settings.xml
+*.bak
+Backup/
+WTC_Discovery/.settings/language.settings.xml
+WTC_Flight/.settings/language.settings.xml
