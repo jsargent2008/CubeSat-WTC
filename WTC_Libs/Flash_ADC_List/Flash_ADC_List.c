@@ -1,6 +1,6 @@
 #include "main.h"
 //#include "stm32l1xx_hal_gpio.h"
-//#include "stm32l1xx_hal_flash.h"
+#include "stm32l1xx_hal_flash.h"
 //#include "stm32l1xx_hal_flash_ex.h"
 
 // LTC2991 code
@@ -41,3 +41,28 @@ void writetoADClist() {
 
 }
 
+
+// should remove the following code, because it references "mbed.h"
+// check the directory:
+// E:\Q-PACE\STM32\STM32_Drivers\en.stm32cubel1\STM32Cube_FW_L1_V1.8.0\Projects\STM32L152D_EVAL\Examples\FLASH
+// for a better example on how to write/read to eeprom.
+// make sure to add the correct start/stop address in flash (0x08080000 -> ???)
+
+/*
+FLASH_Status writeEEPROMByte(uint32_t address, uint8_t data) {
+    FLASH_Status status = FLASH_COMPLETE;
+    address = address + 0x08080000;
+    DATA_EEPROM_Unlock();  //Unprotect the EEPROM to allow writing
+    status = DATA_EEPROM_ProgramByte(address, data);
+    DATA_EEPROM_Lock();  // Reprotect the EEPROM
+    return status;
+}
+
+uint8_t readEEPROMByte(uint32_t address) {
+    uint8_t tmp = 0;
+    address = address + 0x08080000;
+    tmp = *(__IO uint32_t*)address;
+
+    return tmp;
+}
+*/
