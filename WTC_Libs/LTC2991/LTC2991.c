@@ -59,6 +59,39 @@ uint8_t WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 	return 0;
 }
 
+void readAllLTCDevicesIntoMem(I2C_HandleTypeDef *hi2c,uint8_t *pData01,uint16_t nLTCDevices){
+
+	// note. the variable "pData01" name should change to something more understandable or
+	// should be provided with a definition of its name.
+
+	uint16_t arraySize = 16;
+	uint32_t timeoutLength = 1000;
+	uint16_t DevAddress = 0x90;
+	uint16_t MemAddress = 0x0A;
+
+	//pData01 points to an array of size arraySize (16) values
+	// hi2c ...?
+
+
+	// either continue to use a for loop in the memory for storing the ADC values of the LTC
+	// in flash is contiguous. otherwise it would be ideal to create a switch statement to all
+	// for different procedures if calling from QPACE or SurfSat.
+	for(int i = 0; i< nLTCDevices; i++){
+
+		//	prototype for "HAL_I2C_Mem_Read();" function
+		//	HAL_StatusTypeDef HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+
+		//	Read MSB and LSB of V1-V8 (0x0A to 0x19)
+		HAL_I2C_Mem_Read(hi2c, DevAddress, MemAddress, I2C_MEMADD_SIZE_8BIT, pData01, arraySize, timeoutLength);
+
+
+		// 	store pData01 into flash by calling a write to flash function.
+		// 	update the pointer so that the next LTC2991 device stores its data in another location
+		//	pData01 = pData01 + ? (increment to next place in memory.
+
+	}
+}
+
 uint8_t ReadLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 		uint16_t StartMemAddress, uint8_t *pData01, uint16_t Size) {
 	if (CheckDevAddress(DevAddress)) {
