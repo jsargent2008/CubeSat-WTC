@@ -30,4 +30,6 @@ Further project information is outlined below and in the respective folders.
  - Be sure to download the **whole** repository into your workspace
  - Simply import the project you need
 	 - Don't worry about the libraries they are automatically linked
-   
+## Troubleshooting
+ - `unknown type name 'HAL_StatusTypeDef'`   
+ 	This error occurs when you have a problem with order of includes, especially in the `WTC_Libs` library folder.
