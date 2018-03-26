@@ -33,14 +33,15 @@ uint8_t CheckDevAddress(uint16_t DevAddress) {
 
 uint8_t WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 		uint16_t MemAddress, uint8_t *data2write) {
-	if (CheckDevAddress(DevAddress)) {
-		//check memory address to write to
-		if (MemAddress != 0x01 //Channel Enable-Status, Trigger
-		|| MemAddress != 0x06 //V1, V2, V3 and V4 Control Register
-		|| MemAddress != 0x07 //V5, V6, V7 and V8 Control Register
-		|| MemAddress != 0x08 //PWM Threshold and Tinternal Control Register
-		|| MemAddress != 0x09) { ////PWM Threshold
-		//Invalid memory addresses to write to
+
+		if (CheckDevAddress(DevAddress)) {
+			//check memory address to write to, return if the address is incorrect.
+			if (MemAddress != 0x01 //Channel Enable-Status, Trigger
+			|| MemAddress != 0x06 //V1, V2, V3 and V4 Control Register
+			|| MemAddress != 0x07 //V5, V6, V7 and V8 Control Register
+			|| MemAddress != 0x08 //PWM Threshold and Tinternal Control Register
+			|| MemAddress != 0x09) { ////PWM Threshold
+			//Invalid memory addresses to write to
 			return 0;
 		}
 		HAL_Delay(100);
@@ -51,8 +52,9 @@ uint8_t WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 		//*************Example*************
 		//uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
 		//HAL_I2C_Mem_Write(hi2c, 0x90, 0x01, I2C_MEMADD_SIZE_8BIT, &data2write, 1, 1000); //enable all channels (V1-V8) status register 0x01 on LTC2991 Device address 0x90
-
-	} else {
+	}
+	else
+	{
 		return 0;
 	}
 
@@ -61,6 +63,7 @@ uint8_t WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 
 uint8_t ReadLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 		uint16_t StartMemAddress, uint8_t *pData01, uint16_t Size) {
+
 	if (CheckDevAddress(DevAddress)) {
 		HAL_Delay(100);
 		//HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
@@ -69,13 +72,23 @@ uint8_t ReadLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 		HAL_I2C_Mem_Read(hi2c, DevAddress, StartMemAddress,
 				I2C_MEMADD_SIZE_16BIT, pData01, Size, 1000);
 
+		// possible to include feedback status bit from I2C mem read function as
+		// a return for READLTC
+
 		//*************Example*************
 		//HAL_I2C_Mem_Read(hi2c, 0x90, 0x01, I2C_MEMADD_SIZE_8BIT, pData01, 1, 1000); //status of channels
 		//HAL_I2C_Mem_Read(hi2c, 0x90, 0x0A, I2C_MEMADD_SIZE_8BIT, pData01, 2, 1000); //Read MSB (0x0A) and LSB (0x0B) of V1
 		//HAL_I2C_Mem_Read(hi2c, 0x90, 0x0A, I2C_MEMADD_SIZE_8BIT, pData01, 16, 1000); //Read MSB and LSB of V1-V8 (0x0A to 0x19)
-	} else {
+	}
+
+	else
+	{
 		return 0;
 	}
+
+	// consider changing return statement to account if the "if/else" statement was
+	// implemented.
+
 	return 0;
 }
 
@@ -90,6 +103,7 @@ float LTC2991_Vcc(uint16_t ADC_Reg_Val) {
 	Vcc = (((float) ADC_Reg_Val) * LTC2991_VCC_lsb * sign) + 2.5; //! 2) Convert code to Vcc Voltage from single-ended lsb
 	return (Vcc);
 }
+
 float LTC2991_IntTemp(uint16_t ADC_Reg_Val) {
 	float IntTemp;
 	ADC_Reg_Val = (ADC_Reg_Val & 0x1FFF);            //! 1) Removes first 3 bits
@@ -101,6 +115,7 @@ float LTC2991_IntTemp(uint16_t ADC_Reg_Val) {
 	IntTemp = ((float) ADC_Reg_Val) * LTC2991_TEMPERATURE_lsb; //! 2) Converts code to temperature from temperature lsb
 	return (IntTemp);
 }
+
 float LTC2991_Single_Ended_Voltage(uint16_t ADC_Reg_Val) {
 	float voltage;
 	int16_t sign = 1;
@@ -113,6 +128,7 @@ float LTC2991_Single_Ended_Voltage(uint16_t ADC_Reg_Val) {
 
 	return (voltage);
 }
+
 float LTC2991_Diode_Voltage(uint16_t ADC_Reg_Val) {
 	float voltage;
 	ADC_Reg_Val = (ADC_Reg_Val & 0x1FFF);            //! 1) Removes first 3 bits

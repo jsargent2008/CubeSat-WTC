@@ -1,6 +1,8 @@
 #include "main.h"
+
 //#include "stm32l1xx_hal_gpio.h"
-#include "stm32l1xx_hal_flash.h"
+//#include "stm32l1xx_hal_def.h"
+//#include "stm32l1xx_hal_flash.h"
 //#include "stm32l1xx_hal_flash_ex.h"
 
 // LTC2991 code
