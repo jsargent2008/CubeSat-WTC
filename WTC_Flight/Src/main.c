@@ -72,7 +72,6 @@ static void MX_ADC_Init(void);
 /* Private function prototypes -----------------------------------------------*/
 
 /* USER CODE END PFP */
-int foobar = 7;
 
 /* USER CODE BEGIN 0 */
 
@@ -99,8 +98,8 @@ int main(void)
 
   }
   //WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *data2write)
-  uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
-  WriteLTC(&hi2c1, 0x90, 0x01, &data2write);
+  //uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
+  //WriteLTC(&hi2c1, 0x90, 0x01, &data2write);
 
   /* USER CODE END Init */
 
@@ -121,34 +120,60 @@ int main(void)
   MX_ADC_Init();
   /* USER CODE BEGIN 2 */
 
+  // added the following line based off of https://visualgdb.com/tutorials/arm/stm32/uart/hal/
+  // section 21.
+  // Remove if necessary.
+  //NVIC_EnableIRQ(USART3_IRQn);
+  // ^ ^ ^
   for(;;){
-  	  HAL_Delay(1000);
-  	  HAL_Delay(1000);
-ITM_SendChar('a');
-	 	  HAL_GPIO_TogglePin(EN_Chrg_1_GPIO_Port, EN_Chrg_1_Pin);
 
-	 	  HAL_Delay(1000);
+	  //**** START OF TESTING UART3 (aka Pi2 Line)
+	  //huart3 is for pi2 tx and rx
 
-	 	  HAL_GPIO_TogglePin(EN_Chrg_1_GPIO_Port, EN_Chrg_1_Pin);
+	  //HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+	  //HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
 
-	 	  //ReadLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t StartMemAddress, uint8_t *pData01, uint16_t Size)
-	 	  uint8_t Size = 16;
-	 	  uint8_t ReadData[Size];
-	 	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
+	  //comment out:
+	  //this...
+	  /*
+	  uint8_t buffer[4] =;
+	  HAL_UART_Receive_IT(&huart3, buffer, sizeof(buffer));
+	  HAL_UART_Transmit_IT(&huart3, buffer, sizeof(buffer));
+	  */
+	  //or this...
+	  char buffer[] = "test\r\n";
+	  HAL_UART_Receive_IT(&huart3, (uint8_t *)buffer, sizeof(buffer));
+	  HAL_UART_Transmit_IT(&huart3, (uint8_t *)buffer, sizeof(buffer));
+	  //
+	  HAL_Delay(2);
 
-	 	  //float V1 = (ReadData[0]<<8)+ReadData[1]; //V1 voltage
-	 	  float V1 = LTC2991_Single_Ended_Voltage(((ReadData[0]<<8)+ReadData[1]));
+	  //**** END OF TESTING UART3 (aka Pi2 Line)
 
+	  /*
+	  ITM_SendChar('a');
+	  HAL_GPIO_TogglePin(EN_Chrg_1_GPIO_Port, EN_Chrg_1_Pin);
+	  HAL_Delay(1000);
+	  HAL_GPIO_TogglePin(EN_Chrg_1_GPIO_Port, EN_Chrg_1_Pin);
+	  //ReadLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t StartMemAddress, uint8_t *pData01, uint16_t Size)
+	  uint8_t Size = 16;
+	  uint8_t ReadData[Size];
+	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
 
-	 	  Size = 4;
-	 	  uint8_t ReadIntData[Size];
-	 	  ReadLTC(&hi2c1, 0x90, 0x1A, ReadIntData, Size); //Read all Internal Temperature and Vcc (4 bytes total, on device 0x90) and stores in ReadIntData
+	  //float V1 = (ReadData[0]<<8)+ReadData[1]; //V1 voltage
+	  float V1 = LTC2991_Single_Ended_Voltage(((ReadData[0]<<8)+ReadData[1]));
 
-	 	  uint16_t IntTempReg = (ReadIntData[0]<<8)+ReadIntData[1];
-	 	  uint16_t VccReg = (ReadIntData[2]<<8)+ReadIntData[3];
-	 	  float Tint, Vcc;
-	 	  Tint = LTC2991_IntTemp(IntTempReg);
-	 	  Vcc = LTC2991_Vcc(VccReg);
+	  Size = 4;
+	  uint8_t ReadIntData[Size];
+	  ReadLTC(&hi2c1, 0x90, 0x1A, ReadIntData, Size); //Read all Internal Temperature and Vcc (4 bytes total, on device 0x90) and stores in ReadIntData
+
+	  uint16_t IntTempReg = (ReadIntData[0]<<8)+ReadIntData[1];
+	  uint16_t VccReg = (ReadIntData[2]<<8)+ReadIntData[3];
+	  float Tint, Vcc;
+
+	  Tint = LTC2991_IntTemp(IntTempReg);
+	  Vcc = LTC2991_Vcc(VccReg);
+	  */
+
 
   }
   /* USER CODE END 2 */
@@ -343,7 +368,7 @@ static void MX_USART3_UART_Init(void)
 {
 
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
+  huart3.Init.BaudRate = 9600;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;

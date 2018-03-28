@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Users/clayt/Atollic/TrueSTUDIO/STM32_workspace_9.0/CubeSat-WTC/WTC_Flight/Inc
+HeaderPath=E:/Q-PACE/Atollic/workspace/CubeSat-WTC/WTC_Flight/Inc
 HeaderFiles=stm32l1xx_it.h;stm32l1xx_hal_conf.h;main.h;
-SourcePath=C:/Users/clayt/Atollic/TrueSTUDIO/STM32_workspace_9.0/CubeSat-WTC/WTC_Flight/Src
+SourcePath=E:/Q-PACE/Atollic/workspace/CubeSat-WTC/WTC_Flight/Src
 SourceFiles=stm32l1xx_it.c;stm32l1xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]
