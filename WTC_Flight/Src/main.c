@@ -135,17 +135,87 @@ int main(void)
 
 	  //comment out:
 	  //this...
-	  /*
-	  uint8_t buffer[4] =;
-	  HAL_UART_Receive_IT(&huart3, buffer, sizeof(buffer));
-	  HAL_UART_Transmit_IT(&huart3, buffer, sizeof(buffer));
-	  */
-	  //or this...
-	  char buffer[] = "test\r\n";
-	  HAL_UART_Receive_IT(&huart3, (uint8_t *)buffer, sizeof(buffer));
-	  HAL_UART_Transmit_IT(&huart3, (uint8_t *)buffer, sizeof(buffer));
-	  //
+
+	  //HAL_UART_Receive_IT(&huart3, rbuffer, sizeof(rbuffer));
+
+	 // HAL_Delay(100);
+	  //uint8_t tbuffer[5];
+/*
+	  for(int i = 0; i<4;i++)
+	  {
+		  tbuffer[i] = rbuffer[i];
+	  }
+*/
+
+	  //HAL_UART_IRQHandler(&huart3);
+	  //HAL_Delay(100);
+	  //HAL_UART_Transmit_IT(&huart3, huart3.pRxBuffPtr, sizeof(huart3.pRxBuffPtr));
+	  //HAL_Delay(100);
+
+	  int num = huart3.State;
+	  char snum[5];
+	  snum[3] = '\r';
+	  snum[4] = '\n';
+	  itoa(num, snum, 10);
+	  HAL_UART_Transmit_IT(&huart3, (uint8_t *)snum, sizeof(snum));
 	  HAL_Delay(2);
+	  char str[7];"hello\n\r";
+	  HAL_UART_Transmit_IT(&huart3, (uint8_t *)str, sizeof(snum));
+	  HAL_Delay(2);
+
+	  //until state is ready, print state
+	  while(huart3.State != HAL_UART_STATE_READY)
+	  {
+		  //print state of uart
+		  int num = huart3.State;
+		  char snum[5];
+		  snum[3] = '\r';
+		  itoa(num, snum, 10);
+		  HAL_UART_Transmit_IT(&huart3, (uint8_t *)snum, sizeof(snum));
+		  HAL_Delay(2);
+	  }
+	  // recieve
+	  uint8_t rbuffer[5];
+	  HAL_UART_Receive_IT(&huart3, rbuffer, sizeof(rbuffer));
+  	  rbuffer[4] = '\n';
+	  HAL_Delay(2);
+	  //interupt recieved
+  	  uint8_t tbuffer[6] = "IRQ!\r\n";
+  	  HAL_UART_Transmit_IT(&huart3, tbuffer, sizeof(tbuffer));
+  	  // transmit back what was recieved
+  	  HAL_UART_Transmit_IT(&huart3, rbuffer, sizeof(rbuffer));
+
+	  /*
+	  int num = huart3.State;
+	  char snum[5];
+	  snum[3] = '\r';
+	  itoa(num, snum, 10);
+
+	  HAL_UART_Transmit_IT(&huart3, (uint8_t *)snum, sizeof(snum));
+	  HAL_UART_Receive_IT(&huart3, rbuffer, sizeof(rbuffer));
+	  if(num == HAL_UART_STATE_BUSY_RX)
+	  {
+		  HAL_UART_Receive_IT(&huart3, rbuffer, sizeof(rbuffer));
+	  	  HAL_Delay(100);
+	  	  uint8_t tbuffer[5] = "IRQ!\r";
+	  	  HAL_UART_Transmit_IT(&huart3, tbuffer, sizeof(tbuffer));
+	  }
+	  else
+	  {
+		  uint8_t tbuffer[5] = "NOT\n\r";
+		  HAL_UART_Transmit_IT(&huart3, tbuffer, sizeof(tbuffer));
+	  }
+	   */
+
+	  //uint8_t tbuffer[5] = "IRQ!\r";
+	  //HAL_UART_Receive_IT(&huart3, rbuffer, sizeof(rbuffer));
+	  //HAL_UART_Transmit_IT(&huart3, tbuffer, sizeof(tbuffer));
+	  //or this...
+	  //char buffer[] = "test\r\n";
+	  //HAL_UART_Receive_IT(&huart3, (uint8_t *)buffer, sizeof(buffer));
+	  //HAL_UART_Transmit_IT(&huart3, (uint8_t *)buffer, sizeof(buffer));
+	  //
+	  //HAL_Delay(100);
 
 	  //**** END OF TESTING UART3 (aka Pi2 Line)
 
