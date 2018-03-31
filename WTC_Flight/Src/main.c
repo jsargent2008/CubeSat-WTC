@@ -37,11 +37,14 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
 #include "stm32l1xx_hal.h"
 
 /* USER CODE BEGIN Includes */
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
 #include "LTC2991/LTC2991.h"
+#include "UART_IRQ/UART_IRQ.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -66,8 +69,8 @@ static void MX_UART4_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C2_Init(void);
-static void MX_USART3_UART_Init(void);
 static void MX_ADC_Init(void);
+static void MX_USART3_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -94,13 +97,16 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  HAL_StatusTypeDef var = HAL_Init();
-  if(var  == HAL_ERROR){
+
+  HAL_StatusTypeDef hal = HAL_Init();
+  if(hal  == HAL_ERROR){
 
   }
+
   //WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *data2write)
-  uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
-  WriteLTC(&hi2c1, 0x90, 0x01, &data2write);
+
+  //uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
+  //WriteLTC(&hi2c1, 0x90, 0x01, &data2write);
 
   /* USER CODE END Init */
 
@@ -117,38 +123,26 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_I2C2_Init();
-  MX_USART3_UART_Init();
   MX_ADC_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
   for(;;){
-  	  HAL_Delay(1000);
-  	  HAL_Delay(1000);
-ITM_SendChar('a');
-	 	  HAL_GPIO_TogglePin(EN_Chrg_1_GPIO_Port, EN_Chrg_1_Pin);
-
-	 	  HAL_Delay(1000);
-
-	 	  HAL_GPIO_TogglePin(EN_Chrg_1_GPIO_Port, EN_Chrg_1_Pin);
-
-	 	  //ReadLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t StartMemAddress, uint8_t *pData01, uint16_t Size)
-	 	  uint8_t Size = 16;
-	 	  uint8_t ReadData[Size];
-	 	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
-
-	 	  //float V1 = (ReadData[0]<<8)+ReadData[1]; //V1 voltage
-	 	  float V1 = LTC2991_Single_Ended_Voltage(((ReadData[0]<<8)+ReadData[1]));
 
 
-	 	  Size = 4;
-	 	  uint8_t ReadIntData[Size];
-	 	  ReadLTC(&hi2c1, 0x90, 0x1A, ReadIntData, Size); //Read all Internal Temperature and Vcc (4 bytes total, on device 0x90) and stores in ReadIntData
+/* 3-31-18
+ *  1. Figure out how to send float value to UART serial console
+ *  2. Determine that LTC functions to read/write are operating correctly
+ *  3. Send voltage value and device address to UART to test functionality or..
+ *  	find a way to make debug view show the float value in variable value window.
+ */
+	  uint8_t Size = 16;
+ 	  uint8_t ReadData[Size];
+ 	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
+ 	  float V1 = LTC2991_Single_Ended_Voltage(((ReadData[0]<<8)+ReadData[1]));
+ 	  char tst[2] = {V1,V1};
+ 	  HAL_UART_Transmit_IT(&huart3, (uint8_t *) tst, (uint16_t)sizeof(tst));
 
-	 	  uint16_t IntTempReg = (ReadIntData[0]<<8)+ReadIntData[1];
-	 	  uint16_t VccReg = (ReadIntData[2]<<8)+ReadIntData[3];
-	 	  float Tint, Vcc;
-	 	  Tint = LTC2991_IntTemp(IntTempReg);
-	 	  Vcc = LTC2991_Vcc(VccReg);
 
   }
   /* USER CODE END 2 */
@@ -343,7 +337,7 @@ static void MX_USART3_UART_Init(void)
 {
 
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
+  huart3.Init.BaudRate = 9600;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;
