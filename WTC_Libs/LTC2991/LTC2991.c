@@ -39,14 +39,20 @@ uint8_t CheckDevAddress(uint16_t DevAddress) {
  * @retval uint8_t ?
  */
 
-/*
-uint8_t initLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,uint8_t *data2write)
-{
-	  uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
-	  WriteLTC(hi2c, DevAddress, 0x01, data2write);
 
+LTC2991 *initLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,uint8_t *data2write) {
+	LTC2991 *myLTC = malloc(sizeof(LTC2991));
+	if (myLTC != NULL) {
+		myLTC->hi2c = hi2c;
+		myLTC->DevAddress = DevAddress;
+
+//		uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
+		myLTC->returnVal = WriteLTC(hi2c, DevAddress, 0x01, data2write);
+	}
+
+	return myLTC;
 }
-*/
+
 uint8_t WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 		uint16_t MemAddress, uint8_t *data2write) {
 
@@ -77,6 +83,13 @@ uint8_t WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 
 	return 0;
 }
+
+/*
+uint8_t ReadLTC(LTC2991 ltc, int16_t StartMemAddress, uint8_t *pData01, uint16_t Size) {
+	ReadLTC(ltc->hi2c, ltc->DevAddress, pData01, Size);
+}
+
+*/
 
 /**
  * @brief  ?

@@ -108,6 +108,9 @@ int main(void)
   uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
   WriteLTC(&hi2c1, 0x90, 0x01, &data2write);
 
+  //LTC2991 *CCDR_LTC_1 = initLT(&hi2c1, 0x90, 0x01, &data2write);
+
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -139,10 +142,13 @@ int main(void)
 
 	  uint8_t Size = 16;
  	  uint8_t ReadData[Size];
+
  	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
  	  float V1 = LTC2991_Single_Ended_Voltage(((ReadData[0]<<sizeof(uint8_t))+ReadData[1]));
- 	  char tst[2] = {V1,V1};
- 	  HAL_UART_Transmit_IT(&huart3, (uint8_t *) tst, (uint16_t)sizeof(tst));
+ 	  char outBuf[10];// = malloc(sizeof(char)* 10);
+ 	  sprintf(outBuf, "*%e*", V1);
+
+ 	  HAL_UART_Transmit_IT(&huart3, outBuf, strlen(outBuf));
 
 /*
 	  // the following code test Tinternal and VCC of LTC2991 device
