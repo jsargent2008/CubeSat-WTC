@@ -143,12 +143,24 @@ int main(void)
 	  uint8_t Size = 16;
  	  uint8_t ReadData[Size];
 
- 	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
- 	  float V1 = LTC2991_Single_Ended_Voltage(((ReadData[0]<<sizeof(uint8_t))+ReadData[1]));
- 	  char outBuf[10];// = malloc(sizeof(char)* 10);
- 	  sprintf(outBuf, "*%e*", V1);
+ 	  UART_printSOS(&huart3,10);
 
- 	  HAL_UART_Transmit_IT(&huart3, outBuf, strlen(outBuf));
+ 	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
+		float V1 = LTC2991_Single_Ended_Voltage(
+				((ReadData[0] << sizeof(uint8_t)) + ReadData[1]));
+
+		while (V1 < 10000) {
+			V1 *= 10;
+		}
+
+		double Vd = (uint32_t) V1;
+		char outBuf[20];
+//		sn
+		sprintf(outBuf, "%f",V1);
+		double Vs = V1;
+		//sprintf(outBuf, "%d", Vs);
+		HAL_UART_Transmit_IT(&huart3, (uint8_t *) outBuf,
+				(uint16_t) strlen(outBuf));
 
 /*
 	  // the following code test Tinternal and VCC of LTC2991 device

@@ -39,6 +39,7 @@ uint8_t CheckDevAddress(uint16_t DevAddress) {
  * @retval uint8_t ?
  */
 
+/*
 
 LTC2991 *initLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,uint8_t *data2write) {
 	LTC2991 *myLTC = malloc(sizeof(LTC2991));
@@ -52,6 +53,7 @@ LTC2991 *initLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,uint8_t *data2writ
 
 	return myLTC;
 }
+*/
 
 uint8_t WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 		uint16_t MemAddress, uint8_t *data2write) {
