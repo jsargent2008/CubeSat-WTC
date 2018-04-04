@@ -14,6 +14,9 @@ float LTC2991_IntTemp(uint16_t ADC_Reg_Val);
 float LTC2991_Single_Ended_Voltage(uint16_t ADC_Reg_Val);
 float LTC2991_Diode_Voltage(uint16_t ADC_Reg_Val);
 
+#define startAllChannels = 0xf8;
+
+
 typedef struct LTC2991 {
 	I2C_HandleTypeDef *hi2c;
 	uint16_t DevAddress;

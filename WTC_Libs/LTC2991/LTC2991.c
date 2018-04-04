@@ -55,6 +55,18 @@ LTC2991 *initLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,uint8_t *data2writ
 }
 */
 
+/*The LTC2991 is configured by writing the channel control
+registers through the serial interface. Refer to Tables 5, 6
+and 7 for control register bit definition.*/
+
+/**
+ * @brief  ?
+ * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+ * @param  DevAddress ?
+ * @param  MemAddress ?
+ * @param  data2write ?
+ * @retval uint8_t ?
+ */
 uint8_t WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 		uint16_t MemAddress, uint8_t *data2write) {
 
