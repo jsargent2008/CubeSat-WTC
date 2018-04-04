@@ -139,29 +139,31 @@ int main(void)
  *  3. Send voltage value and device address to UART to test functionality or..
  *  	find a way to make debug view show the float value in variable value window.
  */
-
-	  uint8_t Size = 16;
- 	  uint8_t ReadData[Size];
-
- 	  UART_printSOS(&huart3,10);
-
- 	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
-		float V1 = LTC2991_Single_Ended_Voltage(
-				((ReadData[0] << sizeof(uint8_t)) + ReadData[1]));
-
-		while (V1 < 10000) {
-			V1 *= 10;
-		}
-
-		double Vd = (uint32_t) V1;
-		char outBuf[20];
-//		sn
-		sprintf(outBuf, "%f",V1);
-		double Vs = V1;
-		//sprintf(outBuf, "%d", Vs);
-		HAL_UART_Transmit_IT(&huart3, (uint8_t *) outBuf,
-				(uint16_t) strlen(outBuf));
-
+  	  uint8_t tbuffer[6] = "IRQ!\r\n";
+  	  HAL_UART_Transmit_IT(&huart3, tbuffer, sizeof(tbuffer));
+//
+//	  uint8_t Size = 16;
+// 	  uint8_t ReadData[Size];
+//
+// 	  UART_printSOS(&huart3,10);
+//
+// 	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
+//		float V1 = LTC2991_Single_Ended_Voltage(
+//				((ReadData[0] << sizeof(uint8_t)) + ReadData[1]));
+//
+//		while (V1 < 10000) {
+//			V1 *= 10;
+//		}
+//
+//		double Vd = (uint32_t) V1;
+//		char outBuf[20];
+////		sn
+//		sprintf(outBuf, "%f",V1);
+//		double Vs = V1;
+//		//sprintf(outBuf, "%d", Vs);
+//		HAL_UART_Transmit_IT(&huart3, (uint8_t *) outBuf,
+//				(uint16_t) strlen(outBuf));
+//
 /*
 	  // the following code test Tinternal and VCC of LTC2991 device
 	  uint8_t Size = 4;
