@@ -45,6 +45,7 @@
 #include <math.h>
 #include "LTC2991/LTC2991.h"
 #include "UART_IRQ/UART_IRQ.h"
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -103,14 +104,6 @@ int main(void)
 
   }
 
-  //WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *data2write)
-
-  uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
-  WriteLTC(&hi2c1, 0x90, 0x01, &data2write);
-
-  //LTC2991 *CCDR_LTC_1 = initLT(&hi2c1, 0x90, 0x01, &data2write);
-
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -132,51 +125,69 @@ int main(void)
 
   for(;;){
 
+/*******
+* JON START HERE
+*/
 
-/* 3-31-18
- *  1. Figure out how to send float value to UART serial console
- *  2. Determine that LTC functions to read/write are operating correctly
- *  3. Send voltage value and device address to UART to test functionality or..
- *  	find a way to make debug view show the float value in variable value window.
- */
-  	  uint8_t tbuffer[6] = "IRQ!\r\n";
-  	  HAL_UART_Transmit_IT(&huart3, tbuffer, sizeof(tbuffer));
+	  //initalize LTC2991 IC to allow all read accesss for all voltage pins
+	  //uint8_t command = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
+	  //uint8_t command = 0x08;// temp & vcc enable
+	  // WriteLTC(&hi2c2, 0x90, 0x01, &command);
+
+//	  uint8_t command = 0x10;// enable V1
+//	  WriteLTC(&hi2c2, 0x90, 0x01, &command);
+//	  // set array of 2 (MSB & LSB) to store V1 data
 //
-//	  uint8_t Size = 16;
+// 	  uint8_t Size = 2;
 // 	  uint8_t ReadData[Size];
 //
-// 	  UART_printSOS(&huart3,10);
+// 	  // i2c LTC2991 0'0'0' voltage pin 1, return data to readData pointer
+// 	  HAL_I2C_Mem_Read(&hi2c2, 0x90, 0x0A, I2C_MEMADD_SIZE_16BIT, ReadData, Size, 1000);
 //
-// 	  ReadLTC(&hi2c1, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
-//		float V1 = LTC2991_Single_Ended_Voltage(
-//				((ReadData[0] << sizeof(uint8_t)) + ReadData[1]));
-//
-//		while (V1 < 10000) {
-//			V1 *= 10;
-//		}
-//
-//		double Vd = (uint32_t) V1;
-//		char outBuf[20];
-////		sn
-//		sprintf(outBuf, "%f",V1);
-//		double Vs = V1;
-//		//sprintf(outBuf, "%d", Vs);
-//		HAL_UART_Transmit_IT(&huart3, (uint8_t *) outBuf,
-//				(uint16_t) strlen(outBuf));
-//
-/*
-	  // the following code test Tinternal and VCC of LTC2991 device
-	  uint8_t Size = 4;
+// 	  // shift MSB over to first 15-8 bits (byte 1) of 'data'
+// 	  // add LSB to 7-0 (byte 0) of 'data'
+// 	  uint16_t data = (ReadData[0]<<8) | ReadData[1];
+
+	  uint8_t command = 0xF8;// enable V1
+	  WriteLTC(&hi2c2, 0x90, 0x01, &command);
+ 	  //ReadLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t StartMemAddress, uint8_t *pData01, uint16_t Size)
+ 	  uint8_t Size = 16;
+ 	  uint8_t ReadData[Size];
+ 	  ReadLTC(&hi2c2, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
+
+ 	  //float V1 = (ReadData[0]<<8)+ReadData[1]; //V1 voltage
+ 	  float V1 = LTC2991_Single_Ended_Voltage(((ReadData[0]<<8)+ReadData[1]));
+
+ 	  Size = 4;
  	  uint8_t ReadIntData[Size];
- 	  ReadLTC(&hi2c1, 0x90, 0x1A, ReadIntData, Size); //Read all Internal Temperature and Vcc (4 bytes total, on device 0x90) and stores in ReadIntData
+ 	  ReadLTC(&hi2c2, 0x90, 0x1A, ReadIntData, Size); //Read all Internal Temperature and Vcc (4 bytes total, on device 0x90) and stores in ReadIntData
 
  	  uint16_t IntTempReg = (ReadIntData[0]<<8)+ReadIntData[1];
  	  uint16_t VccReg = (ReadIntData[2]<<8)+ReadIntData[3];
  	  float Tint, Vcc;
  	  Tint = LTC2991_IntTemp(IntTempReg);
  	  Vcc = LTC2991_Vcc(VccReg);
-*/
 
+
+ 	  // VOLTAGE REGISTER FORMAT
+ 	  //MSB
+ 	  //[DV][SIGN][D13][D12][D11][D10][D9][D8]
+ 	  //LSB
+ 	  //[D7][D6][D5][D4][D3][D2][D1][D0]
+ 	  //float result = LTC2991_Single_Ended_Voltage(data);
+
+ 	  // TEMPERATURE REGISTER FORMAT
+ 	  //MSB
+ 	  //[DV][X][X][D12][D11][D10][D9][D8]
+ 	  //LSB
+ 	  //[D7][D6][D5][D4][D3][D2][D1][D0]
+
+
+ 	  //float result = LTC2991_Single_Ended_Voltage(data);
+ 	  free(ReadData);
+ 	  /*******
+ * JON END HERE
+*/
   }
   /* USER CODE END 2 */
 
@@ -186,7 +197,20 @@ int main(void)
   {
 
   /* USER CODE END WHILE */
+	  /*******
+	   * JON START HERE
+	   */
 
+	  	  if(HAL_FLASHEx_DATAEEPROM_Unlock()==HAL_OK) // Remember to unlock the EEPROM before using
+	  	  {
+	  //		  HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD,0x08080000,555); //Write: Type, Address, Data
+	  		  uint32_t data_in = *(uint32_t *)0x08080000;	//Read: Cast the address as a uint32_t pointer and dereference it
+	  		  HAL_FLASHEx_DATAEEPROM_Lock();	//Lock when done? (Not sure if necessary)
+	  	  }
+
+	  /*******
+	   * JON END HERE
+	  */
   /* USER CODE BEGIN 3 */
 
   }
