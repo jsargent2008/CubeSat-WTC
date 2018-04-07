@@ -42,9 +42,11 @@
 /* USER CODE BEGIN Includes */
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <math.h>
 #include "LTC2991/LTC2991.h"
 #include "UART_IRQ/UART_IRQ.h"
+#include "PRINTF/printf.h"
 
 /* USER CODE END Includes */
 
@@ -79,6 +81,60 @@ static void MX_USART3_UART_Init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+#pragma GCC push_options
+#pragma GCC optimize ("O3")
+void delayUS_DWT(uint32_t us) {
+//	volatile uint32_t cycles = (SystemCoreClock/1000000L)*us;
+//	volatile uint32_t start = DWT->CYCCNT;
+//	do  {
+//	} while(DWT->CYCCNT - start < cycles);
+}
+#pragma GCC pop_options
+
+void dprint(char* str) {
+	int len = strlen(str), i;
+	for(i=0;i<len;i++){
+		ITM_SendChar((uint32_t) str[i]);
+		delayUS_DWT(100);
+	}
+}
+//
+//void dprintf(char* str, const char *fmt, ...) {
+//	int len = strlen(str);
+//
+//	char lcdstring[50] = "";
+//	sprintf(lcdstring, "Called write directly");
+//	printf(lcdstring);
+//
+//	ITM_SendChar('-');
+//}
+uint8_t aRxBuffer[20];
+
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	/* Turn LED2 on: Transfer in reception process is correct */
+	HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi2_Pin, GPIO_PIN_SET);
+}
+
+///**
+//  * @brief Rx Transfer completed callbacks
+//  * @param huart: uart handle
+//  * @retval None
+//  */
+////HAL_UART_TxCpltCallback
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+//{
+//  /* Prevent unused argument(s) compilation warning */
+//  UNUSED(huart);
+//
+//  /* NOTE : This function should not be modified, when the callback is needed,
+//            the HAL_UART_RxCpltCallback can be implemented in the user file
+//   */
+//    HAL_UART_Transmit(huart, (uint8_t *)aRxBuffer, 10, 0xFFFF);
+//}
+
+
 
 /* USER CODE END 0 */
 
@@ -123,7 +179,47 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
+
   for(;;){
+	  char lcdstring[50] = "";
+
+	  UART_printSOS(&huart3, 1);
+	  HAL_UART_Receive(&huart3, (uint8_t *)aRxBuffer, 10,0xFFFF );
+	  HAL_UART_Transmit(&huart3,  (uint8_t *)aRxBuffer, (uint16_t)sizeof(aRxBuffer), 0xFFFF);
+	  for(;;){
+			float f = 0.0024445;
+			char lcdstring[50] = "";
+//			sprintf(lcdstring, "Called write directly");
+			sprintf(lcdstring, "Val: %f", f);
+			HAL_UART_Transmit(&huart3,  (uint8_t *)lcdstring, (uint16_t)sizeof(lcdstring), 0xFFFF);
+//		  printf(lcdstring);
+		  dprint(lcdstring);
+		  ITM_SendChar('-');
+			//		  write(0, lcdstring, strlen(lcdstring));
+			int i;
+//			GPIO_Init(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin);
+//			// turn pins 6 and 7 on
+//			GPIO_SetBits(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin | Pwr_En_Pi2_Pin);
+
+			// loop forever
+//			for (;;) {
+				// toggle pins 6 and 7
+				HAL_GPIO_TogglePin(Pwr_En_Pi1_GPIO_Port,
+						Pwr_En_Pi1_Pin );
+				// waste time
+//				for (i = 0; i < 25000; i++)
+//					;
+				HAL_Delay(500);
+//				HAL_UART_Transmit(&huart3,  (uint8_t *)lcdstring, (uint16_t)sizeof(lcdstring), 0xFFFF);
+//				UART_printSOS(&huart3, 1);
+//				HAL_UART_Transmit_IT(&huart3, (uint8_t *)lcdstring, (uint16_t)sizeof(lcdstring));
+				HAL_Delay(500);
+//				HAL_UART_IRQHandler(&huart3,1);
+//				UART_IRQ(&huart3, )
+
+//			}
+
+	  }
 
 /*******
 * JON START HERE
@@ -346,6 +442,7 @@ static void MX_UART4_Init(void)
   huart4.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart4) != HAL_OK)
   {
+
     _Error_Handler(__FILE__, __LINE__);
   }
 
@@ -401,8 +498,10 @@ static void MX_USART3_UART_Init(void)
   huart3.Init.Mode = UART_MODE_TX_RX;
   huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+
   if (HAL_UART_Init(&huart3) != HAL_OK)
   {
+	HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi2_Pin, GPIO_PIN_SET);
     _Error_Handler(__FILE__, __LINE__);
   }
 

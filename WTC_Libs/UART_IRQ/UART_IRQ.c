@@ -52,13 +52,13 @@
 
 		uint32_t i;
 		//can loop up to decimal value 2^32
-		for(i = 0; i< time; i++)
+		for(i = 0; i < time; i++)
 		{
 
 			char str[8] = {"S.O.S.\r\n"};
 
 			// print s.o.s.
-			HAL_UART_Transmit_IT(huart, (uint8_t *)str, (uint16_t)sizeof(str));
+			HAL_UART_Transmit(huart, (uint8_t *)str, (uint16_t)sizeof(str), 0xFFFF);
 			HAL_Delay(500);
 		}
 	}
