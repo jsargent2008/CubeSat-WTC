@@ -49,6 +49,12 @@
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/
+#define _5X_Out_2_Pin GPIO_PIN_1
+#define _5X_Out_2_GPIO_Port GPIOC
+//GPIO_PIN_1
+//GPIOC
+//>> ADC_CHANNEL_10
+//#define GPIO_PIN_3 ADC_CHANNEL_10
 
 #define EN_Chrg_1_Pin GPIO_PIN_3
 #define EN_Chrg_1_GPIO_Port GPIOE

@@ -1,0 +1,35 @@
+/*
+ * adc.c
+ *
+ *  Created on: Apr 7, 2018
+ *      Author: Administrator
+ */
+
+#include "adc.h"
+
+/**
+ * @brief  ADC measurement digital
+ * @param	hadc: pointer to ADC_HandleTypeDef
+ * @retval val of ADC conversion
+ */
+float adcReadSingle(ADC_HandleTypeDef *hadc, uint32_t channel) {
+
+	ADC_ChannelConfTypeDef sConfig;
+	sConfig.Channel = channel;
+	sConfig.Rank = ADC_REGULAR_RANK_1;
+	sConfig.SamplingTime = ADC_SAMPLETIME_4CYCLES;
+	if (HAL_ADC_ConfigChannel(hadc, &sConfig) != HAL_OK) {
+		_Error_Handler(__FILE__, __LINE__);
+	}
+
+	HAL_ADC_Start(hadc);
+	HAL_ADC_PollForConversion(hadc, 100);
+	return adcToVoltage(hadc);
+}
+// adcToVoltage currently does not work
+// issues with float data type
+float adcToVoltage(ADC_HandleTypeDef *hadc) {
+	uint32_t val = HAL_ADC_GetValue(hadc);
+	return (float) (ADC_BITS_TO_VOLTAGE(val) * 1.0);
+}
+
