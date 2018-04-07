@@ -47,6 +47,7 @@
 #include "LTC2991/LTC2991.h"
 #include "UART_IRQ/UART_IRQ.h"
 #include "PRINTF/printf.h"
+#include "adc/adc.h"
 
 /* USER CODE END Includes */
 
@@ -179,14 +180,13 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
-
   for(;;){
 	  char lcdstring[50] = "";
 
 	  UART_printSOS(&huart3, 1);
 	  HAL_UART_Receive(&huart3, (uint8_t *)aRxBuffer, 10,0xFFFF );
 	  HAL_UART_Transmit(&huart3,  (uint8_t *)aRxBuffer, (uint16_t)sizeof(aRxBuffer), 0xFFFF);
-	  for(;;){
+
 			float f = 0.0024445;
 			char lcdstring[50] = "";
 //			sprintf(lcdstring, "Called write directly");
@@ -218,8 +218,6 @@ int main(void)
 //				UART_IRQ(&huart3, )
 
 //			}
-
-	  }
 
 /*******
 * JON START HERE
@@ -284,6 +282,7 @@ int main(void)
  	  /*******
  * JON END HERE
 */
+
   }
   /* USER CODE END 2 */
 
@@ -291,8 +290,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-  /* USER CODE END WHILE */
 	  /*******
 	   * JON START HERE
 	   */
@@ -307,9 +304,24 @@ int main(void)
 	  /*******
 	   * JON END HERE
 	  */
-  /* USER CODE BEGIN 3 */
-
   }
+  /* USER CODE END WHILE */
+
+  /* USER CODE BEGIN 3 */
+  for(;;){
+
+//	  HAL_ADC
+		HAL_ADC_Start(&hadc);
+		HAL_ADC_PollForConversion(&hadc, 100);
+		uint32_t val = HAL_ADC_GetValue(&hadc);
+		UNUSED(val);
+
+//		float val2 = adcToVoltage(&hadc);
+//		UNUSED(val2);
+		HAL_ADC_Stop(&hadc);
+//	  EN_Chrg_1_GPIO_Port
+  }
+  
   /* USER CODE END 3 */
 
 }

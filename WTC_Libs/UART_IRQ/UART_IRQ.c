@@ -7,6 +7,7 @@
 /**
   * @brief  This function is executed when waiting for a UART Interrupt
   * @param  time: the time the program runs.
+
   */
 	void UART_IRQ(UART_HandleTypeDef *huart, uint8_t time){
 
@@ -62,3 +63,4 @@
 			HAL_Delay(500);
 		}
 	}
+
