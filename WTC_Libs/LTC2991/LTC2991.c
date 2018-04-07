@@ -1,5 +1,4 @@
 #include "LTC2991.h"
-
 #define LTCrocks TRUE;
 
 // Calibration Variables
@@ -31,6 +30,43 @@ uint8_t CheckDevAddress(uint16_t DevAddress) {
 	}
 }
 
+/**
+ * @brief  ?
+ * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+ * @param  DevAddress ?
+ * @param  MemAddress ?
+ * @param  data2write ?
+ * @retval uint8_t ?
+ */
+
+/*
+
+LTC2991 *initLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,uint8_t *data2write) {
+	LTC2991 *myLTC = malloc(sizeof(LTC2991));
+	if (myLTC != NULL) {
+		myLTC->hi2c = hi2c;
+		myLTC->DevAddress = DevAddress;
+
+//		uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
+		myLTC->returnVal = WriteLTC(hi2c, DevAddress, 0x01, data2write);
+	}
+
+	return myLTC;
+}
+*/
+
+/*The LTC2991 is configured by writing the channel control
+registers through the serial interface. Refer to Tables 5, 6
+and 7 for control register bit definition.*/
+
+/**
+ * @brief  ?
+ * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+ * @param  DevAddress ?
+ * @param  MemAddress ?
+ * @param  data2write ?
+ * @retval uint8_t ?
+ */
 uint8_t WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 		uint16_t MemAddress, uint8_t *data2write) {
 
@@ -44,6 +80,7 @@ uint8_t WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 			//Invalid memory addresses to write to
 			return 0;
 		}
+
 		HAL_Delay(100);
 		//HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 		HAL_I2C_Mem_Write(hi2c, DevAddress, MemAddress, I2C_MEMADD_SIZE_8BIT,
@@ -61,6 +98,22 @@ uint8_t WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 	return 0;
 }
 
+/*
+uint8_t ReadLTC(LTC2991 ltc, int16_t StartMemAddress, uint8_t *pData01, uint16_t Size) {
+	ReadLTC(ltc->hi2c, ltc->DevAddress, pData01, Size);
+}
+
+*/
+
+/**
+ * @brief  ?
+ * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+ * @param  DevAddress ?
+ * @param  StartMemAddress ?
+ * @param  pData01 ?
+ * @param  Size ?
+ * @retval uint8_t ?
+ */
 uint8_t ReadLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 		uint16_t StartMemAddress, uint8_t *pData01, uint16_t Size) {
 
@@ -92,6 +145,11 @@ uint8_t ReadLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress,
 	return 0;
 }
 
+/**
+ * @brief  ?
+ * @param  ADC_Reg_Val ?
+ * @retval float ?
+ */
 float LTC2991_Vcc(uint16_t ADC_Reg_Val) {
 	float Vcc;
 	int16_t sign = 1;
@@ -104,6 +162,11 @@ float LTC2991_Vcc(uint16_t ADC_Reg_Val) {
 	return (Vcc);
 }
 
+/**
+ * @brief  ?
+ * @param  ADC_Reg_Val ?
+ * @retval float ?
+ */
 float LTC2991_IntTemp(uint16_t ADC_Reg_Val) {
 	float IntTemp;
 	ADC_Reg_Val = (ADC_Reg_Val & 0x1FFF);            //! 1) Removes first 3 bits
@@ -116,9 +179,19 @@ float LTC2991_IntTemp(uint16_t ADC_Reg_Val) {
 	return (IntTemp);
 }
 
+/**
+ * @brief  ?
+ * @param  ADC_Reg_Val ?
+ * @retval float ?
+ */
 float LTC2991_Single_Ended_Voltage(uint16_t ADC_Reg_Val) {
 	float voltage;
 	int16_t sign = 1;
+
+	// check table 9 of LTC2991 datasheet
+	// d0 -d13 are used.
+	// the remaining bits (sign and DV*) are not used
+
 	if (ADC_Reg_Val >> 14) {
 		ADC_Reg_Val = (ADC_Reg_Val ^ 0x7FFF) + 1; //! 1) Converts two's complement to binary
 		sign = -1;
@@ -129,6 +202,11 @@ float LTC2991_Single_Ended_Voltage(uint16_t ADC_Reg_Val) {
 	return (voltage);
 }
 
+/**
+ * @brief  ?
+ * @param  ADC_Reg_Val ?
+ * @retval float ?
+ */
 float LTC2991_Diode_Voltage(uint16_t ADC_Reg_Val) {
 	float voltage;
 	ADC_Reg_Val = (ADC_Reg_Val & 0x1FFF);            //! 1) Removes first 3 bits

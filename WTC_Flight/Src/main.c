@@ -37,7 +37,6 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
 #include "stm32l1xx_hal.h"
 
 /* USER CODE BEGIN Includes */
@@ -49,6 +48,7 @@
 #include "UART_IRQ/UART_IRQ.h"
 #include "PRINTF/printf.h"
 #include "adc/adc.h"
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -73,8 +73,8 @@ static void MX_UART4_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C2_Init(void);
-static void MX_USART3_UART_Init(void);
 static void MX_ADC_Init(void);
+static void MX_USART3_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -82,6 +82,60 @@ static void MX_ADC_Init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+#pragma GCC push_options
+#pragma GCC optimize ("O3")
+void delayUS_DWT(uint32_t us) {
+//	volatile uint32_t cycles = (SystemCoreClock/1000000L)*us;
+//	volatile uint32_t start = DWT->CYCCNT;
+//	do  {
+//	} while(DWT->CYCCNT - start < cycles);
+}
+#pragma GCC pop_options
+
+void dprint(char* str) {
+	int len = strlen(str), i;
+	for(i=0;i<len;i++){
+		ITM_SendChar((uint32_t) str[i]);
+		delayUS_DWT(100);
+	}
+}
+//
+//void dprintf(char* str, const char *fmt, ...) {
+//	int len = strlen(str);
+//
+//	char lcdstring[50] = "";
+//	sprintf(lcdstring, "Called write directly");
+//	printf(lcdstring);
+//
+//	ITM_SendChar('-');
+//}
+uint8_t aRxBuffer[20];
+
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	/* Turn LED2 on: Transfer in reception process is correct */
+	HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi2_Pin, GPIO_PIN_SET);
+}
+
+///**
+//  * @brief Rx Transfer completed callbacks
+//  * @param huart: uart handle
+//  * @retval None
+//  */
+////HAL_UART_TxCpltCallback
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+//{
+//  /* Prevent unused argument(s) compilation warning */
+//  UNUSED(huart);
+//
+//  /* NOTE : This function should not be modified, when the callback is needed,
+//            the HAL_UART_RxCpltCallback can be implemented in the user file
+//   */
+//    HAL_UART_Transmit(huart, (uint8_t *)aRxBuffer, 10, 0xFFFF);
+//}
+
+
 
 /* USER CODE END 0 */
 
@@ -101,13 +155,11 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  HAL_StatusTypeDef var = HAL_Init();
-  if(var  == HAL_ERROR){
+
+  HAL_StatusTypeDef hal = HAL_Init();
+  if(hal  == HAL_ERROR){
 
   }
-  //WriteLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *data2write)
-//  uint8_t data2write = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
-//  WriteLTC(&hi2c1, 0x90, 0x01, &data2write);
 
   /* USER CODE END Init */
 
@@ -124,10 +176,138 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_I2C2_Init();
-  MX_USART3_UART_Init();
   MX_ADC_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  for(;;){
+	  char lcdstring[50] = "";
+
+	  UART_printSOS(&huart3, 1);
+	  HAL_UART_Receive(&huart3, (uint8_t *)aRxBuffer, 10,0xFFFF );
+	  HAL_UART_Transmit(&huart3,  (uint8_t *)aRxBuffer, (uint16_t)sizeof(aRxBuffer), 0xFFFF);
+
+			float f = 0.0024445;
+			char lcdstring[50] = "";
+//			sprintf(lcdstring, "Called write directly");
+			sprintf(lcdstring, "Val: %f", f);
+			HAL_UART_Transmit(&huart3,  (uint8_t *)lcdstring, (uint16_t)sizeof(lcdstring), 0xFFFF);
+//		  printf(lcdstring);
+		  dprint(lcdstring);
+		  ITM_SendChar('-');
+			//		  write(0, lcdstring, strlen(lcdstring));
+			int i;
+//			GPIO_Init(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin);
+//			// turn pins 6 and 7 on
+//			GPIO_SetBits(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin | Pwr_En_Pi2_Pin);
+
+			// loop forever
+//			for (;;) {
+				// toggle pins 6 and 7
+				HAL_GPIO_TogglePin(Pwr_En_Pi1_GPIO_Port,
+						Pwr_En_Pi1_Pin );
+				// waste time
+//				for (i = 0; i < 25000; i++)
+//					;
+				HAL_Delay(500);
+//				HAL_UART_Transmit(&huart3,  (uint8_t *)lcdstring, (uint16_t)sizeof(lcdstring), 0xFFFF);
+//				UART_printSOS(&huart3, 1);
+//				HAL_UART_Transmit_IT(&huart3, (uint8_t *)lcdstring, (uint16_t)sizeof(lcdstring));
+				HAL_Delay(500);
+//				HAL_UART_IRQHandler(&huart3,1);
+//				UART_IRQ(&huart3, )
+
+//			}
+
+/*******
+* JON START HERE
+*/
+
+	  //initalize LTC2991 IC to allow all read accesss for all voltage pins
+	  //uint8_t command = 0xF8; //Enable reading all voltages V1-V8 & enable internal Temperature and Vcc
+	  //uint8_t command = 0x08;// temp & vcc enable
+	  // WriteLTC(&hi2c2, 0x90, 0x01, &command);
+
+//	  uint8_t command = 0x10;// enable V1
+//	  WriteLTC(&hi2c2, 0x90, 0x01, &command);
+//	  // set array of 2 (MSB & LSB) to store V1 data
+//
+// 	  uint8_t Size = 2;
+// 	  uint8_t ReadData[Size];
+//
+// 	  // i2c LTC2991 0'0'0' voltage pin 1, return data to readData pointer
+// 	  HAL_I2C_Mem_Read(&hi2c2, 0x90, 0x0A, I2C_MEMADD_SIZE_16BIT, ReadData, Size, 1000);
+//
+// 	  // shift MSB over to first 15-8 bits (byte 1) of 'data'
+// 	  // add LSB to 7-0 (byte 0) of 'data'
+// 	  uint16_t data = (ReadData[0]<<8) | ReadData[1];
+
+	  uint8_t command = 0xF8;// enable V1
+	  WriteLTC(&hi2c2, 0x90, 0x01, &command);
+ 	  //ReadLTC(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t StartMemAddress, uint8_t *pData01, uint16_t Size)
+ 	  uint8_t Size = 16;
+ 	  uint8_t ReadData[Size];
+ 	  ReadLTC(&hi2c2, 0x90, 0x0A, ReadData, Size); //Read all 8 voltages V1 to V8 (16 bytes total, on device 0x90) and stores in ReadData
+
+ 	  //float V1 = (ReadData[0]<<8)+ReadData[1]; //V1 voltage
+ 	  float V1 = LTC2991_Single_Ended_Voltage(((ReadData[0]<<8)+ReadData[1]));
+
+ 	  Size = 4;
+ 	  uint8_t ReadIntData[Size];
+ 	  ReadLTC(&hi2c2, 0x90, 0x1A, ReadIntData, Size); //Read all Internal Temperature and Vcc (4 bytes total, on device 0x90) and stores in ReadIntData
+
+ 	  uint16_t IntTempReg = (ReadIntData[0]<<8)+ReadIntData[1];
+ 	  uint16_t VccReg = (ReadIntData[2]<<8)+ReadIntData[3];
+ 	  float Tint, Vcc;
+ 	  Tint = LTC2991_IntTemp(IntTempReg);
+ 	  Vcc = LTC2991_Vcc(VccReg);
+
+
+ 	  // VOLTAGE REGISTER FORMAT
+ 	  //MSB
+ 	  //[DV][SIGN][D13][D12][D11][D10][D9][D8]
+ 	  //LSB
+ 	  //[D7][D6][D5][D4][D3][D2][D1][D0]
+ 	  //float result = LTC2991_Single_Ended_Voltage(data);
+
+ 	  // TEMPERATURE REGISTER FORMAT
+ 	  //MSB
+ 	  //[DV][X][X][D12][D11][D10][D9][D8]
+ 	  //LSB
+ 	  //[D7][D6][D5][D4][D3][D2][D1][D0]
+
+
+ 	  //float result = LTC2991_Single_Ended_Voltage(data);
+ 	  free(ReadData);
+ 	  /*******
+ * JON END HERE
+*/
+
+  }
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+	  /*******
+	   * JON START HERE
+	   */
+
+	  	  if(HAL_FLASHEx_DATAEEPROM_Unlock()==HAL_OK) // Remember to unlock the EEPROM before using
+	  	  {
+	  //		  HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD,0x08080000,555); //Write: Type, Address, Data
+	  		  uint32_t data_in = *(uint32_t *)0x08080000;	//Read: Cast the address as a uint32_t pointer and dereference it
+	  		  HAL_FLASHEx_DATAEEPROM_Lock();	//Lock when done? (Not sure if necessary)
+	  	  }
+
+	  /*******
+	   * JON END HERE
+	  */
+  }
+  /* USER CODE END WHILE */
+
+  /* USER CODE BEGIN 3 */
   for(;;){
 
 //	  HAL_ADC
@@ -141,18 +321,7 @@ int main(void)
 		HAL_ADC_Stop(&hadc);
 //	  EN_Chrg_1_GPIO_Port
   }
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-
-  /* USER CODE END WHILE */
-
-  /* USER CODE BEGIN 3 */
-
-  }
+  
   /* USER CODE END 3 */
 
 }
@@ -285,6 +454,7 @@ static void MX_UART4_Init(void)
   huart4.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart4) != HAL_OK)
   {
+
     _Error_Handler(__FILE__, __LINE__);
   }
 
@@ -333,15 +503,17 @@ static void MX_USART3_UART_Init(void)
 {
 
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
+  huart3.Init.BaudRate = 9600;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;
   huart3.Init.Mode = UART_MODE_TX_RX;
   huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+
   if (HAL_UART_Init(&huart3) != HAL_OK)
   {
+	HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi2_Pin, GPIO_PIN_SET);
     _Error_Handler(__FILE__, __LINE__);
   }
 
