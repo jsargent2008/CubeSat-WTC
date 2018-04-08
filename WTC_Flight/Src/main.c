@@ -206,7 +206,7 @@ int main(void) {
 
 			// get pin
 			getS(aRxBuffer, 2);
-			pin = aRxBuffer[0];
+			pin = atoi(aRxBuffer[0]);
 			if(0 <= pin && pin <= 15){
 				pin = 1 << pin;
 			} else if(pin == 16) {
