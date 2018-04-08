@@ -14,7 +14,11 @@ float LTC2991_IntTemp(uint16_t ADC_Reg_Val);
 float LTC2991_Single_Ended_Voltage(uint16_t ADC_Reg_Val);
 float LTC2991_Diode_Voltage(uint16_t ADC_Reg_Val);
 
-#define startAllChannels = 0xf8;
+
+// use for "data2write" pointer in function writeLTC. 1111-1000 sets all V1-V8 pins ready to read. VCC and internal temp.
+// see LTC2991 datasheet
+#define startAllChannels = 0xf8; //
+
 
 
 typedef struct LTC2991 {
@@ -24,3 +28,25 @@ typedef struct LTC2991 {
 } LTC2991;
 
 #endif
+
+
+//NOTES:
+
+//***
+// the argument "size" should account for the MSB and LSB. when reading V1, size should be 2.
+
+
+//***
+// VOLTAGE REGISTER FORMAT
+//MSB
+//[DV][SIGN][D13][D12][D11][D10][D9][D8]
+//LSB
+//[D7][D6][D5][D4][D3][D2][D1][D0]
+//float result = LTC2991_Single_Ended_Voltage(data);
+
+// TEMPERATURE REGISTER FORMAT
+//MSB
+//[DV][X][X][D12][D11][D10][D9][D8]
+//LSB
+//[D7][D6][D5][D4][D3][D2][D1][D0]
+
