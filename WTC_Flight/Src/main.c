@@ -46,6 +46,7 @@
 #include <math.h>
 #include "LTC2991/LTC2991.h"
 #include "UART_IRQ/UART_IRQ.h"
+#include "command/command.h"
 #include "PRINTF/printf.h"
 #include "adc/adc.h"
 
@@ -83,18 +84,19 @@ static void MX_USART3_UART_Init(void);
 
 /* USER CODE BEGIN 0 */
 int fgetc(FILE *f) {
-  char ch;
-  while (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_RXNE) == RESET);
-  HAL_UART_Receive(&huart3, (uint8_t*)&ch, 1, 0xFFFF);
-  return ch;
+	char ch;
+	while (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_RXNE) == RESET)
+		;
+	HAL_UART_Receive(&huart3, (uint8_t*) &ch, 1, 0xFFFF);
+	return ch;
 }
 
 size_t __read(int Handle, unsigned char * buf, size_t count) {
-	while (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_RXNE) == RESET);
+	while (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_RXNE) == RESET)
+		;
 	HAL_UART_Receive(&huart3, (uint8_t *) buf, count, 0xFFFF);
 	return count;
 }
-
 
 //"compiler optimization stuff" - clayton
 //"i didn't write it though" - also clayton
@@ -192,212 +194,61 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 		//tx "Waiting for command..."
 		char *prompt = mallocCharArray(sizeof(message));
-		strcpy(prompt,(char*)message);
-		putS(&huart3,prompt);
+		strcpy(prompt, (char*) message);
+		putS(&huart3, prompt);
 		free(prompt);
 
 		// print "cmdXX:""
 		prompt = mallocCharArray(20);
-		prompt[0] = 'c';prompt[1] = 'm';prompt[2] = 'd';
-		prompt[3]= (digit+48); prompt[4]= (index%10+48);prompt[5] = ':';
+		prompt[0] = 'c';
+		prompt[1] = 'm';
+		prompt[2] = 'd';
+		prompt[3] = (digit + 48);
+		prompt[4] = (index % 10 + 48);
+		prompt[5] = ':';
 
 		//noticed that using a new string would prevent the rxbuffer
 		// from being altered by the strcmp function.
 		// next; check why strcmp affacts the input string (rxbuffer).
 		uint8_t tempBuff[20] = "";
-		strcpy((char *)tempBuff,(char *)prompt);
+		strcpy((char *) tempBuff, (char *) prompt);
 
 		//tx "cmdXX:"
-		putS(&huart3,prompt);
+		putS(&huart3, prompt);
 		free(prompt);
 
-		 //		read in two character command
-		 getS(&huart3,aRxBuffer, 2);
+		//		read in two character command
+		getS(&huart3, aRxBuffer, 2);
 
-//		digital write
-		if (strcmp((char *) aRxBuffer, "dw") == 0) {
-			putS(&huart3,"dw");
-			uint8_t flag = 0;
-			GPIO_TypeDef* port;
-			uint16_t pin;
-			GPIO_PinState state;
-
-			// get port X
-			getS(&huart3,aRxBuffer, 1);
-			switch(aRxBuffer[0]){
-			case 'a':
-				port = GPIOA;
-				break;
-			case 'b':
-				port = GPIOB;
-				break;
-			case 'c':
-				port = GPIOC;
-				break;
-			case 'd':
-				port = GPIOD;
-				break;
-			default:
-				//putS(&huart3,"f1");
-				//putS(&huart3,"invalid port");
-				flag = 1;
-				break;//continue
-			}
-
-			//TX received string.
-			putS(&huart3,aRxBuffer);
-
-			// get pin XX
-			getS(&huart3,aRxBuffer, 2);
-
-			if(flag == 0)
-			{
-				pin = atoi(aRxBuffer[0]);
-				if(0 <= pin && pin <= 15){
-					pin = 1 << pin;
-				} else if(pin == 16) {
-					pin = GPIO_PIN_All;
-				} else {
-					//putS(&huart3,"f2");
-					//putS(&huart3,"invalid pin");
-					flag = 2;
-					//continue;
-				}
-			}
-
-			//TX received string.
-			putS(&huart3,aRxBuffer);
-			// get state, 1 or 0 X
-			getS(&huart3,aRxBuffer, 1);
-			if(flag == 0)
-			{
-				state = aRxBuffer[0];
-				if(state == '1'){
-					state = GPIO_PIN_SET;
-				} else if(state == '0'){
-					state = GPIO_PIN_RESET;
-				} else {
-					//putS(&huart3,"f3");
-					//putS(&huart3,"invalid state");
-					flag = 3;
-					//continue;
-				}
-			}
-
-			//TX received string.
-			putS(&huart3,aRxBuffer);
-
-			// size of return string should be consistent for every return
-			// for easy script writing
-			// ex. size of 5
-			prompt = mallocCharArray(5);
-			prompt[0] = ':';
-			if(flag == 0)
-			{
-				writeDPin(port, pin, state);
-				// print "ok" or ":)"
-				prompt[1] = 'o';prompt[2] = 'k';prompt[3] = '\n';prompt[4] = '\r';
-			}
-			else
-			{
-				//else --> print flags what was caught above.
-				prompt[1] = 'f';prompt[2] = (flag+48);prompt[3] = '\n';prompt[4] = '\r';
-			}
-
-			putS(&huart3,prompt);
-			free(prompt);
-		}
-
-//			digital read
+		if (strcmp((char *) aRxBuffer, "dw") == 0)
+			dw(&huart3);
 		else if (strcmp((char *) aRxBuffer, "dr") == 0)
-		{
-			putS(&huart3,"dr");
-			int flag = 0;
-			GPIO_TypeDef* port;
-			uint16_t pin;
-			GPIO_PinState state;
-
-			// get port
-			getS(&huart3,aRxBuffer, 1);
-			switch(aRxBuffer[0]){
-			case 'a':
-				port = GPIOA;
-				break;
-			case 'b':
-				port = GPIOB;
-				break;
-			case 'c':
-				port = GPIOC;
-				break;
-			case 'd':
-				port = GPIOD;
-				break;
-			default:
-				putS(&huart3,"f1");
-				//putS(&huart3,"invalid port");
-				flag = 1;
-				break;//continue;
-			}
-
-			// get pin
-			getS(&huart3,aRxBuffer, 2);
-			if(flag == 0)
-			{
-				pin = atoi(aRxBuffer[0]);
-				if(0 <= pin && pin <= 15){
-					pin = 1 << pin;
-				} else if(pin == 16) {
-					pin = GPIO_PIN_All;
-				} else {
-					putS(&huart3,"f2");
-					//putS(&huart3,"invalid pin");
-					flag = 2;
-					break;//continue;
-				}
-			}
-			// get state, 1 or 0
-			getS(&huart3,aRxBuffer, 1);
-			if(flag == 0)
-			{
-				state = aRxBuffer[0];
-				if(state == '1'){
-					state = GPIO_PIN_SET;
-				} else if(state == '0'){
-					state = GPIO_PIN_RESET;
-				} else {
-					putS(&huart3,"f3");
-					//putS(&huart3,"invalid state");
-					flag = 3;
-					break;//continue;
-				}
-			}
-
-		}
-//			analog write
+			dr(&huart3);
 		else if (strcmp((char *) aRxBuffer, "aw") == 0)
-		{
-			putS(&huart3,"aw");
-			putS(&huart3,"f0");//putS(&huart3,"not implemented");
-
-		}
-//			analog read
+			aw(&huart3);
 		else if (strcmp((char *) aRxBuffer, "ar") == 0)
+			ar(&huart3);
+		else
 		{
-			putS(&huart3,"ar");
-			float f = 0.0024445;
-			sprintf(lcdstring, "Val: %f", f);
-			HAL_UART_Transmit(&huart3, (uint8_t *) lcdstring, (uint16_t) sizeof(lcdstring), 0xFFFF);
+			prompt = mallocCharArray(4);
+			prompt[0] = (char) '?';
+			prompt[1] = (char) '?';
+			prompt[2] = (char) '\n';
+			prompt[3] = (char) '\r';
+			putS(&huart3, prompt);
+			free(prompt);
 		}
 
 		//print new line
 		prompt = mallocCharArray(2);
-		prompt[0] = (char)'\n';prompt[1] = (char)'\r';
-		putS(&huart3,prompt);
+		prompt[0] = (char) '\n';
+		prompt[1] = (char) '\r';
+		putS(&huart3, prompt);
 		free(prompt);
 
 		//increment main forloop index, numbering of command sent.
 		index++;
-		if(index%10 == 0)
+		if (index % 10 == 0)
 			digit++;
 	}
 	/* USER CODE END 2 */
@@ -412,8 +263,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		if (HAL_FLASHEx_DATAEEPROM_Unlock() == HAL_OK) // Remember to unlock the EEPROM before using
 				{
 			//		  HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD,0x08080000,555); //Write: Type, Address, Data
-			uint32_t data_in = *(uint32_t *) 0x08080000;//Read: Cast the address as a uint32_t pointer and dereference it
-			HAL_FLASHEx_DATAEEPROM_Lock();//Lock when done? (Not sure if necessary)
+			uint32_t data_in = *(uint32_t *) 0x08080000; //Read: Cast the address as a uint32_t pointer and dereference it
+			HAL_FLASHEx_DATAEEPROM_Lock(); //Lock when done? (Not sure if necessary)
 		}
 
 		/*******
@@ -469,8 +320,8 @@ void SystemClock_Config(void) {
 
 	/**Initializes the CPU, AHB and APB busses clocks
 	 */
-	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
-			| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1
+			| RCC_CLOCKTYPE_PCLK2;
 	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
@@ -643,37 +494,32 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOE,
-			EN_Chrg_1_Pin | Reset_C6_Pin | Reset_C6E5_Pin
-					| RF_Deck_Power_Enable_Pin | UHF_Deploy_2_Pin
-					| UHF_Deploy_1_Pin | Kill_Switch_1_Pin | Kill_Switch_2_Pin
+			EN_Chrg_1_Pin | Reset_C6_Pin | Reset_C6E5_Pin | RF_Deck_Power_Enable_Pin
+					| UHF_Deploy_2_Pin | UHF_Deploy_1_Pin | Kill_Switch_1_Pin | Kill_Switch_2_Pin
 					| EN_MPPT_YZ_E1_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOD,
-			Pwr_En_Pi1_Pin | WTC_BUS_Switch_Pi_Select_Pin | _70cm_Primary_TR_Pin
-					| EN_MPPT_Z__Pin | EN_MPPT_YZ__Pin | EN_MPPT_YCtr_Pin,
-			GPIO_PIN_RESET);
+			Pwr_En_Pi1_Pin | WTC_BUS_Switch_Pi_Select_Pin | _70cm_Primary_TR_Pin | EN_MPPT_Z__Pin
+					| EN_MPPT_YZ__Pin | EN_MPPT_YCtr_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOC,
-			_12V_1_Enable_Pin | _12V_2_Enable_Pin | _70cm_Primary_Enable_Pin,
-			GPIO_PIN_RESET);
+	_12V_1_Enable_Pin | _12V_2_Enable_Pin | _70cm_Primary_Enable_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOA, _5V_Rail_1_Enable_Pin | _70cm_Primary_Select_Pin,
-			GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, _5V_Rail_1_Enable_Pin | _70cm_Primary_Select_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOB,
-			EN_MPPT_XZ__Pin | EN_MPPT_XCtr_Pin | EN_MPPT_XZ_Pin
-					| EN_NTC_Drive_Pin, GPIO_PIN_RESET);
+	EN_MPPT_XZ__Pin | EN_MPPT_XCtr_Pin | EN_MPPT_XZ_Pin | EN_NTC_Drive_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pins : EN_Chrg_1_Pin Reset_C6_Pin Reset_C6E5_Pin RF_Deck_Power_Enable_Pin
 	 UHF_Deploy_2_Pin UHF_Deploy_1_Pin Kill_Switch_1_Pin Kill_Switch_2_Pin
 	 EN_MPPT_YZ_E1_Pin */
-	GPIO_InitStruct.Pin = EN_Chrg_1_Pin | Reset_C6_Pin | Reset_C6E5_Pin
-			| RF_Deck_Power_Enable_Pin | UHF_Deploy_2_Pin | UHF_Deploy_1_Pin
-			| Kill_Switch_1_Pin | Kill_Switch_2_Pin | EN_MPPT_YZ_E1_Pin;
+	GPIO_InitStruct.Pin = EN_Chrg_1_Pin | Reset_C6_Pin | Reset_C6E5_Pin | RF_Deck_Power_Enable_Pin
+			| UHF_Deploy_2_Pin | UHF_Deploy_1_Pin | Kill_Switch_1_Pin | Kill_Switch_2_Pin
+			| EN_MPPT_YZ_E1_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -693,24 +539,21 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pins : Pwr_En_Pi1_Pin WTC_BUS_Switch_Pi_Select_Pin _70cm_Primary_TR_Pin EN_MPPT_Z__Pin
 	 EN_MPPT_YZ__Pin EN_MPPT_YCtr_Pin */
-	GPIO_InitStruct.Pin = Pwr_En_Pi1_Pin | WTC_BUS_Switch_Pi_Select_Pin
-			| _70cm_Primary_TR_Pin | EN_MPPT_Z__Pin | EN_MPPT_YZ__Pin
-			| EN_MPPT_YCtr_Pin;
+	GPIO_InitStruct.Pin = Pwr_En_Pi1_Pin | WTC_BUS_Switch_Pi_Select_Pin | _70cm_Primary_TR_Pin
+			| EN_MPPT_Z__Pin | EN_MPPT_YZ__Pin | EN_MPPT_YCtr_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : Pwr_En_Pi2_Pin Pi_Heartbeat_Pi2_Pin Pi_Heartbeat_Pi1_Pin */
-	GPIO_InitStruct.Pin = Pwr_En_Pi2_Pin | Pi_Heartbeat_Pi2_Pin
-			| Pi_Heartbeat_Pi1_Pin;
+	GPIO_InitStruct.Pin = Pwr_En_Pi2_Pin | Pi_Heartbeat_Pi2_Pin | Pi_Heartbeat_Pi1_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : _12V_1_Enable_Pin _12V_2_Enable_Pin _70cm_Primary_Enable_Pin */
-	GPIO_InitStruct.Pin = _12V_1_Enable_Pin | _12V_2_Enable_Pin
-			| _70cm_Primary_Enable_Pin;
+	GPIO_InitStruct.Pin = _12V_1_Enable_Pin | _12V_2_Enable_Pin | _70cm_Primary_Enable_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -724,8 +567,7 @@ static void MX_GPIO_Init(void) {
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : EN_MPPT_XZ__Pin EN_MPPT_XCtr_Pin EN_MPPT_XZ_Pin EN_NTC_Drive_Pin */
-	GPIO_InitStruct.Pin = EN_MPPT_XZ__Pin | EN_MPPT_XCtr_Pin | EN_MPPT_XZ_Pin
-			| EN_NTC_Drive_Pin;
+	GPIO_InitStruct.Pin = EN_MPPT_XZ__Pin | EN_MPPT_XCtr_Pin | EN_MPPT_XZ_Pin | EN_NTC_Drive_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
