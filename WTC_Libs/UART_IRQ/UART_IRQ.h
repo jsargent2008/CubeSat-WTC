@@ -7,5 +7,14 @@
 
 void UART_IRQ(UART_HandleTypeDef *huart, uint8_t time);
 void UART_printSOS(UART_HandleTypeDef *huart, uint32_t time);
+void UART_PUT(UART_HandleTypeDef *huart, char *str);
 
+void putS(UART_HandleTypeDef *huart, char* buf);
+void getS(UART_HandleTypeDef *huart, uint8_t * buf, uint8_t len);
+
+// char array stuff, useful as supplementary functiosn for
+// the uart functions above ^^^
+char* mallocCharArray(uint32_t size);
+char* appendCharArrays(char* dest, char* src, uint32_t index);
+uint32_t arraylength(char* array);
 #endif

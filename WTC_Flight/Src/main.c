@@ -110,28 +110,42 @@ void dprint(char* str) {
 	}
 }
 
-uint8_t aRxBuffer[20];
+//uint8_t aRxBuffer[20];
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	/* Turn LED2 on: Transfer in reception process is correct */
 	HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi2_Pin, GPIO_PIN_SET);
 }
 
-void getS(uint8_t * buf, uint8_t len){
-	HAL_UART_Receive(&huart3, (uint8_t *) buf, len+1, 0xFFFF);
-	buf[strlen(buf)-1] = '\0';
-}
-void putS(void* buf) {
-	HAL_UART_Transmit(&huart3, (uint8_t *) buf, (uint16_t) sizeof(buf), 0xFFFF);
-}
+//void getS(&huart3,uint8_t * buf, uint8_t len){
+//	//HAL_UART_Receive(&huart3, (uint8_t *) buf, len, 0xFFFF);
+//	//buf[strlen(buf)] = '\0';
+//	HAL_UART_Receive(&huart3, (uint8_t *) buf, len+1, 0xFFFF);
+//	buf[strlen(buf)-1] = '\0';
+//}
+//
+//
+//void putS(&huart3,char* buf) {
+//
+//	uint8_t size = 0;
+//
+//	while(buf[size] != 0)
+//		size++;
+//
+//	//
+//	// sizeof DOESNT NOT WORK!!!!!!!!!
+//	// HAL_UART_Transmit(&huart3, (uint8_t *) buf, (uint16_t) sizeof(buf), 0xFFFF);
+//	HAL_UART_Transmit(&huart3, (uint8_t *) buf, (uint16_t) size, 0xFFFF);
+//
+//}
+
 /* USER CODE END 0 */
 
 /**
  * @brief  The application entry point.
  *
  * @retval None
- */
-int main(void) {
+ */int main(void) {
 	/* USER CODE BEGIN 1 */
 
 	/* USER CODE END 1 */
@@ -168,24 +182,48 @@ int main(void) {
 	/* USER CODE BEGIN 2 */
 	char lcdstring[50] = "";
 
+	//used for "cmdXX" string
+	uint8_t index = 0;
+	uint8_t digit = 0;
+	char *message = "Waiting for command...\n\r";
+
 	for (;;) {
+		uint8_t aRxBuffer[20] = "";
 
-		UART_printSOS(&huart3, 1);
-//		scanf("%2s", (char *) &aRxBuffer);
-//		HAL_UART_Receive(&huart3, (uint8_t *) aRxBuffer, 2, 0xFFFF);
+		//tx "Waiting for command..."
+		char *prompt = mallocCharArray(sizeof(message));
+		strcpy(prompt,(char*)message);
+		putS(&huart3,prompt);
+		free(prompt);
 
-//		read in two character command
-		getS(aRxBuffer, 2);
-//		HAL_UART_Transmit(&huart3, (uint8_t *) aRxBuffer, (uint16_t) sizeof(aRxBuffer), 0xFFFF);
+		// print "cmdXX:""
+		prompt = mallocCharArray(20);
+		prompt[0] = 'c';prompt[1] = 'm';prompt[2] = 'd';
+		prompt[3]= (digit+48); prompt[4]= (index%10+48);prompt[5] = ':';
+
+		//noticed that using a new string would prevent the rxbuffer
+		// from being altered by the strcmp function.
+		// next; check why strcmp affacts the input string (rxbuffer).
+		uint8_t tempBuff[20] = "";
+		strcpy((char *)tempBuff,(char *)prompt);
+
+		//tx "cmdXX:"
+		putS(&huart3,prompt);
+		free(prompt);
+
+		 //		read in two character command
+		 getS(&huart3,aRxBuffer, 2);
 
 //		digital write
 		if (strcmp((char *) aRxBuffer, "dw") == 0) {
+			putS(&huart3,"dw");
+			uint8_t flag = 0;
 			GPIO_TypeDef* port;
 			uint16_t pin;
 			GPIO_PinState state;
 
-			// get port
-			getS(aRxBuffer, 1);
+			// get port X
+			getS(&huart3,aRxBuffer, 1);
 			switch(aRxBuffer[0]){
 			case 'a':
 				port = GPIOA;
@@ -200,68 +238,167 @@ int main(void) {
 				port = GPIOD;
 				break;
 			default:
-				putS("invalid port");
-				continue;
+				//putS(&huart3,"f1");
+				//putS(&huart3,"invalid port");
+				flag = 1;
+				break;//continue
+			}
+
+			//TX received string.
+			putS(&huart3,aRxBuffer);
+
+			// get pin XX
+			getS(&huart3,aRxBuffer, 2);
+
+			if(flag == 0)
+			{
+				pin = atoi(aRxBuffer[0]);
+				if(0 <= pin && pin <= 15){
+					pin = 1 << pin;
+				} else if(pin == 16) {
+					pin = GPIO_PIN_All;
+				} else {
+					//putS(&huart3,"f2");
+					//putS(&huart3,"invalid pin");
+					flag = 2;
+					//continue;
+				}
+			}
+
+			//TX received string.
+			putS(&huart3,aRxBuffer);
+			// get state, 1 or 0 X
+			getS(&huart3,aRxBuffer, 1);
+			if(flag == 0)
+			{
+				state = aRxBuffer[0];
+				if(state == '1'){
+					state = GPIO_PIN_SET;
+				} else if(state == '0'){
+					state = GPIO_PIN_RESET;
+				} else {
+					//putS(&huart3,"f3");
+					//putS(&huart3,"invalid state");
+					flag = 3;
+					//continue;
+				}
+			}
+
+			//TX received string.
+			putS(&huart3,aRxBuffer);
+
+			// size of return string should be consistent for every return
+			// for easy script writing
+			// ex. size of 5
+			prompt = mallocCharArray(5);
+			prompt[0] = ':';
+			if(flag == 0)
+			{
+				writeDPin(port, pin, state);
+				// print "ok" or ":)"
+				prompt[1] = 'o';prompt[2] = 'k';prompt[3] = '\n';prompt[4] = '\r';
+			}
+			else
+			{
+				//else --> print flags what was caught above.
+				prompt[1] = 'f';prompt[2] = (flag+48);prompt[3] = '\n';prompt[4] = '\r';
+			}
+
+			putS(&huart3,prompt);
+			free(prompt);
+		}
+
+//			digital read
+		else if (strcmp((char *) aRxBuffer, "dr") == 0)
+		{
+			putS(&huart3,"dr");
+			int flag = 0;
+			GPIO_TypeDef* port;
+			uint16_t pin;
+			GPIO_PinState state;
+
+			// get port
+			getS(&huart3,aRxBuffer, 1);
+			switch(aRxBuffer[0]){
+			case 'a':
+				port = GPIOA;
+				break;
+			case 'b':
+				port = GPIOB;
+				break;
+			case 'c':
+				port = GPIOC;
+				break;
+			case 'd':
+				port = GPIOD;
+				break;
+			default:
+				putS(&huart3,"f1");
+				//putS(&huart3,"invalid port");
+				flag = 1;
+				break;//continue;
 			}
 
 			// get pin
-			getS(aRxBuffer, 2);
-			pin = atoi(aRxBuffer[0]);
-			if(0 <= pin && pin <= 15){
-				pin = 1 << pin;
-			} else if(pin == 16) {
-				pin = GPIO_PIN_All;
-			} else {
-				putS("invalid pin");
-				continue;
+			getS(&huart3,aRxBuffer, 2);
+			if(flag == 0)
+			{
+				pin = atoi(aRxBuffer[0]);
+				if(0 <= pin && pin <= 15){
+					pin = 1 << pin;
+				} else if(pin == 16) {
+					pin = GPIO_PIN_All;
+				} else {
+					putS(&huart3,"f2");
+					//putS(&huart3,"invalid pin");
+					flag = 2;
+					break;//continue;
+				}
 			}
-
 			// get state, 1 or 0
-			getS(aRxBuffer, 1);
-			state = aRxBuffer[0];
-			if(state == '1'){
-				state = GPIO_PIN_SET;
-			} else if(state == '0'){
-				state = GPIO_PIN_RESET;
-			} else {
-				putS("invalid state");
-				continue;
+			getS(&huart3,aRxBuffer, 1);
+			if(flag == 0)
+			{
+				state = aRxBuffer[0];
+				if(state == '1'){
+					state = GPIO_PIN_SET;
+				} else if(state == '0'){
+					state = GPIO_PIN_RESET;
+				} else {
+					putS(&huart3,"f3");
+					//putS(&huart3,"invalid state");
+					flag = 3;
+					break;//continue;
+				}
 			}
 
-			writeDPin(port, pin, state);
-//			digital read
-		} else if (strcmp((char *) aRxBuffer, "dw") == 0) {
-
+		}
 //			analog write
-		} else if (strcmp((char *) aRxBuffer, "aw") == 0) {
-			putS("not implemented");
+		else if (strcmp((char *) aRxBuffer, "aw") == 0)
+		{
+			putS(&huart3,"aw");
+			putS(&huart3,"f0");//putS(&huart3,"not implemented");
+
+		}
 //			analog read
-		} else if (strcmp((char *) aRxBuffer, "ar") == 0) {
+		else if (strcmp((char *) aRxBuffer, "ar") == 0)
+		{
+			putS(&huart3,"ar");
 			float f = 0.0024445;
 			sprintf(lcdstring, "Val: %f", f);
 			HAL_UART_Transmit(&huart3, (uint8_t *) lcdstring, (uint16_t) sizeof(lcdstring), 0xFFFF);
 		}
 
-//		char lcdstring[50] = "";
-//			sprintf(lcdstring, "Called write directly");
+		//print new line
+		prompt = mallocCharArray(2);
+		prompt[0] = (char)'\n';prompt[1] = (char)'\r';
+		putS(&huart3,prompt);
+		free(prompt);
 
-//		  printf(lcdstring);
-		dprint(lcdstring);
-		ITM_SendChar('-');
-		//		  write(0, lcdstring, strlen(lcdstring));
-		int i;
-//DW D 11 1
-		// toggle pins 6 and 7
-		HAL_GPIO_TogglePin(Pwr_En_Pi1_GPIO_Port,
-		Pwr_En_Pi1_Pin);
-//		HAL_Delay(500);
-
-//		free(ReadData);
-
-
-
-
-
+		//increment main forloop index, numbering of command sent.
+		index++;
+		if(index%10 == 0)
+			digit++;
 	}
 	/* USER CODE END 2 */
 
