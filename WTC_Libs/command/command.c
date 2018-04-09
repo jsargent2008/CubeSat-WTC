@@ -148,7 +148,9 @@ void dr(UART_HandleTypeDef *huart) {
 			if (0 <= pin && pin <= 15) {
 				pin = 1 << pin;
 			} else if (pin == 16) {
-				pin = GPIO_PIN_All;
+				putS(huart, (char*) aRxBuffer);
+				drAllport(huart, port);
+				//pin = GPIO_PIN_All;
 			} else {
 				flag = ERROR_INVALID_PIN;
 			}
@@ -157,23 +159,20 @@ void dr(UART_HandleTypeDef *huart) {
 		}
 	}
 
-	//TX received string.
-	putS(huart, (char*) aRxBuffer);
+	if (pin != 16) {
+		//TX received string.
+		putS(huart, (char*) aRxBuffer);
+	}
 
-	//read digital pin
+	prompt = mallocCharArray(5);
 	if (flag == 0) {
+		//read digital pin
 		state = HAL_GPIO_ReadPin(port, pin);
+
 		if (state != GPIO_PIN_RESET)
 			state = 1;
 		else
 			state = 0;
-	}
-
-	// size of return string should be consistent for every return
-	// for easy script writing
-	// ex. size of 5
-	prompt = mallocCharArray(5);
-	if (flag == 0) {
 		// print "ok" or ":)"
 		sprintf(prompt, ":%s\r\n", state ? "hi" : "lo");
 	} else {
@@ -198,7 +197,6 @@ void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 	putS(huart, "ar");
 	uint8_t flag = 0;
 	uint8_t aRxBuffer[20] = "";
-	char* prompt; //used for TX line
 	uint8_t baseChannel = ADC_CHANNEL_0;
 	uint16_t readChannel = 0;
 	char str[50] = "";
@@ -209,7 +207,6 @@ void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 	if (flag == 0) {
 		if (isdigit(aRxBuffer[0]) && isdigit(aRxBuffer[1])) {
 			readChannel = atoi((char*) aRxBuffer);
-			uint16_t inc2 = readChannel;
 			if (0 <= readChannel && readChannel <= 31) {
 				readChannel = baseChannel + readChannel;
 			} else if (readChannel == 32) {
@@ -241,7 +238,7 @@ void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 		sprintf(str, ":%02d-%05db4096\r\n", readChannel, (int) f); //decimal
 		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
 	} else {
-		sprintf(str, ":f%d\r\n",flag); //decimal
+		sprintf(str, ":f%d\r\n", flag); //decimal
 		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
 	}
 }
@@ -257,3 +254,40 @@ void arAll(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
 	}
 }
+
+void drAllport(UART_HandleTypeDef *huart, GPIO_TypeDef* port) {
+
+	char str[50] = "";
+	//GPIO_TypeDef* port = NULL;
+	GPIO_PinState state = GPIO_PIN_RESET;
+	uint8_t i;
+
+	switch ((int) port) {
+	case (int) GPIOA:
+		i = 'a';  //a
+		break;
+	case (int) GPIOB:
+		i = 'b';  // b
+		break;
+	case (int) GPIOC:
+		i = 'c';  //c
+		break;
+	case (int) GPIOD:
+		i = 'd';  //c
+		break;
+	default:
+		i = '?';
+	}
+
+	for (int pin = 0; pin < 16; pin++) {
+		state = HAL_GPIO_ReadPin(port, (uint16_t) 1 << pin);
+		if (state != GPIO_PIN_RESET)
+			state = 1;
+		else
+			state = 0;
+		//prompt, ":%s\r\n", state ? "hi" : "lo");
+		sprintf(str, ":port%c_pin%02d-%s\r\n", i, pin, state ? "hi" : "lo");
+		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
+	}
+}
+

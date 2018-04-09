@@ -50,6 +50,8 @@
 #include "PRINTF/printf.h"
 #include "adc/adc.h"
 
+#define DEBUG_UART huart4
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -85,16 +87,16 @@ static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN 0 */
 int fgetc(FILE *f) {
 	char ch;
-	while (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_RXNE) == RESET)
+	while (__HAL_UART_GET_FLAG(&DEBUG_UART, UART_FLAG_RXNE) == RESET)
 		;
-	HAL_UART_Receive(&huart3, (uint8_t*) &ch, 1, 0xFFFF);
+	HAL_UART_Receive(&DEBUG_UART, (uint8_t*) &ch, 1, 0xFFFF);
 	return ch;
 }
 
 size_t __read(int Handle, unsigned char * buf, size_t count) {
-	while (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_RXNE) == RESET)
+	while (__HAL_UART_GET_FLAG(&DEBUG_UART, UART_FLAG_RXNE) == RESET)
 		;
-	HAL_UART_Receive(&huart3, (uint8_t *) buf, count, 0xFFFF);
+	HAL_UART_Receive(&DEBUG_UART, (uint8_t *) buf, count, 0xFFFF);
 	return count;
 }
 
@@ -126,7 +128,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
  * @brief  The application entry point.
  *
  * @retval None
- */int main(void) {
+ */
+int main(void) {
 	/* USER CODE BEGIN 1 */
 
 	/* USER CODE END 1 */
@@ -176,7 +179,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		//tx "Waiting for command..."
 		char *prompt = mallocCharArray(sizeof(message));
 		strcpy(prompt, (char*) message);
-		putS(&huart3, prompt);
+		putS(&DEBUG_UART, prompt);
 		free(prompt);
 
 		// print "cmdXX:""
@@ -195,28 +198,27 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		strcpy((char *) tempBuff, (char *) prompt);
 
 		//tx "cmdXX:"
-		putS(&huart3, prompt);
+		putS(&DEBUG_UART, prompt);
 		free(prompt);
 
 		//		read in two character command
-		getS(&huart3, aRxBuffer, 2);
+		getS(&DEBUG_UART, aRxBuffer, 2);
 
 		if (strcmp((char *) aRxBuffer, "dw") == 0)
-			dw(&huart3);
+			dw(&DEBUG_UART);
 		else if (strcmp((char *) aRxBuffer, "dr") == 0)
-			dr(&huart3);
+			dr(&DEBUG_UART);
 		else if (strcmp((char *) aRxBuffer, "aw") == 0)
-			aw(&huart3);
+			aw(&DEBUG_UART);
 		else if (strcmp((char *) aRxBuffer, "ar") == 0)
-			ar(&huart3, &hadc);
-		else
-		{
+			ar(&DEBUG_UART, &hadc);
+		else {
 			prompt = mallocCharArray(4);
 			prompt[0] = (char) '?';
 			prompt[1] = (char) '?';
 			prompt[2] = (char) '\n';
 			prompt[3] = (char) '\r';
-			putS(&huart3, prompt);
+			putS(&DEBUG_UART, prompt);
 			free(prompt);
 		}
 
@@ -224,7 +226,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		prompt = mallocCharArray(2);
 		prompt[0] = (char) '\n';
 		prompt[1] = (char) '\r';
-		putS(&huart3, prompt);
+		putS(&DEBUG_UART, prompt);
 		free(prompt);
 
 		//increment main forloop index, numbering of command sent.
@@ -391,7 +393,6 @@ static void MX_UART4_Init(void) {
 	huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	huart4.Init.OverSampling = UART_OVERSAMPLING_16;
 	if (HAL_UART_Init(&huart4) != HAL_OK) {
-
 		_Error_Handler(__FILE__, __LINE__);
 	}
 
@@ -442,9 +443,7 @@ static void MX_USART3_UART_Init(void) {
 	huart3.Init.Mode = UART_MODE_TX_RX;
 	huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-
 	if (HAL_UART_Init(&huart3) != HAL_OK) {
-		HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi2_Pin, GPIO_PIN_SET);
 		_Error_Handler(__FILE__, __LINE__);
 	}
 
@@ -481,19 +480,19 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOD,
-			Pwr_En_Pi1_Pin | WTC_BUS_Switch_Pi_Select_Pin | _70cm_Primary_TR_Pin | EN_MPPT_Z__Pin
-					| EN_MPPT_YZ__Pin | EN_MPPT_YCtr_Pin, GPIO_PIN_RESET);
+			Pwr_En_Pi1_Pin | Pwr_En_Pi2_Pin | WTC_BUS_Switch_Pi_Select_Pin | _70cm_Primary_TR_Pin
+					| EN_MPPT_Z__Pin | EN_MPPT_YZ__Pin | EN_MPPT_YCtr_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOC,
-	_12V_1_Enable_Pin | _12V_2_Enable_Pin | _70cm_Primary_Enable_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC, _12V_1_Enable_Pin | _12V_2_Enable_Pin | _70cm_Primary_Enable_Pin,
+			GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOA, _5V_Rail_1_Enable_Pin | _70cm_Primary_Select_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOB,
-	EN_MPPT_XZ__Pin | EN_MPPT_XCtr_Pin | EN_MPPT_XZ_Pin | EN_NTC_Drive_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, EN_MPPT_XZ__Pin | EN_MPPT_XCtr_Pin | EN_MPPT_XZ_Pin | EN_NTC_Drive_Pin,
+			GPIO_PIN_RESET);
 
 	/*Configure GPIO pins : EN_Chrg_1_Pin Reset_C6_Pin Reset_C6E5_Pin RF_Deck_Power_Enable_Pin
 	 UHF_Deploy_2_Pin UHF_Deploy_1_Pin Kill_Switch_1_Pin Kill_Switch_2_Pin
@@ -518,17 +517,17 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-	/*Configure GPIO pins : Pwr_En_Pi1_Pin WTC_BUS_Switch_Pi_Select_Pin _70cm_Primary_TR_Pin EN_MPPT_Z__Pin
-	 EN_MPPT_YZ__Pin EN_MPPT_YCtr_Pin */
-	GPIO_InitStruct.Pin = Pwr_En_Pi1_Pin | WTC_BUS_Switch_Pi_Select_Pin | _70cm_Primary_TR_Pin
-			| EN_MPPT_Z__Pin | EN_MPPT_YZ__Pin | EN_MPPT_YCtr_Pin;
+	/*Configure GPIO pins : Pwr_En_Pi1_Pin Pwr_En_Pi2_Pin WTC_BUS_Switch_Pi_Select_Pin _70cm_Primary_TR_Pin
+	 EN_MPPT_Z__Pin EN_MPPT_YZ__Pin EN_MPPT_YCtr_Pin */
+	GPIO_InitStruct.Pin = Pwr_En_Pi1_Pin | Pwr_En_Pi2_Pin | WTC_BUS_Switch_Pi_Select_Pin
+			| _70cm_Primary_TR_Pin | EN_MPPT_Z__Pin | EN_MPPT_YZ__Pin | EN_MPPT_YCtr_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-	/*Configure GPIO pins : Pwr_En_Pi2_Pin Pi_Heartbeat_Pi2_Pin Pi_Heartbeat_Pi1_Pin */
-	GPIO_InitStruct.Pin = Pwr_En_Pi2_Pin | Pi_Heartbeat_Pi2_Pin | Pi_Heartbeat_Pi1_Pin;
+	/*Configure GPIO pins : Pi_Heartbeat_Pi2_Pin Pi_Heartbeat_Pi1_Pin */
+	GPIO_InitStruct.Pin = Pi_Heartbeat_Pi2_Pin | Pi_Heartbeat_Pi1_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);

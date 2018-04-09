@@ -49,12 +49,6 @@
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/
-#define _5X_Out_2_Pin GPIO_PIN_1
-#define _5X_Out_2_GPIO_Port GPIOC
-//GPIO_PIN_1
-//GPIOC
-//>> ADC_CHANNEL_10
-//#define GPIO_PIN_3 ADC_CHANNEL_10
 
 #define EN_Chrg_1_Pin GPIO_PIN_3
 #define EN_Chrg_1_GPIO_Port GPIOE
@@ -98,8 +92,8 @@
 #define Kill_Switch_1_GPIO_Port GPIOE
 #define Kill_Switch_2_Pin GPIO_PIN_15
 #define Kill_Switch_2_GPIO_Port GPIOE
-#define UART_TXD_Pi1_Pin GPIO_PIN_8
-#define UART_TXD_Pi1_GPIO_Port GPIOD
+#define UART_TXD_Pi2_Pin GPIO_PIN_8
+#define UART_TXD_Pi2_GPIO_Port GPIOD
 #define UART_RXD_Pi2_Pin GPIO_PIN_9
 #define UART_RXD_Pi2_GPIO_Port GPIOD
 #define Pwr_En_Pi1_Pin GPIO_PIN_11
@@ -116,8 +110,8 @@
 #define _12V_1_Enable_GPIO_Port GPIOC
 #define _12V_2_Enable_Pin GPIO_PIN_9
 #define _12V_2_Enable_GPIO_Port GPIOC
-#define UART_TXD_Pi1A9_Pin GPIO_PIN_9
-#define UART_TXD_Pi1A9_GPIO_Port GPIOA
+#define UART_TXD_Pi1_Pin GPIO_PIN_9
+#define UART_TXD_Pi1_GPIO_Port GPIOA
 #define UART_RXD_Pi1_Pin GPIO_PIN_10
 #define UART_RXD_Pi1_GPIO_Port GPIOA
 #define _5V_Rail_1_Enable_Pin GPIO_PIN_12
