@@ -17,15 +17,17 @@
 #include "stm32l1xx_hal_uart.h"
 #include "UART_IRQ/UART_IRQ.h"
 #include "gpio/gpio.h"
+#include "adc/adc.h"
+#include "PRINTF/printf.h"
 
 #define ERROR_INVALID_PORT 1
 #define ERROR_INVALID_PIN 2
 #define ERROR_INVALID_STATE 3
-
+#define ERROR_SKIP 4			//example use. cmd "ar32" will print channel 32 after it complete the arALL call
+								// channel 32 is invalid. memory leak.
 void dw(UART_HandleTypeDef *huart);
 void dr(UART_HandleTypeDef *huart);
 void aw(UART_HandleTypeDef *huart);
-void ar(UART_HandleTypeDef *huart);
-
+void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc);
 
 #endif /* COMMAND_COMMAND_H_ */

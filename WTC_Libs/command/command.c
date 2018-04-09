@@ -8,12 +8,12 @@
 #include "command.h"
 
 //		digital write
-//if (strcmp((char *) aRxBuffer, "dw") == 0) {
 void dw(UART_HandleTypeDef *huart) {
+
+	putS(huart, "dw");
 	uint8_t aRxBuffer[20] = "";
 	char* prompt; //used for TX line
 
-	putS(huart, "dw");
 	uint8_t flag = 0;
 	GPIO_TypeDef* port = NULL;
 	uint16_t pin = 0;
@@ -46,7 +46,7 @@ void dw(UART_HandleTypeDef *huart) {
 	getS(huart, aRxBuffer, 2);
 
 	if (flag == 0) {
-		if (isdigit(aRxBuffer[0]) && isdigit(aRxBuffer[1]) ) {
+		if (isdigit(aRxBuffer[0]) && isdigit(aRxBuffer[1])) {
 			pin = atoi((char*) aRxBuffer);
 			if (0 <= pin && pin <= 15) {
 				pin = 1 << pin;
@@ -104,10 +104,11 @@ void dw(UART_HandleTypeDef *huart) {
 }
 
 void dr(UART_HandleTypeDef *huart) {
+
+	putS(huart, "dr");
 	uint8_t aRxBuffer[20] = "";
 	char* prompt; //used for TX line
 
-	putS(huart, "dr");
 	uint8_t flag = 0;
 	GPIO_TypeDef* port = NULL;
 	uint16_t pin = 0;
@@ -142,7 +143,7 @@ void dr(UART_HandleTypeDef *huart) {
 	getS(huart, aRxBuffer, 2);
 
 	if (flag == 0) {
-		if (isdigit(aRxBuffer[0]) && isdigit(aRxBuffer[1]) ) {
+		if (isdigit(aRxBuffer[0]) && isdigit(aRxBuffer[1])) {
 			pin = atoi((char*) aRxBuffer);
 			if (0 <= pin && pin <= 15) {
 				pin = 1 << pin;
@@ -185,19 +186,74 @@ void dr(UART_HandleTypeDef *huart) {
 }
 
 //			analog write
-//else if (strcmp((char *) aRxBuffer, "aw") == 0){
 void aw(UART_HandleTypeDef *huart) {
 	putS(huart, "aw");
-	putS(huart, "f0");			//putS("not implemented");
+	putS(huart, "f0");
 
 }
+
+//uint32_t channels =  {
 //			analog read
-//else if (strcmp((char *) aRxBuffer, "ar") == 0){
-void ar(UART_HandleTypeDef *huart) {
-	char str[50] = "";
+void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 	putS(huart, "ar");
-	float f = 0.0024445;
-	sprintf(str, "Val: %f", f);
-	HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
+	uint8_t flag = 0;
+	uint8_t aRxBuffer[20] = "";
+	char* prompt; //used for TX line
+	uint8_t baseChannel = ADC_CHANNEL_0;
+	uint16_t readChannel = 0;
+	char str[50] = "";
+
+	// get pin XX
+	getS(huart, aRxBuffer, 2);
+
+	if (flag == 0) {
+		if (isdigit(aRxBuffer[0]) && isdigit(aRxBuffer[1])) {
+			readChannel = atoi((char*) aRxBuffer);
+			uint16_t inc2 = readChannel;
+			if (0 <= readChannel && readChannel <= 31) {
+				readChannel = baseChannel + readChannel;
+			} else if (readChannel == 32) {
+				//use flag to prevent reading Channel 32
+				//flag = ERROR_SKIP; // currently not used.
+				//TX received string.
+				putS(huart, (char*) aRxBuffer);
+
+				arAll(huart, hadc);
+			} else {
+				flag = ERROR_INVALID_PIN;
+			}
+		} else {
+			flag = ERROR_INVALID_PIN;
+		}
+	}
+
+	if (readChannel != 32) {
+		//TX received string.
+		putS(huart, (char*) aRxBuffer);
+	}
+//		sprintf(str, "\r\n" PRINTF_BINARY_PATTERN_INT32  , PRINTF_BYTE_TO_BINARY_INT32(readChannel));
+//		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
+//		sprintf(str, "\r\n" PRINTF_BINARY_PATTERN_INT32  , PRINTF_BYTE_TO_BINARY_INT32(ADC_CHANNEL_10));
+//		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
+	if (flag == 0) {
+		float f = adcReadSingle(hadc, readChannel);
+//		sprintf(str, ":%fb4096\r\n", f);
+		sprintf(str, ":%02d-%05db4096\r\n", readChannel, (int) f); //decimal
+		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
+	} else {
+		sprintf(str, ":f%d\r\n",flag); //decimal
+		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
+	}
 }
 
+void arAll(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
+	char str[50] = "";
+	int nADCchannels = 32;
+
+	for (int i = 0; i < nADCchannels; i++) {
+		float f = adcReadSingle(hadc, i);
+		//sprintf(str, ":%d-%05.2fb4096\r\n", i, f); //float
+		sprintf(str, ":%02d-%05db4096\r\n", i, (int) f); //decimal
+		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
+	}
+}

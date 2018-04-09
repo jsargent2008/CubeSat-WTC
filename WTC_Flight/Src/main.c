@@ -208,7 +208,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		else if (strcmp((char *) aRxBuffer, "aw") == 0)
 			aw(&huart3);
 		else if (strcmp((char *) aRxBuffer, "ar") == 0)
-			ar(&huart3);
+			ar(&huart3, &hadc);
 		else
 		{
 			prompt = mallocCharArray(4);
