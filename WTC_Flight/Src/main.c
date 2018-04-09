@@ -119,27 +119,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi2_Pin, GPIO_PIN_SET);
 }
 
-//void getS(&huart3,uint8_t * buf, uint8_t len){
-//	//HAL_UART_Receive(&huart3, (uint8_t *) buf, len, 0xFFFF);
-//	//buf[strlen(buf)] = '\0';
-//	HAL_UART_Receive(&huart3, (uint8_t *) buf, len+1, 0xFFFF);
-//	buf[strlen(buf)-1] = '\0';
-//}
-//
-//
-//void putS(&huart3,char* buf) {
-//
-//	uint8_t size = 0;
-//
-//	while(buf[size] != 0)
-//		size++;
-//
-//	//
-//	// sizeof DOESNT NOT WORK!!!!!!!!!
-//	// HAL_UART_Transmit(&huart3, (uint8_t *) buf, (uint16_t) sizeof(buf), 0xFFFF);
-//	HAL_UART_Transmit(&huart3, (uint8_t *) buf, (uint16_t) size, 0xFFFF);
-//
-//}
 
 /* USER CODE END 0 */
 
@@ -188,6 +167,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	uint8_t index = 0;
 	uint8_t digit = 0;
 	char *message = "Waiting for command...\n\r";
+
+	//gpio port d pin 11 --> d11 is the yellow LED for testing (pwr enable pi 1)
 
 	for (;;) {
 		uint8_t aRxBuffer[20] = "";
