@@ -116,7 +116,7 @@ int main(void)
   HAL_Delay(100);
 */
   HAL_Delay(100);
-  ReadLTC(&hi2c2, &pData01);
+  //ReadLTC(&hi2c2, &pData01);
 
   HAL_Delay(100);
   SetupLTC(&hi2c2, &pData01);
@@ -133,7 +133,7 @@ int main(void)
 	  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
 
 	  HAL_Delay(100);
-	  ReadLTC(&hi2c2, &pData01);
+	 // ReadLTC(&hi2c2, &pData01);
 
 	  if((pData01 >> 1)&1)
 	  {
