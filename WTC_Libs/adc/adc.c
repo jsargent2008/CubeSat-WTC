@@ -30,6 +30,8 @@ float adcReadSingle(ADC_HandleTypeDef *hadc, uint32_t channel) {
 // adcToVoltage currently does not work
 // issues with float data type
 float adcToVoltage(ADC_HandleTypeDef *hadc) {
-	uint32_t val = HAL_ADC_GetValue(hadc);
-	return (float) (ADC_BITS_TO_VOLTAGE(val) * 1.0);
+	float f = (float) HAL_ADC_GetValue(hadc);
+	f /= 4095;
+	f *= 3.3;
+	return f;
 }

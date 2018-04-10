@@ -234,8 +234,7 @@ void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 //		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
 	if (flag == 0) {
 		float f = adcReadSingle(hadc, readChannel);
-//		sprintf(str, ":%fb4096\r\n", f);
-		sprintf(str, ":%02d-%05db4096\r\n", readChannel, (int) f); //decimal
+		sprintf(str, ":%02d-%.3f\r\n", readChannel, f);
 		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
 	} else {
 		sprintf(str, ":f%d\r\n", flag); //decimal
@@ -249,8 +248,8 @@ void arAll(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 
 	for (int i = 0; i < nADCchannels; i++) {
 		float f = adcReadSingle(hadc, i);
-		//sprintf(str, ":%d-%05.2fb4096\r\n", i, f); //float
-		sprintf(str, ":%02d-%05db4096\r\n", i, (int) f); //decimal
+
+		sprintf(str, ":%02d-%.3f\r\n", i, f); //decimal
 		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
 	}
 }
@@ -291,3 +290,26 @@ void drAllport(UART_HandleTypeDef *huart, GPIO_TypeDef* port) {
 	}
 }
 
+void tt(UART_HandleTypeDef *huart, UART_HandleTypeDef *hout) {
+	putS(huart, "tt");
+	uint8_t packet_size = 12;
+
+	uint8_t aRxBuffer[20] = "";
+
+	HAL_UART_Receive(huart, (uint8_t *) aRxBuffer, packet_size, 0xFFFF);
+
+	aRxBuffer[packet_size] = '\r';
+	aRxBuffer[packet_size + 1] = '\n';
+
+	HAL_UART_Transmit(hout, (uint8_t *) aRxBuffer, (uint16_t) packet_size + 2, 0xFFFF);
+
+	HAL_Delay(20);
+
+	HAL_UART_Receive(hout, (uint8_t *) aRxBuffer, packet_size, 5000);
+
+	aRxBuffer[packet_size] = '\r';
+	aRxBuffer[packet_size + 1] = '\n';
+
+	HAL_UART_Transmit(huart, (uint8_t *) aRxBuffer, (uint16_t) packet_size + 2, 0xFFFF);
+
+}

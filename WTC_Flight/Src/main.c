@@ -168,7 +168,6 @@ int main(void) {
 
 	//used for "cmdXX" string
 	uint8_t index = 0;
-	uint8_t digit = 0;
 	char *message = "Waiting for command...\n\r";
 
 	//gpio port d pin 11 --> d11 is the yellow LED for testing (pwr enable pi 1)
@@ -187,8 +186,8 @@ int main(void) {
 		prompt[0] = 'c';
 		prompt[1] = 'm';
 		prompt[2] = 'd';
-		prompt[3] = (digit + 48);
-		prompt[4] = (index % 10 + 48);
+		prompt[3] = index / 10 + '0';
+		prompt[4] = (index % 10) + '0';
 		prompt[5] = ':';
 
 		//noticed that using a new string would prevent the rxbuffer
@@ -212,6 +211,8 @@ int main(void) {
 			aw(&DEBUG_UART);
 		else if (strcmp((char *) aRxBuffer, "ar") == 0)
 			ar(&DEBUG_UART, &hadc);
+		else if (strcmp((char *) aRxBuffer, "tt") == 0)
+			tt(&DEBUG_UART, &huart2);
 		else {
 			prompt = mallocCharArray(4);
 			prompt[0] = (char) '?';
@@ -231,8 +232,8 @@ int main(void) {
 
 		//increment main forloop index, numbering of command sent.
 		index++;
-		if (index % 10 == 0)
-			digit++;
+		if (index >= 100)
+			index = 0;
 	}
 	/* USER CODE END 2 */
 
