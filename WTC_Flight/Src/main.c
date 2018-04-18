@@ -164,8 +164,7 @@ int main(void) {
 	MX_ADC_Init();
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
-	char lcdstring[50] = "";
-
+	//char lcdstring[50] = "";
 	//used for "cmdXX" string
 	uint8_t index = 0;
 	char *message = "Waiting for command...\n\r";
@@ -213,6 +212,8 @@ int main(void) {
 			ar(&DEBUG_UART, &hadc);
 		else if (strcmp((char *) aRxBuffer, "tt") == 0)
 			tt(&DEBUG_UART, &huart2);
+		else if (strcmp((char *) aRxBuffer, "ks") == 0)
+			ks(&DEBUG_UART);
 		else {
 			prompt = mallocCharArray(4);
 			prompt[0] = (char) '?';
@@ -244,13 +245,12 @@ int main(void) {
 		 * JON START HERE
 		 */
 
-		if (HAL_FLASHEx_DATAEEPROM_Unlock() == HAL_OK) // Remember to unlock the EEPROM before using
-				{
-			//		  HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD,0x08080000,555); //Write: Type, Address, Data
-			uint32_t data_in = *(uint32_t *) 0x08080000; //Read: Cast the address as a uint32_t pointer and dereference it
-			HAL_FLASHEx_DATAEEPROM_Lock(); //Lock when done? (Not sure if necessary)
-		}
-
+//		if (HAL_FLASHEx_DATAEEPROM_Unlock() == HAL_OK) // Remember to unlock the EEPROM before using
+//				{
+//			//		  HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD,0x08080000,555); //Write: Type, Address, Data
+//			uint32_t data_in = *(uint32_t *) 0x08080000; //Read: Cast the address as a uint32_t pointer and dereference it
+//			HAL_FLASHEx_DATAEEPROM_Lock(); //Lock when done? (Not sure if necessary)
+//		}
 		/*******
 		 * JON END HERE
 		 */
@@ -472,6 +472,8 @@ static void MX_GPIO_Init(void) {
 	;
 	__HAL_RCC_GPIOD_CLK_ENABLE()
 	;
+	__HAL_RCC_GPIOH_CLK_ENABLE()
+	;
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOE,
@@ -481,7 +483,8 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOD,
-			Pwr_En_Pi1_Pin | Pwr_En_Pi2_Pin | WTC_BUS_Switch_Pi_Select_Pin | _70cm_Primary_TR_Pin
+			WTC_V_Stack_Pin | Pwr_En_Pi1_Pin | Pwr_En_Pi2_Pin | WTC_BUS_Switch_Pi_Select_Pin
+					| Pi_Heartbeat_Pi2_Pin | Pi_Heartbeat_Pi2D15_Pin | _70cm_Primary_TR_Pin
 					| EN_MPPT_Z__Pin | EN_MPPT_YZ__Pin | EN_MPPT_YCtr_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
@@ -492,8 +495,12 @@ static void MX_GPIO_Init(void) {
 	HAL_GPIO_WritePin(GPIOA, _5V_Rail_1_Enable_Pin | _70cm_Primary_Select_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOB, EN_MPPT_XZ__Pin | EN_MPPT_XCtr_Pin | EN_MPPT_XZ_Pin | EN_NTC_Drive_Pin,
-			GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(_5V_Rail_2_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOB,
+			EN_MPPT_XZ__Pin | EN_MPPT_XCtr_Pin | EN_MPPT_XZ_Pin | EN_NTC_Drive_Pin
+					| Deployment_Power_Enable_Pin | UHF_Power_Enable_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pins : EN_Chrg_1_Pin Reset_C6_Pin Reset_C6E5_Pin RF_Deck_Power_Enable_Pin
 	 UHF_Deploy_2_Pin UHF_Deploy_1_Pin Kill_Switch_1_Pin Kill_Switch_2_Pin
@@ -512,25 +519,27 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(DAC_REF_Chrg_GPIO_Port, &GPIO_InitStruct);
 
-	/*Configure GPIO pins : PwrMon_RC_ADC_Pin _70cm_Primary_Temp_ADC_Pin */
-	GPIO_InitStruct.Pin = PwrMon_RC_ADC_Pin | _70cm_Primary_Temp_ADC_Pin;
+	/*Configure GPIO pin : ADC_REF_Chrg_Pin */
+	GPIO_InitStruct.Pin = ADC_REF_Chrg_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+	HAL_GPIO_Init(ADC_REF_Chrg_GPIO_Port, &GPIO_InitStruct);
 
-	/*Configure GPIO pins : Pwr_En_Pi1_Pin Pwr_En_Pi2_Pin WTC_BUS_Switch_Pi_Select_Pin _70cm_Primary_TR_Pin
-	 EN_MPPT_Z__Pin EN_MPPT_YZ__Pin EN_MPPT_YCtr_Pin */
-	GPIO_InitStruct.Pin = Pwr_En_Pi1_Pin | Pwr_En_Pi2_Pin | WTC_BUS_Switch_Pi_Select_Pin
+	/*Configure GPIO pin : PwrMon_RC_ADC_Pin */
+	GPIO_InitStruct.Pin = PwrMon_RC_ADC_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(PwrMon_RC_ADC_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : WTC_V_Stack_Pin Pwr_En_Pi1_Pin Pwr_En_Pi2_Pin WTC_BUS_Switch_Pi_Select_Pin
+	 Pi_Heartbeat_Pi2_Pin Pi_Heartbeat_Pi2D15_Pin _70cm_Primary_TR_Pin EN_MPPT_Z__Pin
+	 EN_MPPT_YZ__Pin EN_MPPT_YCtr_Pin */
+	GPIO_InitStruct.Pin = WTC_V_Stack_Pin | Pwr_En_Pi1_Pin | Pwr_En_Pi2_Pin
+			| WTC_BUS_Switch_Pi_Select_Pin | Pi_Heartbeat_Pi2_Pin | Pi_Heartbeat_Pi2D15_Pin
 			| _70cm_Primary_TR_Pin | EN_MPPT_Z__Pin | EN_MPPT_YZ__Pin | EN_MPPT_YCtr_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-	/*Configure GPIO pins : Pi_Heartbeat_Pi2_Pin Pi_Heartbeat_Pi1_Pin */
-	GPIO_InitStruct.Pin = Pi_Heartbeat_Pi2_Pin | Pi_Heartbeat_Pi1_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : _12V_1_Enable_Pin _12V_2_Enable_Pin _70cm_Primary_Enable_Pin */
@@ -547,8 +556,23 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	/*Configure GPIO pins : EN_MPPT_XZ__Pin EN_MPPT_XCtr_Pin EN_MPPT_XZ_Pin EN_NTC_Drive_Pin */
-	GPIO_InitStruct.Pin = EN_MPPT_XZ__Pin | EN_MPPT_XCtr_Pin | EN_MPPT_XZ_Pin | EN_NTC_Drive_Pin;
+	/*Configure GPIO pin : _5V_Rail_2_Enable_Pin */
+	GPIO_InitStruct.Pin = _5V_Rail_2_Enable_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(_5V_Rail_2_Enable_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : Pgood_3V3_1_Pin Pgood_3V3_2_Pin */
+	GPIO_InitStruct.Pin = Pgood_3V3_1_Pin | Pgood_3V3_2_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : EN_MPPT_XZ__Pin EN_MPPT_XCtr_Pin EN_MPPT_XZ_Pin EN_NTC_Drive_Pin
+	 Deployment_Power_Enable_Pin UHF_Power_Enable_Pin */
+	GPIO_InitStruct.Pin = EN_MPPT_XZ__Pin | EN_MPPT_XCtr_Pin | EN_MPPT_XZ_Pin | EN_NTC_Drive_Pin
+			| Deployment_Power_Enable_Pin | UHF_Power_Enable_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

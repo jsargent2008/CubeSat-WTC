@@ -64,12 +64,18 @@
 #define _5X_Out_1_GPIO_Port GPIOC
 #define _10X_Out_1_Pin GPIO_PIN_3
 #define _10X_Out_1_GPIO_Port GPIOC
+#define MPPT_BUS_MON_Pin GPIO_PIN_1
+#define MPPT_BUS_MON_GPIO_Port GPIOA
 #define UART_TX_RF_Deck_Pin GPIO_PIN_2
 #define UART_TX_RF_Deck_GPIO_Port GPIOA
 #define UART_RX_RF_Deck_Pin GPIO_PIN_3
 #define UART_RX_RF_Deck_GPIO_Port GPIOA
 #define DAC_REF_Chrg_Pin GPIO_PIN_5
 #define DAC_REF_Chrg_GPIO_Port GPIOA
+#define ADC_REF_Chrg_Pin GPIO_PIN_6
+#define ADC_REF_Chrg_GPIO_Port GPIOA
+#define _10X_Out_2_Pin GPIO_PIN_7
+#define _10X_Out_2_GPIO_Port GPIOA
 #define _20X_Out_1_Pin GPIO_PIN_4
 #define _20X_Out_1_GPIO_Port GPIOC
 #define STM_PC5_ADC_Pin GPIO_PIN_5
@@ -82,8 +88,8 @@
 #define RF_Deck_Power_Enable_GPIO_Port GPIOE
 #define PwrMon_RC_ADC_Pin GPIO_PIN_9
 #define PwrMon_RC_ADC_GPIO_Port GPIOE
-#define _70cm_Primary_Temp_ADC_Pin GPIO_PIN_10
-#define _70cm_Primary_Temp_ADC_GPIO_Port GPIOE
+#define _70cm_AUX_ADC_Pin GPIO_PIN_10
+#define _70cm_AUX_ADC_GPIO_Port GPIOE
 #define UHF_Deploy_2_Pin GPIO_PIN_11
 #define UHF_Deploy_2_GPIO_Port GPIOE
 #define UHF_Deploy_1_Pin GPIO_PIN_12
@@ -92,10 +98,20 @@
 #define Kill_Switch_1_GPIO_Port GPIOE
 #define Kill_Switch_2_Pin GPIO_PIN_15
 #define Kill_Switch_2_GPIO_Port GPIOE
+#define V_Stack_1_Meas_Pin GPIO_PIN_12
+#define V_Stack_1_Meas_GPIO_Port GPIOB
+#define V_Stack_2_Meas_Pin GPIO_PIN_13
+#define V_Stack_2_Meas_GPIO_Port GPIOB
+#define V_Stack_3_Meas_Pin GPIO_PIN_14
+#define V_Stack_3_Meas_GPIO_Port GPIOB
+#define V_Stack_4_Meas_Pin GPIO_PIN_15
+#define V_Stack_4_Meas_GPIO_Port GPIOB
 #define UART_TXD_Pi2_Pin GPIO_PIN_8
 #define UART_TXD_Pi2_GPIO_Port GPIOD
 #define UART_RXD_Pi2_Pin GPIO_PIN_9
 #define UART_RXD_Pi2_GPIO_Port GPIOD
+#define WTC_V_Stack_Pin GPIO_PIN_10
+#define WTC_V_Stack_GPIO_Port GPIOD
 #define Pwr_En_Pi1_Pin GPIO_PIN_11
 #define Pwr_En_Pi1_GPIO_Port GPIOD
 #define Pwr_En_Pi2_Pin GPIO_PIN_12
@@ -104,8 +120,8 @@
 #define WTC_BUS_Switch_Pi_Select_GPIO_Port GPIOD
 #define Pi_Heartbeat_Pi2_Pin GPIO_PIN_14
 #define Pi_Heartbeat_Pi2_GPIO_Port GPIOD
-#define Pi_Heartbeat_Pi1_Pin GPIO_PIN_15
-#define Pi_Heartbeat_Pi1_GPIO_Port GPIOD
+#define Pi_Heartbeat_Pi2D15_Pin GPIO_PIN_15
+#define Pi_Heartbeat_Pi2D15_GPIO_Port GPIOD
 #define _12V_1_Enable_Pin GPIO_PIN_8
 #define _12V_1_Enable_GPIO_Port GPIOC
 #define _12V_2_Enable_Pin GPIO_PIN_9
@@ -116,6 +132,8 @@
 #define UART_RXD_Pi1_GPIO_Port GPIOA
 #define _5V_Rail_1_Enable_Pin GPIO_PIN_12
 #define _5V_Rail_1_Enable_GPIO_Port GPIOA
+#define _5V_Rail_2_Enable_Pin GPIO_PIN_2
+#define _5V_Rail_2_Enable_GPIO_Port GPIOH
 #define _70cm_Primary_Select_Pin GPIO_PIN_15
 #define _70cm_Primary_Select_GPIO_Port GPIOA
 #define _70cm_Primary_UART_TX_Pin GPIO_PIN_10
@@ -126,6 +144,10 @@
 #define _70cm_Primary_Enable_GPIO_Port GPIOC
 #define _70cm_Primary_TR_Pin GPIO_PIN_0
 #define _70cm_Primary_TR_GPIO_Port GPIOD
+#define Pgood_3V3_1_Pin GPIO_PIN_2
+#define Pgood_3V3_1_GPIO_Port GPIOD
+#define Pgood_3V3_2_Pin GPIO_PIN_3
+#define Pgood_3V3_2_GPIO_Port GPIOD
 #define EN_MPPT_Z__Pin GPIO_PIN_5
 #define EN_MPPT_Z__GPIO_Port GPIOD
 #define EN_MPPT_YZ__Pin GPIO_PIN_6
@@ -140,12 +162,16 @@
 #define EN_MPPT_XZ_GPIO_Port GPIOB
 #define EN_NTC_Drive_Pin GPIO_PIN_7
 #define EN_NTC_Drive_GPIO_Port GPIOB
+#define Deployment_Power_Enable_Pin GPIO_PIN_8
+#define Deployment_Power_Enable_GPIO_Port GPIOB
+#define UHF_Power_Enable_Pin GPIO_PIN_9
+#define UHF_Power_Enable_GPIO_Port GPIOB
 #define EN_MPPT_YZ_E1_Pin GPIO_PIN_1
 #define EN_MPPT_YZ_E1_GPIO_Port GPIOE
 
 /* ########################## Assert Selection ############################## */
 /**
-  * @brief Uncomment the line below to expanse the "assert_param" macro in the 
+  * @brief Uncomment the line below to expanse the "assert_param" macro in the
   *        HAL drivers code
   */
 /* #define USE_FULL_ASSERT    1U */

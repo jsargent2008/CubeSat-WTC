@@ -1,0 +1,8 @@
+TX
+	"Waiting for command...\n\r"
+	"cmdXX"
+RX
+	"dw","dr","aw","ar",e
+
+TX
+	"\n\r"

@@ -54,6 +54,24 @@ def swrite(str, check: 1):
 	else:
 		return 1
 
+def ks(pin):
+	out = ''
+	if(swrite("ks ", 1) == 1):
+		swrite(format("%d ", pin), 0)
+		time.sleep(READ_DELAY)
+		# gets the output confirmation
+		out = ser.read(4).decode('ascii')
+		# gets the output result and \r\n
+		out = ser.readline().decode("ascii").strip()
+		printf("the ret val was `%s`", out);
+		
+		if("bye" in out):
+			return 1
+		else:
+			return 0
+	else:
+		return 0			
+
 def dw(port, pin, state):
 	# `p 00 x `
 	# p  is port, lowercase char
@@ -73,12 +91,6 @@ def dw(port, pin, state):
 		out = ser.readline().decode("ascii").strip()
 		printf("the ret val was `%s`", out);
 
-		if("ok" in out):
-			return 1
-		else:
-			return 0
-	else:
-		return 0
 
 def dr(port, pin):
 	# `p 00 `
@@ -125,14 +137,91 @@ def ar(channel):
 			return 0
 	else:
 		return 0
-	
 
+#def enDeployment():
+	# # deployment power enable
+	# dw('b',9,1)
+	# time.sleep(READ_DELAY)
+	
+	# dw('e',11,1)
+	# time.sleep(500)
+	# dw('e',11,0)
+	# #if deployment 1 not sensed then try deployment #2
+	# 	#dw('e',12,1)
+	# 	#time.sleep(500)
+	# 	#dw('e',12,0)
+	# 	#if deployment 2not sensed return 0
+	# 		# return 0
+	# dw('b',9,0)
+	# return 1
+
+def enPiPwr(pi):
+	# check if 5V power is on
+	if check5V() < 3:
+		# turn on 5V
+		if turnOn5V() == 0:
+			return 0
+
+	# enable Pi 'pi' pin
+	if pi==1 :
+		dw('d',11,1)
+	else:
+		dw('d',12,1)
+	return 1
+
+def check5V():
+	time.sleep(1000)
+	factor = 1/11
+	# WTC ADC Channel 3  = 5V rail
+	val = ar('03')/factor
+	return val
+
+def turnOn5V():
+	#try turning on rail 1
+	time.sleep(READ_DELAY)
+	dw('a','12',1)
+
+	if check5V() > 3:
+		return 1;
+	else:
+		dw('a','12',0)
+		dw('h','2',1)
+		if check5V() > 3:
+			return 1;
+		else:
+			dw('a','1',0)
+			return 0;
+
+
+## for surfsat
 #EnduroSat commands
 cmd1 		= "ES+W22003303"
-cmd1R		= "Okay and .... 3303"
+cmd1R		= "Okay and .... 3303" #fix command
 cmd2A 		= "ES+W22003363"
 cmd2B 		= "a" * 12
 cmd2C		= cmd1
+
+
+## for surfsat
+def tt(channel):
+
+	out = ''
+	if(swrite("tt ", 1) == 1):
+		swrite(cmd1, 0)
+
+		time.sleep(READ_DELAY)
+		# gets the output confirmation
+		out = ser.read(2).decode('ascii')
+		# gets the output result and \r\n
+		out = ser.readline().decode("ascii").strip()
+		printf("the ret val was `%s`", out);
+
+		if("ok" in out):
+			return 1
+		else:
+			return 0
+	else:
+		return 0
 
 # configure the serial connection
 ser = serial.Serial(
@@ -147,14 +236,54 @@ ser.isOpen()
 
 print('Enter your commands below.\r\nInsert "exit" to leave the application.')
 
-cmd=1
 retval = 0
 
+# main loop
 while 1:
 
 	# get keyboard input
 	# cmd = input("Enter command or 'exit':")
-	cmd = "dw d 11 1 " #raw_input(">> ")
+	#cmd = "dw d 11 1 " #raw_input(">> ")
+	commandline = sys.stdin.readline()
+
+	# remove trailing/leading spaces
+	#commandline = commandline.strip()
+	commandline = commandline.replace(" ", "")
+
+	# dw, dr, aw, ar, tt
+	cmd = commandline[0:2]
+	
+	#dw	
+	if cmd == 'dw':
+		# port a, b, c, d
+		port = commandline[2:3]
+		# pin 0<=x<=15
+		pin = commandline[3:5]
+		# state 0 or 1
+		state = commandline[5:6]
+		dw(port, int(pin), int(state))
+	#dr	
+	if cmd == 'dr':
+		# port a, b, c, d
+		port = commandline[2:3]
+		# pin 0<=x<=15
+		pin = commandline[3:5]
+		dr(port, int(pin))
+	# #aw	
+	# if cmd == 'aw':
+	# 	# channel  00 <= XX <= 31
+	# 	channel = commandline[2:4]
+	# 	aw(channel)
+	#ar	
+	if cmd == 'ar':
+		# channel 00 <= XX <= 31
+		channel = commandline[2:4]
+		ar(int(channel))
+
+	if cmd == 'ks':
+		# channel 00 <= XX <= 31
+		pin = commandline[2:3]
+		ks(int(pin))
 
 	# Python 3 users
 	# input = input(">> ")
@@ -165,14 +294,13 @@ while 1:
 		# send the character to the device
 		# ar(32)
 		# time.sleep(1)
-		retval = dw('d', 11, 1)
-		retval = dr('d', 11)
-		time.sleep(1)
-		retval = dw('d', 11, 0)
-		retval = dr('d', 11)
-		time.sleep(1)
-		retval = dw('d', 11, 1)
-
+		# retval = dw('d', 11, 1)
+		# retval = dr('d', 11)
+		# time.sleep(1)
+		# retval = dw('d', 11, 0)
+		# retval = dr('d', 11)
+		# time.sleep(1)
+		# retval = dw('d', 11, 1)
 
 		out = ''
 		time.sleep(1)

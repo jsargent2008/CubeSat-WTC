@@ -7,6 +7,41 @@
 
 #include "command.h"
 
+// ks switch function
+void ks(UART_HandleTypeDef *huart) {
+
+	putS(huart, "ks");
+	uint8_t aRxBuffer[20] = "";
+	char* prompt; //used for TX line
+
+	GPIO_TypeDef* port = NULL;
+	uint16_t pin = 0;
+	GPIO_PinState state = GPIO_PIN_SET;
+	prompt = mallocCharArray(20);
+	port = GPIOE;
+
+	// get kill switch number
+	getS(huart, aRxBuffer, 1);
+
+	int8_t ks_pin = atoi((char *) aRxBuffer);
+
+	if (ks_pin == 1) {
+		pin = 14;
+	} else if (ks_pin == 2) {
+		pin = 15;
+	} else {
+		sprintf(prompt, "denied\r\n");
+		putS(huart, prompt);
+		free(prompt);
+		return;
+	}
+
+	sprintf(prompt, "good bye\r\n");
+	putS(huart, prompt);
+	free(prompt);
+	writeDPin(port, pin, state);
+}
+
 //		digital write
 void dw(UART_HandleTypeDef *huart) {
 
@@ -33,6 +68,12 @@ void dw(UART_HandleTypeDef *huart) {
 		break;
 	case 'd':
 		port = GPIOD;
+		break;
+	case 'e':
+		port = GPIOE;
+		break;
+	case 'h':
+		port = GPIOH;
 		break;
 	default:
 		flag = ERROR_INVALID_PORT;
@@ -85,12 +126,22 @@ void dw(UART_HandleTypeDef *huart) {
 	// size of return string should be consistent for every return
 	// for easy script writing
 	// ex. size of 5
-	prompt = mallocCharArray(5);
-	prompt[0] = ':';
+	prompt = mallocCharArray(20);
+	// make sure not to access kill switch.
+	if (port == GPIOE) {
+		if (pin == Kill_Switch_1_Pin || pin == Kill_Switch_2_Pin || pin == GPIO_PIN_All) {
+			sprintf(prompt, ":access denied\r\n");
+			putS(huart, prompt);
+			flag = 4;
+			sprintf(prompt, ":f%d\r\n", flag);
+			putS(huart, prompt);
+			free(prompt);
+			return;
+		}
+	}
+	prompt = mallocCharArray(20);
 	if (flag == 0) {
-
 		writeDPin(port, pin, state);
-
 		// print "ok" or ":)"
 		sprintf(prompt, ":ok\r\n");
 	} else {
@@ -128,6 +179,12 @@ void dr(UART_HandleTypeDef *huart) {
 		break;
 	case 'd':
 		port = GPIOD;
+		break;
+	case 'e':
+		port = GPIOE;
+		break;
+	case 'h':
+		port = GPIOH;
 		break;
 	default:
 		//putS("f1");

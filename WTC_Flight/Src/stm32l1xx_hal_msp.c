@@ -96,10 +96,17 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     PC1     ------> ADC_IN11
     PC2     ------> ADC_IN12
     PC3     ------> ADC_IN13
+    PA1     ------> ADC_IN1
+    PA7     ------> ADC_IN7
     PC4     ------> ADC_IN14
     PC5     ------> ADC_IN15
     PB0     ------> ADC_IN8
-    PB1     ------> ADC_IN9 
+    PB1     ------> ADC_IN9
+    PE10     ------> ADC_IN25
+    PB12     ------> ADC_IN18
+    PB13     ------> ADC_IN19
+    PB14     ------> ADC_IN20
+    PB15     ------> ADC_IN21 
     */
     GPIO_InitStruct.Pin = _5X_Out_3_Pin|_5X_Out_2_Pin|_5X_Out_1_Pin|_10X_Out_1_Pin 
                           |_20X_Out_1_Pin|STM_PC5_ADC_Pin;
@@ -107,10 +114,21 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = lmon_3_3_2_Pin|lmon_3_3_1_Pin;
+    GPIO_InitStruct.Pin = MPPT_BUS_MON_Pin|_10X_Out_2_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = lmon_3_3_2_Pin|lmon_3_3_1_Pin|V_Stack_1_Meas_Pin|V_Stack_2_Meas_Pin 
+                          |V_Stack_3_Meas_Pin|V_Stack_4_Meas_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = _70cm_AUX_ADC_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(_70cm_AUX_ADC_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN ADC1_MspInit 1 */
 
@@ -135,15 +153,27 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     PC1     ------> ADC_IN11
     PC2     ------> ADC_IN12
     PC3     ------> ADC_IN13
+    PA1     ------> ADC_IN1
+    PA7     ------> ADC_IN7
     PC4     ------> ADC_IN14
     PC5     ------> ADC_IN15
     PB0     ------> ADC_IN8
-    PB1     ------> ADC_IN9 
+    PB1     ------> ADC_IN9
+    PE10     ------> ADC_IN25
+    PB12     ------> ADC_IN18
+    PB13     ------> ADC_IN19
+    PB14     ------> ADC_IN20
+    PB15     ------> ADC_IN21 
     */
     HAL_GPIO_DeInit(GPIOC, _5X_Out_3_Pin|_5X_Out_2_Pin|_5X_Out_1_Pin|_10X_Out_1_Pin 
                           |_20X_Out_1_Pin|STM_PC5_ADC_Pin);
 
-    HAL_GPIO_DeInit(GPIOB, lmon_3_3_2_Pin|lmon_3_3_1_Pin);
+    HAL_GPIO_DeInit(GPIOA, MPPT_BUS_MON_Pin|_10X_Out_2_Pin);
+
+    HAL_GPIO_DeInit(GPIOB, lmon_3_3_2_Pin|lmon_3_3_1_Pin|V_Stack_1_Meas_Pin|V_Stack_2_Meas_Pin 
+                          |V_Stack_3_Meas_Pin|V_Stack_4_Meas_Pin);
+
+    HAL_GPIO_DeInit(_70cm_AUX_ADC_GPIO_Port, _70cm_AUX_ADC_Pin);
 
   /* USER CODE BEGIN ADC1_MspDeInit 1 */
 
