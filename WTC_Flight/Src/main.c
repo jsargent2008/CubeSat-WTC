@@ -121,7 +121,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi2_Pin, GPIO_PIN_SET);
 }
 
-
 /* USER CODE END 0 */
 
 /**
@@ -164,6 +163,14 @@ int main(void) {
 	MX_ADC_Init();
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
+
+	// TODO: fix ltc to oop or struct
+	while (1) {
+		hi2c = hi2c2;
+		myhuart = &huart1;
+		test();
+	}
+
 	//char lcdstring[50] = "";
 	//used for "cmdXX" string
 	uint8_t index = 0;
