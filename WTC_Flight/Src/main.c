@@ -63,6 +63,8 @@ UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
+DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -72,6 +74,7 @@ I2C_HandleTypeDef hi2c1;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_UART4_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
@@ -115,11 +118,24 @@ void dprint(char* str) {
 }
 
 //uint8_t aRxBuffer[20];
+uint8_t aTxStartMessage[] =
+		"\n\r ****UART-Hyperterminal communication based on DMA****\n\r Enter 10 characters using keyboard :\n\r";
+uint8_t aTxEndMessage[] = "\n\r Example Finished\n\r";
+
+uint8_t aRxBuffer[10];
+char prompt[100] = { };
+
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	/* Turn LED2 on: Transfer in reception process is correct */
-	HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi2_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(_12V_1_Enable_GPIO_Port, _12V_1_Enable_Pin, GPIO_PIN_SET);
+
+//	sprintf(prompt, "rdone");
+	HAL_UART_Transmit(&huart1, (uint8_t *) aRxBuffer, (uint16_t) strlen(aRxBuffer), 0xFFFF);
+
 }
+
+
 
 /* USER CODE END 0 */
 
@@ -156,6 +172,7 @@ int main(void) {
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
+	MX_DMA_Init();
 	MX_UART4_Init();
 	MX_USART1_UART_Init();
 	MX_USART2_UART_Init();
@@ -167,8 +184,38 @@ int main(void) {
 	// TODO: fix ltc to oop or struct
 	while (1) {
 		hi2c = hi2c2;
-		myhuart = &huart1;
-		test();
+		myhuart = &myhuart;
+//		test();
+
+		/*##-2- Start the transmission process #####################################*/
+		/* User start transmission data through "TxBuffer" buffer */
+		if (HAL_UART_Transmit_DMA(&huart1, (uint8_t *) aTxStartMessage,
+				strlen((char *) aTxStartMessage)) != HAL_OK) {
+			/* Transfer error in transmission process */
+			Error_Handler();
+		}
+
+		while (HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY) {
+		}
+
+		sprintf(prompt, "tdone  ");
+		HAL_UART_Transmit(&huart1, (uint8_t *) prompt, (uint16_t) strlen(prompt), 0xFFFF);
+
+		/*##-3- Put UART peripheral in reception process ###########################*/
+		/* Any data received will be stored in "RxBuffer" buffer : the number max of
+		 data received is 10 */
+		if (HAL_UART_Receive_DMA(&huart1, (uint8_t *) aRxBuffer, 10) != HAL_OK) {
+			/* Transfer error in reception process */
+			Error_Handler();
+		}
+
+		sprintf(prompt, "rdone");
+		HAL_UART_Transmit(&huart1, (uint8_t *) prompt, (uint16_t) strlen(prompt), 0xFFFF);
+
+		/* Infinite loop */
+		while (1) {
+		}
+
 	}
 
 	//char lcdstring[50] = "";
@@ -248,6 +295,7 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+
 		/*******
 		 * JON START HERE
 		 */
@@ -410,7 +458,7 @@ static void MX_UART4_Init(void) {
 static void MX_USART1_UART_Init(void) {
 
 	huart1.Instance = USART1;
-	huart1.Init.BaudRate = 115200;
+	huart1.Init.BaudRate = 1200;
 	huart1.Init.WordLength = UART_WORDLENGTH_8B;
 	huart1.Init.StopBits = UART_STOPBITS_1;
 	huart1.Init.Parity = UART_PARITY_NONE;
@@ -457,6 +505,24 @@ static void MX_USART3_UART_Init(void) {
 
 }
 
+/** 
+ * Enable DMA controller clock
+ */
+static void MX_DMA_Init(void) {
+	/* DMA controller clock enable */
+	__HAL_RCC_DMA1_CLK_ENABLE()
+	;
+
+	/* DMA interrupt init */
+	/* DMA1_Channel4_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+	/* DMA1_Channel5_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+
+}
+
 /** Configure pins as 
  * Analog
  * Input
@@ -469,8 +535,7 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitTypeDef GPIO_InitStruct;
 
 	/* GPIO Ports Clock Enable */
-	__HAL_RCC_GPIOE_CLK_ENABLE()
-	;
+	__HAL_RCC_GPIOE_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE()
 	;
 	__HAL_RCC_GPIOA_CLK_ENABLE()
