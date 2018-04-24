@@ -59,6 +59,8 @@ ADC_HandleTypeDef hadc;
 
 I2C_HandleTypeDef hi2c2;
 
+RTC_HandleTypeDef hrtc;
+
 UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
@@ -69,6 +71,9 @@ DMA_HandleTypeDef hdma_usart1_tx;
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
+RTC_TimeTypeDef sTime;
+RTC_DateTypeDef sDate;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -81,6 +86,7 @@ static void MX_USART2_UART_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_ADC_Init(void);
 static void MX_USART3_UART_Init(void);
+static void MX_RTC_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -125,7 +131,6 @@ uint8_t aTxEndMessage[] = "\n\r Example Finished\n\r";
 uint8_t aRxBuffer[10];
 char prompt[100] = { };
 
-
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	/* Turn LED2 on: Transfer in reception process is correct */
 	HAL_GPIO_WritePin(_12V_1_Enable_GPIO_Port, _12V_1_Enable_Pin, GPIO_PIN_SET);
@@ -134,8 +139,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	HAL_UART_Transmit(&huart1, (uint8_t *) aRxBuffer, (uint16_t) strlen(aRxBuffer), 0xFFFF);
 
 }
-
-
 
 /* USER CODE END 0 */
 
@@ -179,7 +182,25 @@ int main(void) {
 	MX_I2C2_Init();
 	MX_ADC_Init();
 	MX_USART3_UART_Init();
+	MX_RTC_Init();
 	/* USER CODE BEGIN 2 */
+
+	//RTC testing, the rest of main agrees with master branch
+	while (1) {
+		//HAL_StatusTypeDef HAL_RTC_GetTime(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTime, uint32_t Format)
+		/*Get  the RTC current Time*/
+		HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+		/*Get  the RTC current Date*/
+		HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+
+		uint8_t time[3];
+		time[0] = sTime.Hours;
+		time[1] = sTime.Minutes;
+		time[2] = sTime.Seconds;
+
+		HAL_Delay(1000);
+
+	}
 
 	// TODO: fix ltc to oop or struct
 	while (1) {
@@ -339,6 +360,7 @@ void SystemClock_Config(void) {
 
 	RCC_OscInitTypeDef RCC_OscInitStruct;
 	RCC_ClkInitTypeDef RCC_ClkInitStruct;
+	RCC_PeriphCLKInitTypeDef PeriphClkInit;
 
 	/**Configure the main internal regulator output voltage
 	 */
@@ -346,9 +368,10 @@ void SystemClock_Config(void) {
 
 	/**Initializes the CPU, AHB and APB busses clocks
 	 */
-	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_LSI;
 	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
 	RCC_OscInitStruct.HSICalibrationValue = 16;
+	RCC_OscInitStruct.LSIState = RCC_LSI_ON;
 	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
 	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
 	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL3;
@@ -367,6 +390,12 @@ void SystemClock_Config(void) {
 	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
 	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
+		_Error_Handler(__FILE__, __LINE__);
+	}
+
+	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+	PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+	if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
 		_Error_Handler(__FILE__, __LINE__);
 	}
 
@@ -433,6 +462,51 @@ static void MX_I2C2_Init(void) {
 	hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 	if (HAL_I2C_Init(&hi2c2) != HAL_OK) {
 		_Error_Handler(__FILE__, __LINE__);
+	}
+
+}
+
+/* RTC init function */
+static void MX_RTC_Init(void) {
+
+	RTC_TimeTypeDef sTime;
+	RTC_DateTypeDef sDate;
+
+	/**Initialize RTC Only
+	 */
+	hrtc.Instance = RTC;
+	if (HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) != 0x32F2) {
+		hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+		hrtc.Init.AsynchPrediv = 127;
+		hrtc.Init.SynchPrediv = 255;
+		hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+		hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+		hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+		if (HAL_RTC_Init(&hrtc) != HAL_OK) {
+			_Error_Handler(__FILE__, __LINE__);
+		}
+
+		/**Initialize RTC and set the Time and Date
+		 */
+		sTime.Hours = 0x16;
+		sTime.Minutes = 0x30;
+		sTime.Seconds = 0x0;
+		sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+		sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+		if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK) {
+			_Error_Handler(__FILE__, __LINE__);
+		}
+
+		sDate.WeekDay = RTC_WEEKDAY_TUESDAY;
+		sDate.Month = RTC_MONTH_APRIL;
+		sDate.Date = 0x24;
+		sDate.Year = 0x18;
+
+		if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK) {
+			_Error_Handler(__FILE__, __LINE__);
+		}
+
+		HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR0, 0x32F2);
 	}
 
 }
@@ -535,7 +609,8 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitTypeDef GPIO_InitStruct;
 
 	/* GPIO Ports Clock Enable */
-	__HAL_RCC_GPIOE_CLK_ENABLE();
+	__HAL_RCC_GPIOE_CLK_ENABLE()
+	;
 	__HAL_RCC_GPIOC_CLK_ENABLE()
 	;
 	__HAL_RCC_GPIOA_CLK_ENABLE()
