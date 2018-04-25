@@ -49,6 +49,7 @@
 #include "command/command.h"
 #include "PRINTF/printf.h"
 #include "adc/adc.h"
+#include "rtc/rtc.h"
 
 #define DEBUG_UART huart4
 
@@ -187,18 +188,40 @@ int main(void) {
 
 	//RTC testing, the rest of main agrees with master branch
 	while (1) {
-		//HAL_StatusTypeDef HAL_RTC_GetTime(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTime, uint32_t Format)
-		/*Get  the RTC current Time*/
-		HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-		/*Get  the RTC current Date*/
-		HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-
-		uint8_t time[3];
-		time[0] = sTime.Hours;
-		time[1] = sTime.Minutes;
-		time[2] = sTime.Seconds;
-
-		HAL_Delay(1000);
+		updateTimeFlash(&hrtc, &sTime, &sDate);
+//		//HAL_StatusTypeDef HAL_RTC_GetTime(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTime, uint32_t Format)
+//		/*Get  the RTC current Time*/
+//		HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+//		/*Get  the RTC current Date*/
+//		HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+//
+//		uint32_t time_32 = 0;
+//		time_32 = sTime.Hours;
+//		time_32 = time_32 << 8;
+//		time_32 = time_32 ^ sTime.Minutes;
+//		time_32 = time_32 << 8;
+//		time_32 = time_32 ^ sTime.Seconds;
+//		time_32 = time_32 << 8;
+//		uint32_t date_32 = 0;
+//		date_32 = sDate.Date;
+//		date_32 = date_32 << 8;
+//		date_32 = date_32 ^ sDate.Month;
+//		date_32 = date_32 << 8;
+//		date_32 = date_32 ^ sDate.Year;
+//		date_32 = date_32 << 8;
+//
+//		if (HAL_FLASHEx_DATAEEPROM_Unlock() == HAL_OK) // Remember to unlock the EEPROM before using
+//				{
+//			HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD, 0x08080000, time_32);
+//			HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD, 0x08080010, date_32);
+//			//HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD, 0x08080000, (uint32_t) time); //Write: Type, Address, Data
+//			//HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD, 0x08080010, (uint32_t) date); //Write: Type, Address, Data
+//			uint32_t data_time = *(uint32_t *) 0x08080000; //Read: Cast the address as a uint32_t pointer and dereference it
+//			uint32_t data_date = *(uint32_t *) 0x08080010; //Read: Cast the address as a uint32_t pointer and dereference it
+//			HAL_FLASHEx_DATAEEPROM_Lock(); //Lock when done? (Not sure if necessary)
+//		}
+//
+//		HAL_Delay(1000);
 
 	}
 

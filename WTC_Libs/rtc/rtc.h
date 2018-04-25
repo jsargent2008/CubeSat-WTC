@@ -8,8 +8,15 @@
 #ifndef RTC_H_
 #define RTC_H_
 
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_adc.h"
+
+/* Private variables ---------------------------------------------------------*/
+RTC_TimeTypeDef sTime;
+RTC_DateTypeDef sDate;
+
+/* Private function prototypes -----------------------------------------------*/
+void updateTimeFlash(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTime, RTC_DateTypeDef *sDate);
 
 #endif /* RTC_H_ */
