@@ -1,0 +1,3 @@
+kicadnetlistparsing.Label2Mem
+kicadnetlistparsing.label2Mem
+kicadnetlistparsing.KicadNetListParsing

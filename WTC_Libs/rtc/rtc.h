@@ -11,6 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32l1xx_hal.h"
+#include "memoryMap\memoryMap.h"
 
 /* Private variables ---------------------------------------------------------*/
 RTC_TimeTypeDef sTime;
