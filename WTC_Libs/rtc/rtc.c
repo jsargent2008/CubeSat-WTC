@@ -28,6 +28,7 @@ void updateTimeFlash(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTime, RTC_DateTy
 	time_32 = time_32 << 8;
 	time_32 = time_32 ^ sTime->Seconds;
 	time_32 = time_32 << 8;
+
 	uint32_t date_32 = 0;
 	date_32 = sDate->Date;
 	date_32 = date_32 << 8;
@@ -38,7 +39,7 @@ void updateTimeFlash(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTime, RTC_DateTy
 
 	// Remember to unlock the EEPROM before using
 	if (HAL_FLASHEx_DATAEEPROM_Unlock() == HAL_OK) {
-		HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD, sysMem_lastChk_RTC_Time  ,
+		HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD, sysMem_lastChk_RTC_Time,
 				time_32);
 		HAL_FLASHEx_DATAEEPROM_Program(FLASH_TYPEPROGRAMDATA_WORD, sysMem_lastChk_RTC_Date,
 				date_32);

@@ -186,10 +186,11 @@ int main(void) {
 	MX_RTC_Init();
 	/* USER CODE BEGIN 2 */
 
+	gpioDump((uint32_t)0x08080000);
 	//RTC testing, the rest of main agrees with master branch
 	while (1) {
-		updateTimeFlash(&hrtc, &sTime, &sDate);
-
+		//updateTimeFlash(&hrtc, &sTime, &sDate);
+		HAL_Delay(500);
 	}
 
 	// TODO: fix ltc to oop or struct
