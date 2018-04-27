@@ -67,6 +67,7 @@
 #define sysMem_UHF_Power_Enable_p95			((uint32_t)0x8008001d)
 
 //------------COPY TEXT ABOVE------------
-
-void gpioDump(int32_t baseAdr);
+uint8_t gpioAllDump();
+uint8_t gpioPortDump(char port);
+uint32_t gpioStatusRetrieve(char port);
 #endif /* MEMORYMAP_MEMORYMAP_H_ */

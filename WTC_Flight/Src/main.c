@@ -50,7 +50,9 @@
 #include "PRINTF/printf.h"
 #include "adc/adc.h"
 #include "rtc/rtc.h"
+#include "memoryMap/memoryMap.h"
 
+//huart4 is the 70cm primary
 #define DEBUG_UART huart4
 
 /* USER CODE END Includes */
@@ -185,50 +187,53 @@ int main(void) {
 	MX_USART3_UART_Init();
 	MX_RTC_Init();
 	/* USER CODE BEGIN 2 */
+//	(uint32_t)0x08080000
+	uint32_t data = gpioStatusRetrieve('A');
+	//gpioDump();
 
-	gpioDump((uint32_t)0x08080000);
 	//RTC testing, the rest of main agrees with master branch
 	while (1) {
 		//updateTimeFlash(&hrtc, &sTime, &sDate);
+		data = data;
 		HAL_Delay(500);
 	}
 
 	// TODO: fix ltc to oop or struct
-	while (1) {
-		hi2c = hi2c2;
-		myhuart = &myhuart;
-//		test();
-
-		/*##-2- Start the transmission process #####################################*/
-		/* User start transmission data through "TxBuffer" buffer */
-		if (HAL_UART_Transmit_DMA(&huart1, (uint8_t *) aTxStartMessage,
-				strlen((char *) aTxStartMessage)) != HAL_OK) {
-			/* Transfer error in transmission process */
-			Error_Handler();
-		}
-
-		while (HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY) {
-		}
-
-		sprintf(prompt, "tdone  ");
-		HAL_UART_Transmit(&huart1, (uint8_t *) prompt, (uint16_t) strlen(prompt), 0xFFFF);
-
-		/*##-3- Put UART peripheral in reception process ###########################*/
-		/* Any data received will be stored in "RxBuffer" buffer : the number max of
-		 data received is 10 */
-		if (HAL_UART_Receive_DMA(&huart1, (uint8_t *) aRxBuffer, 10) != HAL_OK) {
-			/* Transfer error in reception process */
-			Error_Handler();
-		}
-
-		sprintf(prompt, "rdone");
-		HAL_UART_Transmit(&huart1, (uint8_t *) prompt, (uint16_t) strlen(prompt), 0xFFFF);
-
-		/* Infinite loop */
-		while (1) {
-		}
-
-	}
+//	while (1) {
+//		hi2c = hi2c2;
+//		myhuart = &myhuart;
+////		test();
+//
+//		/*##-2- Start the transmission process #####################################*/
+//		/* User start transmission data through "TxBuffer" buffer */
+//		if (HAL_UART_Transmit_DMA(&huart1, (uint8_t *) aTxStartMessage,
+//				strlen((char *) aTxStartMessage)) != HAL_OK) {
+//			/* Transfer error in transmission process */
+//			Error_Handler();
+//		}
+//
+//		while (HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY) {
+//		}
+//
+//		sprintf(prompt, "tdone  ");
+//		HAL_UART_Transmit(&huart1, (uint8_t *) prompt, (uint16_t) strlen(prompt), 0xFFFF);
+//
+//		/*##-3- Put UART peripheral in reception process ###########################*/
+//		/* Any data received will be stored in "RxBuffer" buffer : the number max of
+//		 data received is 10 */
+//		if (HAL_UART_Receive_DMA(&huart1, (uint8_t *) aRxBuffer, 10) != HAL_OK) {
+//			/* Transfer error in reception process */
+//			Error_Handler();
+//		}
+//
+//		sprintf(prompt, "rdone");
+//		HAL_UART_Transmit(&huart1, (uint8_t *) prompt, (uint16_t) strlen(prompt), 0xFFFF);
+//
+//		/* Infinite loop */
+//		while (1) {
+//		}
+//
+//	}
 
 	//char lcdstring[50] = "";
 	//used for "cmdXX" string
