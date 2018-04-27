@@ -1,9 +1,10 @@
 import time
 import serial
 import sys
+import math
 from enum import Enum 
 
-WRITE_DELAY = 0.001
+WRITE_DELAY = 0.005
 READ_DELAY = 0.005
 RETURN_LEN = 5
 
@@ -121,6 +122,7 @@ def ar(channel):
 	# 00 is channel, single int
 	# length is 3, validation is 2
 	out = ''
+	time.sleep(WRITE_DELAY)
 	if(swrite("ar ", 1) == 1):
 		swrite(format("%02d ", channel), 0)
 
@@ -129,12 +131,11 @@ def ar(channel):
 		out = ser.read(2).decode('ascii')
 		# gets the output result and \r\n
 		out = ser.readline().decode("ascii").strip()
-		printf("the ret val was `%s`", out);
+		# printf("the ret val was `%s`", out);
+		fval  =  float(out.split("-")[-1]);
+		# printf("\nval `%.3f`\n", fval);
 
-		if("ok" in out):
-			return 1
-		else:
-			return 0
+		return fval
 	else:
 		return 0
 
@@ -192,6 +193,73 @@ def turnOn5V():
 			dw('a','1',0)
 			return 0;
 
+def checkWTC_3V():
+	succeed = True
+	target = 3.3
+	tolerance = 0.20
+
+	printf("\n3.3 Rail and Regulator Voltage Test Begin\n")
+
+	# 	Name		:	ADC Name	:	ADC	:	Factor
+	#	3_3V_Rail 	:	5X_Out_1	:	12	:	5
+	#	3.3Raw-1	:	5X_Out_2	:	11	:	5
+	#	3.3Raw-1	:	5X_Out_3	:	10	:	5
+
+	rail = ar(12) * 5
+	ps1 = ar(11) * 5
+	ps2 = ar(10) * 5
+
+	# printf("3_3V_Rail is %4.3f\n", rail)
+	if(math.isclose(rail, target, rel_tol=target*tolerance)):
+		printf("\tPASS:\t")
+		succeed = succeed & True;
+	else:
+		printf("\tFAIL:\t")
+		succeed = False;
+	printf("3_3V_Rail is %4.3f\n", rail)
+
+	if(math.isclose(ps1, target, rel_tol=target*tolerance)):
+		printf("\tPASS:\t")
+		succeed = succeed & True;
+	else:
+		printf("\tFAIL:\t")
+		succeed = False;
+	printf("3.3Raw-1 is %4.3f\n", ps1)
+
+	if(math.isclose(ps2, target, rel_tol=target*tolerance)):
+		printf("\tPASS:\t")
+		succeed = succeed & True;
+	else:
+		printf("\tFAIL:\t")
+		succeed = False;
+	printf("3.3Raw-1 is %4.3f\n", ps2)
+
+	printf("3.3 Rail and Regulator Voltage Test End:\t %s\n\n", succeed)
+
+	return succeed
+
+
+def checkWTC_3I():
+	printf("\n3.3 Rail and Regulator Current Test Begin\n")
+
+	# 	Name		:	ADC Name	:	ADC	:	Factor
+	#	Imon_3.3-2 	:	Imon_3.3-2	:	8	:	1
+	#	Imon_3.3-1	:	Imon_3.3-1	:	9	:	1
+
+	gain = 20
+	r = .1
+
+	reg1 = ar(9) * gain * r
+	reg2 = ar(8) * gain * r
+
+	printf("\tImon_3.3-1 is %4.3f\n", reg1)
+	printf("\tImon_3.3-2 is %4.3f\n", reg2)
+
+	printf("\t\tI_Total is ~%4.3f\n", reg1+reg2)
+
+	printf("3.3 Rail and Regulator Current Test End\n\n")
+	
+	return True
 
 ## for surfsat
 #EnduroSat commands
@@ -225,7 +293,7 @@ def tt(channel):
 
 # configure the serial connection
 ser = serial.Serial(
-	port='COM7',
+	port='COM4',
 	baudrate=115200,
 	parity=serial.PARITY_NONE,
 	stopbits=serial.STOPBITS_ONE,
@@ -240,6 +308,11 @@ retval = 0
 
 # main loop
 while 1:
+	status = checkWTC_3V()
+	status = checkWTC_3I()
+
+
+	exit()
 
 	# get keyboard input
 	# cmd = input("Enter command or 'exit':")
