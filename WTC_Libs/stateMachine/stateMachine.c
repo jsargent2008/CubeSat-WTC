@@ -5,9 +5,46 @@
  *      Author: Administrator
  */
 
-#include "stateMachine.h"
+//WTC Software Flow:
+//------------------
+//Initialization
+//Deployed Signal
+//Wait 30 minutes/check 3.3V
+//Deploy Antennas (Ant x2, LP?)
+//Confirm Deployed Antennas
+//Battery Check
+//Initial Comm (or Repeat Comms)
+//Turn on Xceiver
+//Listen
+//Get Signal
+//Send back "Hello Earth!" w/ Status
+//Battery Check
+//Operations
+//Initialize w/checkout
+//Science stack health (Pi health/Langmuir/Electrometer/Pico (x2 if failed))
+//Good health - run default science check ADC & LP
+//Bad Health no science check/send to SD card
+//Science Health send to WTC SD card - transmit
+//Shutdown unit
+//Transmit
+//Listen
+//Contact/receive commands
+//Send Spacecraft Health header (level 0) -13 bits
+//Send Pi data packet(s)
+//(comms protocols)
+//Ground
+//Building Orbit Model
+//Establishing Comms windows
+//Data on solar orientation model of spin/charging
+//Science Ops
+//Enable Pi
+//Update run parameters and/or health check
+//RUN (~15 mins)
+//Science
+//Collect points and create data packets
+//Interrupt to shutdown or send data to WTC/SD
 
-//SURFSAT
+#include "stateMachine.h"
 
 void wtcSetup(ADC_HandleTypeDef *hadc) {
 	//setup function for WTC, 3.3v power is on
@@ -28,11 +65,11 @@ void wtcSetup(ADC_HandleTypeDef *hadc) {
 	//deploy_antenna
 	//}
 
-//    turn_on_xceiver
-//    listen
-//    get_signal
-//    print('Hello Earth!' + status)
-//    check_battery
+	// turn_on_xceiver
+	// listen
+	// get_signal
+	// print('Hello Earth!' + status)
+	// check_battery
 }
 
 uint8_t depolyAntenna(ADC_HandleTypeDef *hadc, uint8_t antenna) {

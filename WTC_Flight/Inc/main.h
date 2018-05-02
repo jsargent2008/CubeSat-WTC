@@ -146,8 +146,6 @@
 #define _70cm_Primary_TR_GPIO_Port GPIOD
 #define Pgood_3V3_1_Pin GPIO_PIN_2
 #define Pgood_3V3_1_GPIO_Port GPIOD
-#define Pgood_3V3_2_Pin GPIO_PIN_3
-#define Pgood_3V3_2_GPIO_Port GPIOD
 #define EN_MPPT_Z__Pin GPIO_PIN_5
 #define EN_MPPT_Z__GPIO_Port GPIOD
 #define EN_MPPT_YZ__Pin GPIO_PIN_6
