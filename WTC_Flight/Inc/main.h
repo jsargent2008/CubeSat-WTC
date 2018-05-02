@@ -175,6 +175,10 @@
 /* #define USE_FULL_ASSERT    1U */
 
 /* USER CODE BEGIN Private defines */
+#define USART_PRIMARY huart4
+#define USART_PI1 huart1
+#define USART_UHF huart2
+#define USART_PI2 huart3
 
 /* USER CODE END Private defines */
 

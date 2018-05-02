@@ -196,17 +196,19 @@ int main(void)
 	//gpioDump();
 
 	//RTC testing, the rest of main agrees with master branch
+//	while (1) {
+//		//updateTimeFlash(&hrtc, &sTime, &sDate);
+//		data = data;
+//		HAL_Delay(500);
+//	}
+
+	LTC2991 *testLtc = initLTC2991(&hi2c2, 0x90);
 	while (1) {
-		//updateTimeFlash(&hrtc, &sTime, &sDate);
-		data = data;
 		HAL_Delay(500);
+		test(testLtc, &USART_PI1);
 	}
 
-	// TODO: fix ltc to oop or struct
 //	while (1) {
-//		hi2c = hi2c2;
-//		myhuart = &myhuart;
-////		test();
 //
 //		/*##-2- Start the transmission process #####################################*/
 //		/* User start transmission data through "TxBuffer" buffer */
@@ -548,7 +550,7 @@ static void MX_USART1_UART_Init(void)
 {
 
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 1200;
+  huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;

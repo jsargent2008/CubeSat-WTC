@@ -15,11 +15,17 @@ const float LTC2991_TEMPERATURE_lsb = 0.0625;
 //! Used to readback diode voltage when in temperature measurement mode.
 const float LTC2991_DIODE_VOLTAGE_lsb = 3.815E-05;
 
-// TODO: Make using struct or OOP
-I2C_HandleTypeDef hi2c;
-UART_HandleTypeDef *myhuart;
 
-LTC2991 *test() {
+LTC2991 *initLTC2991(I2C_HandleTypeDef *hi2c, uint8_t i2c_address) {
+	LTC2991 *ltc = malloc(sizeof(LTC2991));
+	ltc->hi2c = hi2c;
+	ltc->i2c_address = i2c_address;
+
+	return ltc;
+}
+
+// TODO: implement ERROR and STATUS checking (LTC2991 register and HAL_I2C) return codes
+LTC2991 *test(LTC2991 *ltc, UART_HandleTypeDef *myhuart) {
 	int8_t ack = 0;
 	// Read Temperature
 	int8_t data_valid;
@@ -32,18 +38,18 @@ LTC2991 *test() {
 	sprintf(prompt, "hi\r\n");
 	putS(myhuart, prompt);
 
-	ack |= LTC2991_register_write(LTC2991_I2C_ADDRESS, LTC2991_CHANNEL_ENABLE_REG,
+	ack |= LTC2991_register_write(ltc, LTC2991_CHANNEL_ENABLE_REG,
 	LTC2991_ENABLE_ALL_CHANNELS);   //! Enables all channels
-	ack |= LTC2991_register_write(LTC2991_I2C_ADDRESS, LTC2991_CONTROL_V1234_REG, 0x00); //! Sets registers to default starting values.
-	ack |= LTC2991_register_write(LTC2991_I2C_ADDRESS, LTC2991_CONTROL_V5678_REG, 0x00);
-	ack |= LTC2991_register_write(LTC2991_I2C_ADDRESS, LTC2991_CONTROL_PWM_Tinternal_REG,
+	ack |= LTC2991_register_write(ltc, LTC2991_CONTROL_V1234_REG, 0x00); //! Sets registers to default starting values.
+	ack |= LTC2991_register_write(ltc, LTC2991_CONTROL_V5678_REG, 0x00);
+	ack |= LTC2991_register_write(ltc, LTC2991_CONTROL_PWM_Tinternal_REG,
 	LTC2991_REPEAT_MODE);    //! Configures LTC2991 for Repeated Acquisition mode
 
 	// Do temp reading
 	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
-	ack |= LTC2991_adc_read_new_data(LTC2991_I2C_ADDRESS, LTC2991_T_Internal_MSB_REG, &adc_code,
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_T_Internal_MSB_REG, &adc_code,
 			&data_valid, 1000);
-	ack |= LTC2991_register_read(LTC2991_I2C_ADDRESS, LTC2991_CONTROL_PWM_Tinternal_REG, &reg_data);
+	ack |= LTC2991_register_read(ltc, LTC2991_CONTROL_PWM_Tinternal_REG, &reg_data);
 	if (reg_data & LTC2991_INT_KELVIN_ENABLE)
 		isKelvin = 1;
 	else
@@ -51,7 +57,7 @@ LTC2991 *test() {
 
 	temperature = LTC2991_temperature(adc_code, LTC2991_TEMPERATURE_lsb, isKelvin);
 
-	sprintf(prompt, "%.2fC\r\n", temperature);
+	sprintf(prompt, "%x\t%.2fC\r\n", ack, temperature);
 	putS(myhuart, prompt);
 
 	//	Do vcc voltage reading
@@ -59,7 +65,7 @@ LTC2991 *test() {
 	float voltage;
 
 	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
-	ack |= LTC2991_adc_read_new_data(LTC2991_I2C_ADDRESS, LTC2991_Vcc_MSB_REG, &code, &data_valid,
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_Vcc_MSB_REG, &code, &data_valid,
 			1000);
 	voltage = LTC2991_code_to_vcc_voltage(code, LTC2991_SINGLE_ENDED_lsb);
 
@@ -85,13 +91,13 @@ uint8_t CheckDevAddress(uint16_t DevAddress) {
 }
 
 // Reads a 14-bit adc_code from LTC2991.
-int8_t LTC2991_adc_read(uint8_t i2c_address, uint8_t msb_register_address, int16_t *adc_code,
+int8_t LTC2991_adc_read(LTC2991 *ltc, uint8_t msb_register_address, int16_t *adc_code,
 		int8_t *data_valid) {
 	int8_t ack = 0;
 	uint8_t code[2] = { };
 
-	HAL_I2C_Master_Transmit(&hi2c, i2c_address, &msb_register_address, 1, 1000);
-	ack = HAL_I2C_Master_Receive(&hi2c, i2c_address, code, 2, 1000);
+	HAL_I2C_Master_Transmit(ltc->hi2c, ltc->i2c_address, &msb_register_address, 1, 1000);
+	ack = HAL_I2C_Master_Receive(ltc->hi2c, ltc->i2c_address, code, 2, 1000);
 
 	// move over first half to msb position then or the lsb in
 	uint16_t actcode;
@@ -109,7 +115,7 @@ int8_t LTC2991_adc_read(uint8_t i2c_address, uint8_t msb_register_address, int16
 // Similar to LTC2991_adc_read except it repeats until the data_valid bit is set, it fails to receive an I2C acknowledge, or the timeout (in milliseconds)
 // expires. It keeps trying to read from the LTC2991 every millisecond until the data_valid bit is set (indicating new data since the previous
 // time this register was read) or until it fails to receive an I2C acknowledge (indicating an error on the I2C bus).
-int8_t LTC2991_adc_read_timeout(uint8_t i2c_address, uint8_t msb_register_address,
+int8_t LTC2991_adc_read_timeout(LTC2991 *ltc, uint8_t msb_register_address,
 		int16_t *adc_code, int8_t *data_valid, uint16_t timeout, uint8_t status_bit) {
 	int8_t ack = 0;
 	uint8_t reg_data;
@@ -118,9 +124,9 @@ int8_t LTC2991_adc_read_timeout(uint8_t i2c_address, uint8_t msb_register_addres
 	for (timer_count = 0; timer_count < timeout; timer_count++) {
 
 		if (status_bit < 8) {
-			ack |= LTC2991_register_read(i2c_address, LTC2991_STATUS_LOW_REG, &reg_data); //! 1)Read status register until correct data valid bit is set
+			ack |= LTC2991_register_read(ltc, LTC2991_STATUS_LOW_REG, &reg_data); //! 1)Read status register until correct data valid bit is set
 		} else {
-			ack |= LTC2991_register_read(i2c_address, LTC2991_STATUS_HIGH_REG, &reg_data); //! 1)Read status register until correct data valid bit is set
+			ack |= LTC2991_register_read(ltc, LTC2991_STATUS_HIGH_REG, &reg_data); //! 1)Read status register until correct data valid bit is set
 			if (status_bit == 8) {
 				status_bit = 1;
 			} else {
@@ -135,7 +141,7 @@ int8_t LTC2991_adc_read_timeout(uint8_t i2c_address, uint8_t msb_register_addres
 		HAL_Delay(1);
 	}
 
-	ack |= LTC2991_adc_read(i2c_address, msb_register_address, &(*adc_code), &(*data_valid)); //! 2) It's either valid or it's timed out, we read anyways
+	ack |= LTC2991_adc_read(ltc, msb_register_address, &(*adc_code), &(*data_valid)); //! 2) It's either valid or it's timed out, we read anyways
 	if (*data_valid != 1) {
 //		Serial.println("Data not valid");
 //		Serial.println(*data_valid);
@@ -149,48 +155,48 @@ int8_t LTC2991_adc_read_timeout(uint8_t i2c_address, uint8_t msb_register_addres
 // to differential voltage mode, the data in the register may still correspond to the temperature reading immediately
 // after the mode change.  Flushing one reading and waiting for a new reading guarantees fresh data is received.
 // If the timeout is reached without valid data (*data_valid=1) the function exits.
-int8_t LTC2991_adc_read_new_data(uint8_t i2c_address, uint8_t msb_register_address,
+int8_t LTC2991_adc_read_new_data(LTC2991 *ltc, uint8_t msb_register_address,
 		int16_t *adc_code, int8_t *data_valid, uint16_t timeout) {
 	int8_t ack = 0;
 
-	ack |= LTC2991_adc_read_timeout(i2c_address, msb_register_address, &(*adc_code), &(*data_valid),
+	ack |= LTC2991_adc_read_timeout(ltc, msb_register_address, &(*adc_code), &(*data_valid),
 			timeout, ((msb_register_address / 2) - 0x05)); //! 1)  Throw away old data
-	ack |= LTC2991_adc_read_timeout(i2c_address, msb_register_address, &(*adc_code), &(*data_valid),
+	ack |= LTC2991_adc_read_timeout(ltc, msb_register_address, &(*adc_code), &(*data_valid),
 			timeout, ((msb_register_address / 2) - 0x05)); //! 2) Read new data
 
 	return (ack);
 }
 
 // Reads an 8-bit register from the LTC2991 using the standard repeated start format.
-int8_t LTC2991_register_read(uint8_t i2c_address, uint8_t register_address, uint8_t *register_data) {
+int8_t LTC2991_register_read(LTC2991 *ltc, uint8_t register_address, uint8_t *register_data) {
 	int8_t ack = 0;
 
-	ack = HAL_I2C_Mem_Read(&hi2c, i2c_address, register_address, I2C_MEMADD_SIZE_8BIT,
+	ack = HAL_I2C_Mem_Read(ltc->hi2c, ltc->i2c_address, register_address, I2C_MEMADD_SIZE_8BIT,
 			register_data, 1, 1000);
 	return (ack);
 }
 
 // Write one byte to an LTC2991 register.
 // Writes to an 8-bit register inside the LTC2991 using the standard I2C repeated start format.
-int8_t LTC2991_register_write(uint8_t i2c_address, uint8_t register_address, uint8_t register_data) {
+int8_t LTC2991_register_write(LTC2991 *ltc, uint8_t register_address, uint8_t register_data) {
 	int8_t ack = 0;
 
-	ack = HAL_I2C_Mem_Write(&hi2c, i2c_address, register_address, I2C_MEMADD_SIZE_8BIT,
+	ack = HAL_I2C_Mem_Write(ltc->hi2c, ltc->i2c_address, register_address, I2C_MEMADD_SIZE_8BIT,
 			&register_data, 1, 1000);
 	return (ack);
 }
 
 // Used to set and clear bits in a control register.  bits_to_set will be bitwise OR'd with the register.
 // bits_to_clear will be inverted and bitwise AND'd with the register so that every location with a 1 will result in a 0 in the register.
-int8_t LTC2991_register_set_clear_bits(uint8_t i2c_address, uint8_t register_address,
+int8_t LTC2991_register_set_clear_bits(LTC2991 *ltc, uint8_t register_address,
 		uint8_t bits_to_set, uint8_t bits_to_clear) {
 	uint8_t register_data;
 	int8_t ack = 0;
 
-	ack |= LTC2991_register_read(i2c_address, register_address, &register_data); //! 1) Read register
+	ack |= LTC2991_register_read(ltc, register_address, &register_data); //! 1) Read register
 	register_data = register_data & (~bits_to_clear); //! 2) Clear bits that were set to be cleared
 	register_data = register_data | bits_to_set;
-	ack |= LTC2991_register_write(i2c_address, register_address, register_data); //! 3) Write to register with the cleared bits
+	ack |= LTC2991_register_write(ltc, register_address, register_data); //! 3) Write to register with the cleared bits
 	return (ack);
 }
 

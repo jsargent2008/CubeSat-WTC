@@ -145,9 +145,6 @@
 #include "UART_IRQ/UART_IRQ.h"
 #include "PRINTF/printf.h"
 
-extern I2C_HandleTypeDef hi2c;
-extern UART_HandleTypeDef *myhuart;
-
 /*! @name I2C_Addresses
  @{ */
 
@@ -259,16 +256,17 @@ extern UART_HandleTypeDef *myhuart;
 /*!@} */
 
 typedef struct LTC2991 {
-	I2C_HandleTypeDef *hi2c;
-	uint16_t DevAddress;
-	uint8_t returnVal;
+	I2C_HandleTypeDef *hi2c;	//!< reference to the hardware i2c bus this instance is on
+	uint16_t i2c_address;		//!< the actual address as configured with jumpers for the LTC
+	uint8_t returnVal;			//!< return status code
 } LTC2991;
 
-LTC2991 *test();
+LTC2991 *initLTC2991(I2C_HandleTypeDef *hi2c, uint8_t i2c_address);
+LTC2991 *test(LTC2991 *ltc, UART_HandleTypeDef *myhuart);
 
 //! Reads a 14-bit adc_code from LTC2991.
 //! @return Returns the state of the acknowledge bit after the I2C address write. 0=acknowledge, 1=no acknowledge.
-int8_t LTC2991_adc_read(uint8_t i2c_address, //!< I2C address of the LTC2991. Configured by tying the ADR0, ADR1, and ADR2 pins high or low. See Table 1 of datasheet.
+int8_t LTC2991_adc_read(LTC2991 *ltc, //!< The master LTC2991 instance(ish?)
 		uint8_t msb_register_address, /*!< Address of the LTC2991 MSB register to be read. This is also known as the "command byte".
 		 Two sequential 8-bit registers are read, starting with the msb_register_address.*/
 		int16_t *adc_code,      //!< returns 14-bit value read from the adc
@@ -280,7 +278,7 @@ int8_t LTC2991_adc_read(uint8_t i2c_address, //!< I2C address of the LTC2991. Co
 //! expires. It keeps trying to read from the LTC2991 every millisecond until the data_valid bit is set (indicating new data since the previous
 //! time this register was read) or until it fails to receive an I2C acknowledge (indicating an error on the I2C bus).
 //! @return Returns the state of the acknowledge bit after the I2C address write. 0=acknowledge, 1=no acknowledge.
-int8_t LTC2991_adc_read_timeout(uint8_t i2c_address, //!< I2C address of the LTC2991. Configured by tying the ADR0, ADR1, and ADR2 pins high or low. See Table 1 of datasheet.
+int8_t LTC2991_adc_read_timeout(LTC2991 *ltc, //!< The master LTC2991 instance(ish?)
 		uint8_t msb_register_address, /*!< Address of the LTC2991 MSB register to be read. This is also known as the "command byte".
 		 Two sequential 8-bit registers will be read, starting with the msb_register_address.*/
 		int16_t *adc_code,      //!< returns 14-bit value read from the adc
@@ -295,7 +293,7 @@ int8_t LTC2991_adc_read_timeout(uint8_t i2c_address, //!< I2C address of the LTC
 //! after the mode change.  Flushing one reading and waiting for a new reading guarantees fresh data is received.
 //! If the timeout is reached without valid data (*data_valid=1) the function exits.
 //! @return Returns the state of the acknowledge bit after the I2C address write. 0=acknowledge, 1=no acknowledge.
-int8_t LTC2991_adc_read_new_data(uint8_t i2c_address, //!< I2C address of the LTC2991. Configured by tying the ADR0, ADR1, and ADR2 pins high or low. See Table 1 of datasheet.
+int8_t LTC2991_adc_read_new_data(LTC2991 *ltc, //!< The master LTC2991 instance(ish?)
 		uint8_t msb_register_address, /*!< Address of the LTC2991 MSB register to be read. This is also known as the "command byte".
 		 Two sequential 8-bit registers will be read, starting with the msb_register_address.*/
 		int16_t *adc_code,     //!< returns 14-bit value read from the adc
@@ -306,7 +304,7 @@ int8_t LTC2991_adc_read_new_data(uint8_t i2c_address, //!< I2C address of the LT
 
 //! Reads an 8-bit register from the LTC2991 using the standard repeated start format.
 //! @return Returns the state of the acknowledge bit after the I2C address write. 0=acknowledge, 1=no acknowledge.
-int8_t LTC2991_register_read(uint8_t i2c_address, //!< I2C address of the LTC2991. Configured by tying the ADR0, ADR1, and ADR2 pins high or low. See Table 1 of datasheet.
+int8_t LTC2991_register_read(LTC2991 *ltc, //!< The master LTC2991 instance(ish?)
 		uint8_t register_address, //!< Address of the LTC2991 register to be read. This is also known as the "command byte".
 		uint8_t *register_data     //!< returns 8-bit value read from the LTC2991 register.
 		);
@@ -314,7 +312,7 @@ int8_t LTC2991_register_read(uint8_t i2c_address, //!< I2C address of the LTC299
 //! Write one byte to an LTC2991 register.
 //! Writes to an 8-bit register inside the LTC2991 using the standard I2C repeated start format.
 //! @return Returns the state of the acknowledge bit after the I2C address write. 0=acknowledge, 1=no acknowledge.
-int8_t LTC2991_register_write(uint8_t i2c_address, //!< I2C address of the LTC2991. Configured by tying the ADR0, ADR1, and ADR2 pins high or low. See Table 1 of datasheet.
+int8_t LTC2991_register_write(LTC2991 *ltc, //!< The master LTC2991 instance(ish?)
 		uint8_t register_address, //!< Address of the LTC2991 register to be overwritten.  This is also known as the "command byte".
 		uint8_t register_data     //!< Value that will be written to the register.
 		);
@@ -322,7 +320,7 @@ int8_t LTC2991_register_write(uint8_t i2c_address, //!< I2C address of the LTC29
 //! Used to set and clear bits in a control register.  bits_to_set will be bitwise OR'd with the register.
 //! bits_to_clear will be inverted and bitwise AND'd with the register so that every location with a 1 will result in a 0 in the register.
 //! @return Returns the state of the acknowledge bit after the I2C address write. 0=acknowledge, 1=no acknowledge.
-int8_t LTC2991_register_set_clear_bits(uint8_t i2c_address, //!< I2C address of the LTC2991. Configured by tying the ADR0, ADR1, and ADR2 pins high or low. See Table 1 of datasheet.
+int8_t LTC2991_register_set_clear_bits(LTC2991 *ltc, //!< The master LTC2991 instance(ish?)
 		uint8_t register_address,    //!< Address of the LTC2991 register to be modified.
 		uint8_t bits_to_set,         //!< bits_to_set will be bitwise OR'd with the register.
 		uint8_t bits_to_clear //!< bits_to_clear will be inverted and bitwise AND'd with the register
