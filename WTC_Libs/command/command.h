@@ -19,6 +19,7 @@
 #include "gpio/gpio.h"
 #include "adc/adc.h"
 #include "PRINTF/printf.h"
+#include "LTC2991/LTC2991.h"
 
 #define ERROR_INVALID_PORT 1
 #define ERROR_INVALID_PIN 2
@@ -34,5 +35,6 @@ void aw(UART_HandleTypeDef *huart);
 void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc);
 void arAll(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc);
 void tt(UART_HandleTypeDef *huart, UART_HandleTypeDef *hout);
+void ltc(I2C_HandleTypeDef *hi2c, UART_HandleTypeDef *huart);
 
 #endif /* COMMAND_COMMAND_H_ */

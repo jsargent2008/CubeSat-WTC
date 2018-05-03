@@ -152,15 +152,15 @@
 //! Configured by tying the ADR0, ADR1, and ADR2 pins high or low. See Table 1 of datasheet.
 //! Uncomment LTC2991_I2C_ADDRESS to match demo board configuration.
 //  Address assignment
-// LTC2991 I2C Address                //  AD2       AD1       AD0
-#define LTC2991_I2C_ADDRESS 0x90      //  Low       Low       Low
-// #define LTC2991_I2C_ADDRESS 0x92    //  Low       Low       High
-// #define LTC2991_I2C_ADDRESS 0x94    //  Low       High      Low
-// #define LTC2991_I2C_ADDRESS 0x96    //  Low       High      High
-// #define LTC2991_I2C_ADDRESS 0x98    //  High      Low       Low
-// #define LTC2991_I2C_ADDRESS 0x9A    //  High      Low       High
-// #define LTC2991_I2C_ADDRESS 0x9C    //  High      High      Low
-// #define LTC2991_I2C_ADDRESS 0x9E    //  High      High      High
+// LTC2991 I2C Address              //  AD2       AD1       AD0
+#define LTC2991_I2C_ADDRESS_1 0x90    //  Low       Low       Low
+#define LTC2991_I2C_ADDRESS_2 0x92    //  Low       Low       High
+#define LTC2991_I2C_ADDRESS_3 0x94    //  Low       High      Low
+#define LTC2991_I2C_ADDRESS_4 0x96    //  Low       High      High
+#define LTC2991_I2C_ADDRESS_5 0x98    //  High      Low       Low
+#define LTC2991_I2C_ADDRESS_6 0x9A    //  High      Low       High
+#define LTC2991_I2C_ADDRESS_7 0x9C    //  High      High      Low
+#define LTC2991_I2C_ADDRESS_8 0x9E    //  High      High      High
 
 //! LTC2991 Global I2C Address.
 #define LTC2991_I2C_GLOBAL_ADDRESS 0xEE  //  Global Address
@@ -262,7 +262,8 @@ typedef struct LTC2991 {
 } LTC2991;
 
 LTC2991 *initLTC2991(I2C_HandleTypeDef *hi2c, uint8_t i2c_address);
-LTC2991 *test(LTC2991 *ltc, UART_HandleTypeDef *myhuart);
+void readAllLTC(LTC2991 *ltc, UART_HandleTypeDef *myhuart);
+int8_t readChannelLTC(LTC2991 *ltc, UART_HandleTypeDef *myhuart, uint8_t channel);
 
 //! Reads a 14-bit adc_code from LTC2991.
 //! @return Returns the state of the acknowledge bit after the I2C address write. 0=acknowledge, 1=no acknowledge.

@@ -7,6 +7,77 @@
 
 #include "command.h"
 
+// LTC switch function
+void ltc(I2C_HandleTypeDef *hi2c, UART_HandleTypeDef *huart) {
+
+	// todo
+	// read all channels for 1 ltc device
+
+	putS(huart, "lt");
+	uint8_t aRxBuffer[20] = "";
+	char prompt[20] = "";
+
+	getS(huart, aRxBuffer, 1);
+
+	int8_t nltc = atoi((char *) aRxBuffer);
+
+	//TX received string.
+	putS(huart, (char*) aRxBuffer);
+
+	uint8_t addr;
+
+	if (nltc == 1) {
+		addr = LTC2991_I2C_ADDRESS_1; //macro
+	} else if (nltc == 2) {
+		addr = LTC2991_I2C_ADDRESS_2;
+	} else if (nltc == 3) {
+		addr = LTC2991_I2C_ADDRESS_3;
+	} else if (nltc == 4) {
+		addr = LTC2991_I2C_ADDRESS_4;
+	} else if (nltc == 5) {
+		addr = LTC2991_I2C_ADDRESS_5;
+	} else if (nltc == 6) {
+		addr = LTC2991_I2C_ADDRESS_6;
+	} else if (nltc == 7) {
+		addr = LTC2991_I2C_ADDRESS_7;
+	} else if (nltc == 8) {
+		addr = LTC2991_I2C_ADDRESS_8;
+	} else {
+		sprintf(prompt, "addr wrong\r\n");
+		putS(huart, prompt);
+		return;
+	}
+
+	// get channel XX
+	getS(huart, aRxBuffer, 2);
+	int8_t channel = atoi((char *) aRxBuffer);
+	//TX received string.
+	putS(huart, (char*) aRxBuffer);
+
+	uint8_t readAll = 0;
+
+	if (1 <= channel && channel <= 10) {
+		channel = channel;
+	} else if (channel == 11) {
+		readAll = 1;
+	} else {
+		sprintf(prompt, "channel wrong\r\n");
+		putS(huart, prompt);
+		return;
+	}
+
+	LTC2991 *ltc;
+	ltc = initLTC2991(hi2c, addr);
+
+	if (readAll == 0) {
+		readChannelLTC(ltc, huart, channel);
+	} else
+		readAllLTC(ltc, huart);
+
+	free(ltc);
+
+}
+
 // ks switch function
 void ks(UART_HandleTypeDef *huart) {
 
@@ -20,7 +91,7 @@ void ks(UART_HandleTypeDef *huart) {
 	prompt = mallocCharArray(20);
 	port = GPIOE;
 
-	// get kill switch number
+// get kill switch number
 	getS(huart, aRxBuffer, 1);
 
 	int8_t ks_pin = atoi((char *) aRxBuffer);
@@ -54,7 +125,7 @@ void dw(UART_HandleTypeDef *huart) {
 	uint16_t pin = 0;
 	GPIO_PinState state = GPIO_PIN_RESET;
 
-	// get port X
+// get port X
 	getS(huart, aRxBuffer, 1);
 	switch (aRxBuffer[0]) {
 	case 'a':
@@ -80,10 +151,10 @@ void dw(UART_HandleTypeDef *huart) {
 		break;
 	}
 
-	//TX received string.
+//TX received string.
 	putS(huart, (char*) aRxBuffer);
 
-	// get pin XX
+// get pin XX
 	getS(huart, aRxBuffer, 2);
 
 	if (flag == 0) {
@@ -101,10 +172,10 @@ void dw(UART_HandleTypeDef *huart) {
 		}
 	}
 
-	//TX received string.
+//TX received string.
 	putS(huart, (char*) aRxBuffer);
 
-	// get state, 1 or 0 X
+// get state, 1 or 0 X
 	getS(huart, aRxBuffer, 1);
 	if (flag == 0) {
 		state = aRxBuffer[0];
@@ -120,14 +191,14 @@ void dw(UART_HandleTypeDef *huart) {
 		}
 	}
 
-	//TX received string.
+//TX received string.
 	putS(huart, (char*) aRxBuffer);
 
-	// size of return string should be consistent for every return
-	// for easy script writing
-	// ex. size of 5
+// size of return string should be consistent for every return
+// for easy script writing
+// ex. size of 5
 	prompt = mallocCharArray(20);
-	// make sure not to access kill switch.
+// make sure not to access kill switch.
 	if (port == GPIOE) {
 		if (pin == Kill_Switch_1_Pin || pin == Kill_Switch_2_Pin || pin == GPIO_PIN_All) {
 			sprintf(prompt, ":access denied\r\n");
@@ -165,7 +236,7 @@ void dr(UART_HandleTypeDef *huart) {
 	uint16_t pin = 0;
 	GPIO_PinState state = GPIO_PIN_RESET;
 
-	// get port X
+// get port X
 	getS(huart, aRxBuffer, 1);
 	switch (aRxBuffer[0]) {
 	case 'a':
@@ -193,10 +264,10 @@ void dr(UART_HandleTypeDef *huart) {
 		break;		//continue
 	}
 
-	//TX received string.
+//TX received string.
 	putS(huart, (char*) aRxBuffer);
 
-	// get pin XX
+// get pin XX
 	getS(huart, aRxBuffer, 2);
 
 	if (flag == 0) {
@@ -258,7 +329,7 @@ void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 	uint16_t readChannel = 0;
 	char str[50] = "";
 
-	// get pin XX
+// get pin XX
 	getS(huart, aRxBuffer, 2);
 
 	if (flag == 0) {
@@ -314,7 +385,7 @@ void arAll(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 void drAllport(UART_HandleTypeDef *huart, GPIO_TypeDef* port) {
 
 	char str[50] = "";
-	//GPIO_TypeDef* port = NULL;
+//GPIO_TypeDef* port = NULL;
 	GPIO_PinState state = GPIO_PIN_RESET;
 	uint8_t i;
 

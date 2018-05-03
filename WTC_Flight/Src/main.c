@@ -53,7 +53,7 @@
 #include "memoryMap/memoryMap.h"
 
 //huart4 is the 70cm primary
-#define DEBUG_UART huart4
+#define DEBUG_UART huart1
 
 /* USER CODE END Includes */
 
@@ -192,7 +192,7 @@ int main(void)
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 //	(uint32_t)0x08080000
-	uint32_t data = gpioStatusRetrieve('A');
+	//uint32_t data = gpioStatusRetrieve('A');
 	//gpioDump();
 
 	//RTC testing, the rest of main agrees with master branch
@@ -202,11 +202,14 @@ int main(void)
 //		HAL_Delay(500);
 //	}
 
-	LTC2991 *testLtc = initLTC2991(&hi2c2, 0x90);
-	while (1) {
-		HAL_Delay(500);
-		test(testLtc, &USART_PI1);
-	}
+//	LTC2991 *testLtc = initLTC2991(&hi2c2, 0x90);
+//	while (1) {
+//		HAL_Delay(500);
+////		test(testLtc, &USART_PI1);
+//		readAllLTC(testLtc, &USART_PI1);
+//		readChannelLTC(testLtc, &USART_PI1, 1);
+//		readChannelLTC(testLtc, &USART_PI1, 10);
+//	}
 
 //	while (1) {
 //
@@ -245,7 +248,11 @@ int main(void)
 	//used for "cmdXX" string
 	uint8_t index = 0;
 	char *message = "Waiting for command...\n\r";
-
+//	while(1){
+//
+//	putS(&huart4, message);
+//	HAL_Delay(500);
+//	}
 	//gpio port d pin 11 --> d11 is the yellow LED for testing (pwr enable pi 1)
 
 	for (;;) {
@@ -291,6 +298,12 @@ int main(void)
 			tt(&DEBUG_UART, &huart2);
 		else if (strcmp((char *) aRxBuffer, "ks") == 0)
 			ks(&DEBUG_UART);
+		else if (strcmp((char *) aRxBuffer, "ce") == 0)
+			HAL_GPIO_TogglePin(EN_Chrg_1_GPIO_Port, EN_Chrg_1_Pin);
+		else if (strcmp((char *) aRxBuffer, "cc") == 0)
+			HAL_GPIO_TogglePin(DAC_REF_Chrg_GPIO_Port, DAC_REF_Chrg_Pin);
+		else if (strcmp((char *) aRxBuffer, "lt") == 0)
+			ltc(&hi2c2,&DEBUG_UART);
 		else {
 			prompt = mallocCharArray(4);
 			prompt[0] = (char) '?';

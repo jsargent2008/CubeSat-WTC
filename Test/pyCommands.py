@@ -171,10 +171,10 @@ def enPiPwr(pi):
 	return 1
 
 def check5V():
-	time.sleep(1000)
-	factor = 1/11
+	time.sleep(100)
+	factor = 1/10
 	# WTC ADC Channel 3  = 5V rail
-	val = ar('03')/factor
+	val = ar(13)/factor
 	return val
 
 def turnOn5V():

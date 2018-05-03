@@ -1,5 +1,7 @@
 #include "LTC2991.h"
+
 #define LTCrocks TRUE;
+#define LTC2991_TIMEOUT 1000
 
 // Calibration Variables
 //! Typical single-ended LSB weight in volts
@@ -24,7 +26,203 @@ LTC2991 *initLTC2991(I2C_HandleTypeDef *hi2c, uint8_t i2c_address) {
 	return ltc;
 }
 
+int8_t setupLTC(LTC2991 *ltc) {
+
+	int8_t ack = 0;
+
+	ack |= LTC2991_register_write(ltc, LTC2991_CHANNEL_ENABLE_REG,
+	LTC2991_ENABLE_ALL_CHANNELS);   //! Enables all channels
+	ack |= LTC2991_register_write(ltc, LTC2991_CONTROL_V1234_REG, 0x00); //! Sets registers to default starting values.
+	ack |= LTC2991_register_write(ltc, LTC2991_CONTROL_V5678_REG, 0x00);
+	ack |= LTC2991_register_write(ltc, LTC2991_CONTROL_PWM_Tinternal_REG,
+	LTC2991_REPEAT_MODE);    //! Configures LTC2991 for Repeated Acquisition mode
+
+	return ack;
+}
+
+
+int8_t readChannelLTC(LTC2991 *ltc, UART_HandleTypeDef *myhuart, uint8_t channel) {
+
+//	int8_t ack = 0;
+//	uint8_t user_command;
+//
+//	int16_t code;
+//	int8_t data_valid;
+//	float voltage;
+//	char prompt[40] = { };
+//
+//	ack |=	setupLTC(ltc);
+//
+//	sprintf(prompt, "LTC 0x%x\t\r\n", ltc->i2c_address,ack);
+//	putS(myhuart, prompt);
+//
+//    ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V1234_REG, 0x00, (LTC2991_V1_V2_DIFFERENTIAL_ENABLE | LTC2991_V3_V4_DIFFERENTIAL_ENABLE | LTC2991_V1_V2_TEMP_ENABLE | LTC2991_V3_V4_TEMP_ENABLE));
+//	ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V5678_REG, 0x00, (LTC2991_V5_V6_DIFFERENTIAL_ENABLE | LTC2991_V7_V8_DIFFERENTIAL_ENABLE | LTC2991_V5_V6_TEMP_ENABLE | LTC2991_V7_V8_TEMP_ENABLE));
+//	// Reads and displays all single-ended voltages
+//
+//	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+//	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_Vcc_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+//	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+//
+//	sprintf(prompt, "\tV%d: %.4f V  %x %x %x\r\n", channel, voltage, LTC2991_V1_MSB_REG, LTC2991_V1_MSB_REG + (channel-1)*2, LTC2991_Vcc_MSB_REG );
+//	putS(myhuart, prompt);
+//
+//	if (ack){
+//	  return;
+//	}
+//
+	if(channel <1 || channel > 10)
+		return 1;
+
+	int8_t ack = 0;
+	uint8_t user_command;
+
+	int16_t code;
+	int8_t data_valid;
+	float voltage;
+	// Read Temperature
+	int8_t isKelvin;
+	int16_t adc_code;
+	uint8_t reg_data;
+	float temperature = 0;
+	char prompt[20] = { };
+
+	ack |=	setupLTC(ltc);
+    ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V1234_REG, 0x00, (LTC2991_V1_V2_DIFFERENTIAL_ENABLE | LTC2991_V3_V4_DIFFERENTIAL_ENABLE | LTC2991_V1_V2_TEMP_ENABLE | LTC2991_V3_V4_TEMP_ENABLE));
+	ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V5678_REG, 0x00, (LTC2991_V5_V6_DIFFERENTIAL_ENABLE | LTC2991_V7_V8_DIFFERENTIAL_ENABLE | LTC2991_V5_V6_TEMP_ENABLE | LTC2991_V7_V8_TEMP_ENABLE));
+	// Reads and displays all single-ended voltages
+
+	if(channel >=1 && channel <= 8){
+		channel --;
+	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V1_MSB_REG + channel*2, &code, &data_valid, LTC2991_TIMEOUT);
+	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+
+	sprintf(prompt, "\tV%d: %.4f V\r\n",channel+1, voltage);
+	putS(myhuart, prompt);
+	}
+	else if(channel == 9){
+		// Do temp reading
+		// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+		ack |= LTC2991_adc_read_new_data(ltc, LTC2991_T_Internal_MSB_REG, &adc_code,
+				&data_valid, 1000);
+		ack |= LTC2991_register_read(ltc, LTC2991_CONTROL_PWM_Tinternal_REG, &reg_data);
+		if (reg_data & LTC2991_INT_KELVIN_ENABLE){
+			isKelvin = 1;
+		}
+		else{
+			isKelvin = 0;
+		}
+
+		temperature = LTC2991_temperature(adc_code, LTC2991_TEMPERATURE_lsb, isKelvin);
+		sprintf(prompt, "%x\t%.2fC\r\n", ack, temperature);
+		putS(myhuart, prompt);
+	}
+
+	else{//channel == 10, VCC reading
+		// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+		ack |= LTC2991_adc_read_new_data(ltc, LTC2991_Vcc_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+		voltage = LTC2991_code_to_vcc_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+
+		sprintf(prompt, "\tVcc: %.4f V\r\n", voltage);
+		putS(myhuart, prompt);
+	}
+
+	return ack;
+}
+
+void readAllLTC(LTC2991 *ltc, UART_HandleTypeDef *myhuart) {
+
+	int8_t ack = 0;
+	uint8_t user_command;
+
+	int16_t code;
+	int8_t data_valid;
+	float voltage;
+	char prompt[20] = { };
+
+	ack |=	setupLTC(ltc);
+    ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V1234_REG, 0x00, (LTC2991_V1_V2_DIFFERENTIAL_ENABLE | LTC2991_V3_V4_DIFFERENTIAL_ENABLE | LTC2991_V1_V2_TEMP_ENABLE | LTC2991_V3_V4_TEMP_ENABLE));
+	ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V5678_REG, 0x00, (LTC2991_V5_V6_DIFFERENTIAL_ENABLE | LTC2991_V7_V8_DIFFERENTIAL_ENABLE | LTC2991_V5_V6_TEMP_ENABLE | LTC2991_V7_V8_TEMP_ENABLE));
+	// Reads and displays all single-ended voltages
+
+	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V1_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+
+	sprintf(prompt, "\tV1: %.4f V\r\n", voltage);
+	putS(myhuart, prompt);
+
+	if (ack)
+	  return;
+	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V2_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+
+	sprintf(prompt, "\tV2: %.4f V\r\n", voltage);
+	putS(myhuart, prompt);
+
+	if (ack)
+		return;
+	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V3_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+
+	sprintf(prompt, "\tV3: %.4f V\r\n", voltage);
+	putS(myhuart, prompt);
+	if (ack)
+		return;
+	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V4_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+
+	sprintf(prompt, "\tV4: %.4f V\r\n", voltage);
+	putS(myhuart, prompt);
+	if (ack)
+		return;
+	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V5_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+
+	sprintf(prompt, "\tV5: %.4f V\r\n", voltage);
+	putS(myhuart, prompt);
+	if (ack)
+		return;
+	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V6_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+
+	sprintf(prompt, "\tV6: %.4f V\r\n", voltage);
+	putS(myhuart, prompt);
+	if (ack)
+		return;
+	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V7_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+
+	sprintf(prompt, "\tV7: %.4f V\r\n", voltage);
+	putS(myhuart, prompt);
+	if (ack)
+		return;
+	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V8_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+
+	sprintf(prompt, "\tV8: %.4f V\r\n", voltage);
+	putS(myhuart, prompt);
+	if (ack)
+		return;
+	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_Vcc_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+	voltage = LTC2991_code_to_vcc_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+
+	sprintf(prompt, "\tVcc: %.4f V\r\n", voltage);
+	putS(myhuart, prompt);
+
+}
+
 // TODO: implement ERROR and STATUS checking (LTC2991 register and HAL_I2C) return codes
+// TODO: reduce delay in adc read to 1 to test ERROR and STATUS checking
 LTC2991 *test(LTC2991 *ltc, UART_HandleTypeDef *myhuart) {
 	int8_t ack = 0;
 	// Read Temperature
@@ -37,6 +235,7 @@ LTC2991 *test(LTC2991 *ltc, UART_HandleTypeDef *myhuart) {
 
 	sprintf(prompt, "hi\r\n");
 	putS(myhuart, prompt);
+
 
 	ack |= LTC2991_register_write(ltc, LTC2991_CHANNEL_ENABLE_REG,
 	LTC2991_ENABLE_ALL_CHANNELS);   //! Enables all channels
@@ -138,7 +337,7 @@ int8_t LTC2991_adc_read_timeout(LTC2991 *ltc, uint8_t msb_register_address,
 			break;
 		}
 
-		HAL_Delay(1);
+		HAL_Delay(10);
 	}
 
 	ack |= LTC2991_adc_read(ltc, msb_register_address, &(*adc_code), &(*data_valid)); //! 2) It's either valid or it's timed out, we read anyways
