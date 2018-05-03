@@ -10,6 +10,15 @@
 #ifndef PI_CONTROL_COMMANDS_H_
 #define PI_CONTROL_COMMANDS_H_
 
+#include "main.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+#include "stm32l1xx_hal.h"
+#include "stm32l1xx_hal_uart.h"
+#include "UART_IRQ/UART_IRQ.h"
+#include "PRINTF/printf.h"
 
 #define ACK 			"OK"
 #define OK				"OK"
@@ -25,6 +34,8 @@
 #define PIPE_COMMAND 	"PC"
 #define UART_CHECK		"UC"
 
-
+uint8_t initHandShake(UART_HandleTypeDef *huart);
+uint8_t sendCommand(UART_HandleTypeDef *huart, uint8_t command);
+uint8_t piNum(UART_HandleTypeDef *huart);
 
 #endif /* PI_CONTROL_COMMANDS_H_ */

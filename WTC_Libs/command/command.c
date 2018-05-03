@@ -48,18 +48,26 @@ void ltc(I2C_HandleTypeDef *hi2c, UART_HandleTypeDef *huart) {
 		return;
 	}
 
-	// get channel XX
-	getS(huart, aRxBuffer, 2);
+	// get channel X
+	getS(huart, aRxBuffer, 1);
+
 	int8_t channel = atoi((char *) aRxBuffer);
+	if (!isdigit(aRxBuffer[0]))
+		channel = aRxBuffer[0];
+
 	//TX received string.
 	putS(huart, (char*) aRxBuffer);
 
 	uint8_t readAll = 0;
 
-	if (1 <= channel && channel <= 10) {
+	if (1 <= channel && channel <= 8) {
 		channel = channel;
-	} else if (channel == 11) {
+	} else if (channel == 'a') { //read all voltages
 		readAll = 1;
+	} else if (channel == 'v') { //read internal voltages
+		channel = 10;
+	} else if (channel == 't') { //read internal temperature
+		channel = 9;
 	} else {
 		sprintf(prompt, "channel wrong\r\n");
 		putS(huart, prompt);
