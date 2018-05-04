@@ -1,0 +1,720 @@
+SURFSAT TESTING STACK
+5/2/2018
+
+no batteries are installed 
+
+mppt: 20ma
+mppt+wtc: 60ma
+mppt+wtc+bpc: 136ma
+
+>ce
+	current down to 28.6ma
+>ce
+	current up to 136ma
+
+>cc
+	no changes
+>cc
+	no changes
+
+
+py test from 5/2
+
+3.3 Rail and Regulator Voltage Test Begin
+        PASS:   3_3V_Rail is 3.290
+        PASS:   3.3Raw-1 is 3.470
+        PASS:   3.3Raw-1 is 3.435
+3.3 Rail and Regulator Voltage Test End:         True
+
+
+3.3 Rail and Regulator Current Test Begin
+        Imon_3.3-1 is 0.006
+        Imon_3.3-2 is 0.010
+                I_Total is ~0.016
+3.3 Rail and Regulator Current Test End
+
+
+Notes:
+
+the 5v surfsat came to be around 4.4 V 
+the 12v surfsat came to be around 6.4 V, 6.32 - 6.4
+
+
+#oddities
+
+The current measurement from the wtc adc varies signaficatnly when connected directly to the PSU->MPPT as compared to the PSU->DMM->MPPT
+
+
+
+LOG:
+
+
+??
+
+Waiting for command...
+cmd13:??
+
+Waiting for command...
+cmd14:ar12:12-0.658
+
+Waiting for command...
+cmd15:ar11:11-0.694
+
+Waiting for command...
+cmd16:ar10:10-0.687
+
+Waiting for command...
+cmd17:ar09:09-0.003
+
+Waiting for command...
+cmd18:ar08:08-0.005
+
+Waiting for command...
+cmd19:??
+
+Waiting for command...
+cmd20:??
+
+Waiting for command...
+cmd21:??
+
+Waiting for command...
+cmd22:??
+
+Waiting for command...
+cmd23:??
+
+Waiting for command...
+cmd24:Waiting for command...
+cmd00:Waiting for command...
+cmd00:ar12:12-0.660
+
+Waiting for command...
+cmd01:ar11:11-0.695
+
+Waiting for command...
+cmd02:ar10:10-0.695
+
+Waiting for command...
+cmd03:ar09:09-0.003
+
+Waiting for command...
+cmd04:ar08:08-0.031
+
+Waiting for command...
+cmd05:Waiting for command...
+cmd00:ar12:12-0.658
+
+Waiting for command...
+cmd01:ar11:11-0.695
+
+Waiting for command...
+cmd02:ar10:10-0.689
+
+Waiting for command...
+cmd03:ar09:09-0.002
+
+Waiting for command...
+cmd04:ar08:08-0.002
+
+Waiting for command...
+cmd05:Waiting for command...
+cmd00:ar12:12-0.658
+
+Waiting for command...
+cmd01:ar11:11-0.695
+
+Waiting for command...
+cmd02:ar10:10-0.693
+
+Waiting for command...
+cmd03:ar09:09-0.002
+
+Waiting for command...
+cmd04:ar08:08-0.031
+
+Waiting for command...
+cmd05:Waiting for command...
+cmd00:ar12:12-0.658
+
+Waiting for command...
+cmd01:ar11:11-0.693
+
+Waiting for command...
+cmd02:ar10:10-0.695
+
+Waiting for command...
+cmd03:ar09:09-0.003
+
+Waiting for command...
+cmd04:ar08:08-0.010
+
+Waiting for command...
+cmd05:ar12:12-0.658
+
+Waiting for command...
+cmd06:ar11:11-0.695
+
+Waiting for command...
+cmd07:ar10:10-0.697
+
+Waiting for command...
+cmd08:ar09:09-0.002
+
+Waiting for command...
+cmd09:ar08:08-0.004
+
+Waiting for command...
+cmd10:ar12:12-0.658
+
+Waiting for command...
+cmd11:ar11:11-0.694
+
+Waiting for command...
+cmd12:ar10:10-0.685
+
+Waiting for command...
+cmd13:ar09:09-0.002
+
+Waiting for command...
+cmd14:ar08:08-0.019
+
+Waiting for command...
+cmd15:ar12:12-0.658
+
+Waiting for command...
+cmd16:ar11:11-0.692
+
+Waiting for command...
+cmd17:ar10:10-0.684
+
+Waiting for command...
+cmd18:ar09:09-0.002
+
+Waiting for command...
+cmd19:ar08:08-0.011
+
+Waiting for command...
+cmd20:ar12:12-0.658
+
+Waiting for command...
+cmd21:ar11:11-0.706
+
+Waiting for command...
+cmd22:ar10:10-0.690
+
+Waiting for command...
+cmd23:ar09:09-0.002
+
+Waiting for command...
+cmd24:ar08:08-0.007
+
+Waiting for command...
+cmd25:ar12:12-0.658
+
+Waiting for command...
+cmd26:ar11:11-0.691
+
+Waiting for command...
+cmd27:ar10:10-0.677
+
+Waiting for command...
+cmd28:ar09:09-0.002
+
+Waiting for command...
+cmd29:ar08:08-0.041
+
+Waiting for command...
+cmd30:ar12:12-0.658
+
+Waiting for command...
+cmd31:ar11:11-0.691
+
+Waiting for command...
+cmd32:ar10:10-0.694
+
+Waiting for command...
+cmd33:ar09:09-0.003
+
+Waiting for command...
+cmd34:ar08:08-0.008
+
+Waiting for command...
+cmd35:ar12:12-0.658
+
+Waiting for command...
+cmd36:ar11:11-0.690
+
+Waiting for command...
+cmd37:ar10:10-0.690
+
+Waiting for command...
+cmd38:ar09:09-0.003
+
+Waiting for command...
+cmd39:ar08:08-0.002
+
+Waiting for command...
+cmd40:ar12:12-0.658
+
+Waiting for command...
+cmd41:ar11:11-0.692
+
+Waiting for command...
+cmd42:ar10:10-0.691
+
+Waiting for command...
+cmd43:ar09:09-0.002
+
+Waiting for command...
+cmd44:ar08:08-0.007
+
+Waiting for command...
+cmd45:Waiting for command...
+cmd00:Waiting for command...
+cmd00:ar12:12-0.658
+
+Waiting for command...
+cmd01:ar11:11-0.692
+
+Waiting for command...
+cmd02:ar10:10-0.693
+
+Waiting for command...
+cmd03:ar09:09-0.027
+
+Waiting for command...
+cmd04:ar08:08-0.011
+
+Waiting for command...
+cmd05:ar12:12-0.658
+
+Waiting for command...
+cmd06:ar11:11-0.695
+
+Waiting for command...
+cmd07:ar10:10-0.690
+
+Waiting for command...
+cmd08:ar09:09-0.002
+
+Waiting for command...
+cmd09:ar08:08-0.002
+
+Waiting for command...
+cmd10:ar12:12-0.658
+
+Waiting for command...
+cmd11:ar11:11-0.694
+
+Waiting for command...
+cmd12:ar10:10-0.694
+
+Waiting for command...
+cmd13:ar09:09-0.006
+
+Waiting for command...
+cmd14:ar08:08-0.043
+
+Waiting for command...
+cmd15:ar12:12-0.658
+
+Waiting for command...
+cmd16:ar11:11-0.694
+
+Waiting for command...
+cmd17:ar10:10-0.687
+
+Waiting for command...
+cmd18:ar09:09-0.019
+
+Waiting for command...
+cmd19:ar08:08-0.048
+
+Waiting for command...
+cmd20:ar12:12-0.658
+
+Waiting for command...
+cmd21:ar11:11-0.694
+
+Waiting for command...
+cmd22:ar10:10-0.689
+
+Waiting for command...
+cmd23:ar09:09-0.004
+
+Waiting for command...
+cmd24:ar08:08-0.002
+
+Waiting for command...
+cmd25:ar12:12-0.658
+
+Waiting for command...
+cmd26:ar11:11-0.694
+
+Waiting for command...
+cmd27:ar10:10-0.695
+
+Waiting for command...
+cmd28:ar09:09-0.003
+
+Waiting for command...
+cmd29:ar08:08-0.002
+
+Waiting for command...
+cmd30:ar12:12-0.654
+
+Waiting for command...
+cmd31:ar11:11-0.694
+
+Waiting for command...
+cmd32:ar10:10-0.681
+
+Waiting for command...
+cmd33:ar09:09-0.005
+
+Waiting for command...
+cmd34:ar08:08-0.027
+
+Waiting for command...
+cmd35:ar12:12-0.658
+
+Waiting for command...
+cmd36:ar11:11-0.694
+
+Waiting for command...
+cmd37:ar10:10-0.693
+
+Waiting for command...
+cmd38:ar09:09-0.013
+
+Waiting for command...
+cmd39:ar08:08-0.036
+
+Waiting for command...
+cmd40:ar12:12-0.658
+
+Waiting for command...
+cmd41:ar11:11-0.693
+
+Waiting for command...
+cmd42:ar10:10-0.693
+
+Waiting for command...
+cmd43:ar09:09-0.005
+
+Waiting for command...
+cmd44:ar08:08-0.036
+
+Waiting for command...
+cmd45:ar12:12-0.664
+
+Waiting for command...
+cmd46:ar11:11-0.691
+
+Waiting for command...
+cmd47:ar10:10-0.690
+
+Waiting for command...
+cmd48:ar09:09-0.003
+
+Waiting for command...
+cmd49:ar08:08-0.006
+
+Waiting for command...
+cmd50:Waiting for command...
+cmd00:ar12:12-0.660
+
+Waiting for command...
+cmd01:ar11:11-0.698
+
+Waiting for command...
+cmd02:ar10:10-0.680
+
+Waiting for command...
+cmd03:ar09:09-0.003
+
+Waiting for command...
+cmd04:ar08:08-0.014
+
+Waiting for command...
+cmd05:??
+
+Waiting for command...
+cmd06:??
+
+Waiting for command...
+cmd07:
+Waiting for command...
+cmd08:
+Waiting for command...
+cmd09:
+Waiting for command...
+cmd10:??
+
+Waiting for command...
+cmd11:??
+
+Waiting for command...
+cmd12:??
+
+Waiting for command...
+cmd13:??
+
+Waiting for command...
+cmd14:??
+
+Waiting for command...
+cmd15:??
+
+Waiting for command...
+cmd16:ar13:13-0.000
+
+Waiting for command...
+cmd17:dwa45`:f2
+
+Waiting for command...
+cmd18:??
+
+Waiting for command...
+cmd19:??
+
+Waiting for command...
+cmd20:dwa4:f2
+
+Waiting for command...
+cmd21:??
+
+Waiting for command...
+cmd22:??
+
+Waiting for command...
+cmd23:??
+
+Waiting for command...
+cmd24:dwa12a:f3
+
+Waiting for command...
+cmd25:??
+
+Waiting for command...
+cmd26:??
+
+Waiting for command...
+cmd27:ar13:13-0.000
+
+Waiting for command...
+cmd28:
+Waiting for command...
+cmd29:dwa121:ok
+
+Waiting for command...
+cmd30:ar13:13-0.440
+
+Waiting for command...
+cmd31:ar13:13-0.447
+
+Waiting for command...
+cmd32:ar13:13-0.441
+
+Waiting for command...
+cmd33:??
+
+Waiting for command...
+cmd34:dra12:hi
+
+Waiting for command...
+cmd35:??
+
+Waiting for command...
+cmd36:??
+
+Waiting for command...
+cmd37:??
+
+Waiting for command...
+cmd38:??
+
+Waiting for command...
+cmd39:dwa120:ok
+
+Waiting for command...
+cmd40:??
+
+Waiting for command...
+cmd41:ar13:13-0.000
+
+Waiting for command...
+cmd42:ar32:00-0.295
+:01-0.523
+:02-3.300
+:03-3.275
+:04-0.716
+:05-0.949
+:06-2.061
+:07-0.954
+:08-0.034
+:09-0.006
+:10-0.695
+:11-0.698
+:12-0.656
+:13-0.000
+:14-0.000
+:15-0.469
+:16-0.467
+:17-1.156
+:18-0.000
+:19-0.000
+:20-0.000
+:21-0.000
+:22-0.002
+:23-0.602
+:24-0.268
+:25-0.533
+:26-1.072
+:27-0.001
+:28-0.001
+:29-0.001
+:30-0.001
+:31-0.000
+:32-0.362
+
+Waiting for command...
+cmd43:dwc081:ok
+
+Waiting for command...
+cmd44:ar32:00-0.304
+:01-0.523
+:02-3.300
+:03-3.299
+:04-0.715
+:05-0.960
+:06-2.063
+:07-0.958
+:08-0.015
+:09-0.002
+:10-0.687
+:11-0.691
+:12-0.658
+:13-0.000
+:14-0.320
+:15-0.496
+:16-0.467
+:17-1.171
+:18-0.000
+:19-0.000
+:20-0.000
+:21-0.000
+:22-0.001
+:23-0.609
+:24-0.301
+:25-0.523
+:26-1.066
+:27-0.001
+:28-0.001
+:29-0.001
+:30-0.000
+:31-0.000
+:32-0.359
+
+Waiting for command...
+cmd45:dwc090:ok
+
+Waiting for command...
+cmd46:dwc8  :f2
+
+Waiting for command...
+cmd47:??
+
+Waiting for command...
+cmd48:??
+
+Waiting for command...
+cmd49:dwc080:ok
+
+Waiting for command...
+cmd50:ar14:14-0.000
+
+Waiting for command...
+cmd51:dwc081:ok
+
+Waiting for command...
+cmd52:ar14:14-0.317
+
+Waiting for command...
+cmd53:dwc080:ok
+
+Waiting for command...
+cmd54:dwc091:ok
+
+Waiting for command...
+cmd55:ar13:13-0.000
+
+Waiting for command...
+cmd56:ar14:14-0.315
+
+Waiting for command...
+cmd57:dwc090:ok
+
+Waiting for command...
+cmd58:??
+
+Waiting for command...
+cmd59:??
+
+Waiting for command...
+cmd60:??
+
+Waiting for command...
+cmd61:??
+
+Waiting for command...
+cmd62:??
+
+Waiting for command...
+cmd63:??
+
+Waiting for command...
+cmd64:??
+
+Waiting for command...
+cmd65:dwc081:ok
+
+Waiting for command...
+cmd66:dwc091:ok
+
+Waiting for command...
+cmd67:ar14:14-0.316
+
+Waiting for command...
+cmd68:dwc080:ok
+
+Waiting for command...
+cmd69:dwc090:ok
+
+Waiting for command...
+cmd70:ar14:14-0.007
+
+Waiting for command...
+cmd71:dwa121:ok
+
+Waiting for command...
+cmd72:dwh021:ok
+
+Waiting for command...
+cmd73:ar13:13-0.442
+
+Waiting for command...
+cmd74:dwa120:ok
+
+Waiting for command...
+cmd75:dwh021:ok
+
+Waiting for command...
+cmd76:??
+
+Waiting for command...
+cmd77:??
+
+Waiting for command...
+cmd78:

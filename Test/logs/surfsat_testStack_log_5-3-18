@@ -1,0 +1,142 @@
+// Stack as is on 5-3-2018
+// including only the WTC MPPT BPC
+// Clayton and Chase
+
+Waiting for command...
+cmd05:lt1a      V1: 2.2839 V
+        V2: 0.0259 V
+        V3: 0.0363 V
+        V4: 0.0394 V
+        V5: 0.0082 V
+        V6: 0.0223 V
+        V7: 2.2769 V
+        V8: 0.0043 V
+        Vcc: 3.4323 V
+
+Waiting for command...
+cmd11:lt2a      V1: 2.2818 V
+        V2: 0.0262 V
+        V3: 0.0388 V
+        V4: 0.0052 V
+        V5: 0.0070 V
+        V6: 0.0201 V
+        V7: 0.0131 V
+        V8: 2.2925 V
+        Vcc: 3.4290 V
+
+Waiting for command...
+cmd12:lt3a      V1: 2.7029 V
+        V2: 2.5354 V
+        V3: 2.5693 V
+        V4: 0.0003 V
+        V5: 0.0006 V
+        V6: 2.5574 V
+        V7: 2.5424 V
+        V8: 0.0012 V
+        Vcc: 3.4250 V
+
+Waiting for command...
+cmd13:lt4a      V1: 0.3253 V
+        V2: 0.0012 V
+        V3: 0.3195 V
+        V4: 0.5911 V
+        V5: 0.0006 V
+        V6: 0.0009 V
+        V7: 0.5713 V
+        V8: 2.0834 V
+        Vcc: 3.4253 V
+
+Waiting for command...
+cmd14:lt5a      V1: 0.8459 V
+        V2: 0.5862 V
+        V3: 0.6412 V
+        V4: 0.5533 V
+        V5: 0.3207 V
+        V6: 0.0009 V
+        V7: 0.3268 V
+        V8: 0.0012 V
+        Vcc: 3.4207 V
+
+Waiting for command...
+cmd15:lt6a      V1: 0.0006 V
+        V2: 0.0015 V
+        V3: 0.0012 V
+        V4: 2.5668 V
+        V5: 2.5101 V
+        V6: 0.0009 V
+        V7: 0.0012 V
+        V8: 2.5952 V
+        Vcc: 3.4189 V
+
+
+// Removed the BPC
+
+Insert "exit" to leave the application.
+
+3.3 Rail and Regulator Voltage Test Begin
+        PASS:   3_3V_Rail is 3.285
+        PASS:   3.3Raw-1 is 3.490
+        PASS:   3.3Raw-1 is 3.435
+3.3 Rail and Regulator Voltage Test End:         True
+
+
+3.3 Rail and Regulator Current Test Begin
+        Imon_3.3-1 is 0.014
+        Imon_3.3-2 is 0.006
+                I_Total is ~0.020
+3.3 Rail and Regulator Current Test End
+
+
+Waiting for command...
+cmd18:lt1a      V1: 0.0000 V
+
+Waiting for command...
+cmd19:lt2a      V1: 0.0000 V
+
+Waiting for command...
+cmd20:lt3a      V1: 2.7054 V
+        V2: 2.5653 V
+        V3: 2.5797 V
+        V4: 0.0009 V
+        V5: 0.0006 V
+        V6: 2.5772 V
+        V7: 2.5626 V
+        V8: 0.0009 V
+        Vcc: 3.4229 V
+
+Waiting for command...
+cmd21:lt4a      V1: 0.2731 V
+        V2: 0.0012 V
+        V3: 0.2728 V
+        V4: 0.2747 V
+        V5: 0.0006 V
+        V6: 0.0006 V
+        V7: 0.2716 V
+        V8: 2.1188 V
+        Vcc: 3.4235 V
+
+Waiting for command...
+cmd22:lt5a      V1: 0.6772 V
+        V2: 0.2716 V
+        V3: 0.2750 V
+        V4: 0.4642 V
+        V5: 0.2725 V
+        V6: 0.0009 V
+        V7: 0.2728 V
+        V8: 0.0009 V
+        Vcc: 3.4195 V
+
+Waiting for command...
+cmd23:lt6a      V1: 0.0015 V
+        V2: 0.0015 V
+        V3: 0.0015 V
+        V4: 2.5714 V
+        V5: 2.5311 V
+        V6: 0.0009 V
+        V7: 0.0006 V
+        V8: 2.6099 V
+        Vcc: 3.4180 V
+
+Waiting for command...
+cmd24:lt7a      V1: 0.0000 V
+

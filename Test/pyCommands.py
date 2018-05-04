@@ -2,7 +2,10 @@ import time
 import serial
 import sys
 import math
+import numpy as np
 from enum import Enum 
+import ltcDef
+
 
 WRITE_DELAY = 0.005
 READ_DELAY = 0.005
@@ -20,6 +23,7 @@ class CommandError(Enum):
 # https://www.safaribooksonline.com/library/view/python-cookbook-2nd/0596007973/ch04s21.html
 def printf(format, *args):
 	sys.stdout.write(format % args)
+	sys.stdout.flush()
 
 def format(format, *args):
 	return (format % args)
@@ -139,6 +143,41 @@ def ar(channel):
 	else:
 		return 0
 
+def ltcSampleAll(num, channel):
+	# `0 `
+	# 0 is channel, single int
+	# length is 3, validation is 2
+	out = ''
+	time.sleep(WRITE_DELAY)
+	if(swrite("lt ", 1) == 1):
+		swrite(format("%d ", num), 1)
+		# if(swrite(format("%d ", channel), 1) == 1):
+		if(channel > 8):
+			swrite("a ", 1)
+
+			vals = []
+
+			for i in range(9):
+				out = ser.readline().decode("ascii").strip()
+				out = out.split(":")[-1][:-1].strip()
+				fval = float(out)
+				vals.append(fval)
+				# printf("the ret val was `%s`\n", out)
+			return vals
+	else:
+		return 0	
+
+def ltcAverageAll(num, channel, samples):
+	avglst = []
+	for i in range(samples):
+		avglst.append(ltcSampleAll(num,channel))
+		printf(".")
+	#print(avglst)
+	printf("\n")
+	ret = np.mean(avglst,axis=0)
+	return ret
+
+
 #def enDeployment():
 	# # deployment power enable
 	# dw('b',9,1)
@@ -155,6 +194,38 @@ def ar(channel):
 	# 		# return 0
 	# dw('b',9,0)
 	# return 1
+
+def printLTC_AVG(num, channel, samples):
+	succeed = True
+	stRes = "FAIL"
+	target = 3.3
+	tolerance = 0.05
+
+	# for num in range(6):
+	ltc = ltcDef.ltcAll[num]
+	printf('LTC %d, Conducting %d sample(s) ', num, samples)
+	avgLst = ltcAverageAll(num, channel, samples)
+	
+	 
+	for i in range(8):
+		channel = ltc[i][0]
+		name 	= ltc[i][1]
+		nomV 	= ltc[i][2]
+		factor  = ltc[i][3]
+		actV	= (1/factor)*avgLst[channel]
+
+		if(nomV < 0 or math.isclose(actV, nomV, rel_tol=nomV*tolerance)):
+			stRes = "PASS"
+			succeed = succeed & True;
+		else:
+			stRes = "--F--"
+			succeed = False;
+
+		printf("\tC %d\t %-12s Meas: %5.2f  Nom: %4.1f V   %.2f V   %-5s\n", channel+1, name , avgLst[channel], nomV, actV, stRes)
+
+	printf("\tLTC %d\t Vcc %.2f V\n", num, avgLst[8])
+	return
+
 
 def enPiPwr(pi):
 	# check if 5V power is on
@@ -192,6 +263,49 @@ def turnOn5V():
 		else:
 			dw('a','1',0)
 			return 0;
+
+
+def check_5V():
+	succeed = True
+	target = 5
+	tolerance = 0.20
+
+	printf("\n3.3 Rail and Regulator Voltage Test Begin\n")
+
+	# 	Name		:	ADC Name	:	ADC	:	Factor
+	#	3_3V_Rail 	:	_10X_Out_1	:	13	:	10
+
+	rail = ar(13) * 10
+
+	# printf("3_3V_Rail is %4.3f\n", rail)
+	if(math.isclose(rail, target, rel_tol=target*tolerance)):
+		printf("\tPASS:\t")
+		succeed = succeed & True;
+	else:
+		printf("\tFAIL:\t")
+		succeed = False;
+	printf("3_3V_Rail is %4.3f\n", rail)
+
+	if(math.isclose(ps1, target, rel_tol=target*tolerance)):
+		printf("\tPASS:\t")
+		succeed = succeed & True;
+	else:
+		printf("\tFAIL:\t")
+		succeed = False;
+	printf("3.3Raw-1 is %4.3f\n", ps1)
+
+	if(math.isclose(ps2, target, rel_tol=target*tolerance)):
+		printf("\tPASS:\t")
+		succeed = succeed & True;
+	else:
+		printf("\tFAIL:\t")
+		succeed = False;
+	printf("3.3Raw-1 is %4.3f\n", ps2)
+
+	printf("3.3 Rail and Regulator Voltage Test End:\t %s\n\n", succeed)
+
+	return succeed
+
 
 def checkWTC_3V():
 	succeed = True
@@ -311,7 +425,10 @@ while 1:
 	status = checkWTC_3V()
 	status = checkWTC_3I()
 
-
+	# ltcSampleAll(1, 10)
+	#print(ltcAverageAll(1,10,2))
+	for i in range(6):	
+		printLTC_AVG(i,10,3)
 	exit()
 
 	# get keyboard input

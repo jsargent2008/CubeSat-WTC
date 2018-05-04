@@ -26,21 +26,21 @@ void ltc(I2C_HandleTypeDef *hi2c, UART_HandleTypeDef *huart) {
 
 	uint8_t addr;
 
-	if (nltc == 1) {
+	if (nltc == 0) {
 		addr = LTC2991_I2C_ADDRESS_1; //macro
-	} else if (nltc == 2) {
+	} else if (nltc == 1) {
 		addr = LTC2991_I2C_ADDRESS_2;
-	} else if (nltc == 3) {
+	} else if (nltc == 2) {
 		addr = LTC2991_I2C_ADDRESS_3;
-	} else if (nltc == 4) {
+	} else if (nltc == 3) {
 		addr = LTC2991_I2C_ADDRESS_4;
-	} else if (nltc == 5) {
+	} else if (nltc == 4) {
 		addr = LTC2991_I2C_ADDRESS_5;
-	} else if (nltc == 6) {
+	} else if (nltc == 5) {
 		addr = LTC2991_I2C_ADDRESS_6;
-	} else if (nltc == 7) {
+	} else if (nltc == 6) {
 		addr = LTC2991_I2C_ADDRESS_7;
-	} else if (nltc == 8) {
+	} else if (nltc == 7) {
 		addr = LTC2991_I2C_ADDRESS_8;
 	} else {
 		sprintf(prompt, "addr wrong\r\n");
@@ -73,6 +73,9 @@ void ltc(I2C_HandleTypeDef *hi2c, UART_HandleTypeDef *huart) {
 		putS(huart, prompt);
 		return;
 	}
+
+	sprintf(prompt,"\r\n");
+	putS(huart, prompt);
 
 	LTC2991 *ltc;
 	ltc = initLTC2991(hi2c, addr);
