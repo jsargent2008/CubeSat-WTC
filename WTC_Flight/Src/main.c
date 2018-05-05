@@ -53,7 +53,7 @@
 #include "memoryMap/memoryMap.h"
 
 //huart4 is the 70cm primary
-#define DEBUG_UART huart1
+#define DEBUG_UART huart4
 #define UART_Pi1		huart1
 #define UART_Pi2		huart3
 /* USER CODE END Includes */
