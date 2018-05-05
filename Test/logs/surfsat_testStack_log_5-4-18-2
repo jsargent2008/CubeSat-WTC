@@ -1,0 +1,281 @@
+E:\Q-PACE\Atollic\workspace\CubeSat-WTC\Test>py pyCommands.py
+Enter your commands below.
+Insert "exit" to leave the application.
+
+3.3 Rail and Regulator Voltage Test Begin
+        PASS:   3_3V_Rail is 3.290
+        PASS:   3.3Raw-1 is 3.495
+        PASS:   3.3Raw-1 is 3.400
+3.3 Rail and Regulator Voltage Test End:         True
+
+
+3.3 Rail and Regulator Current Test Begin
+        Imon_3.3-1 is 0.006
+        Imon_3.3-2 is 0.040
+                I_Total is ~0.046
+3.3 Rail and Regulator Current Test End
+
+LTC 0, Conducting 3 sample(s) ...
+        C 1      V_Stack_4    Meas:  2.28  Nom:  7.2 V   6.92 V   PASS
+        C 2      NC           Meas:  0.02  Nom: -1.0 V   0.02 V   PASS
+        C 3      TH-3-7+      Meas:  0.03  Nom: -2.0 V   0.03 V   PASS
+        C 4      TH-3-7-      Meas:  0.01  Nom: -2.0 V   0.01 V   PASS
+        C 5      TH-4-8+      Meas:  0.03  Nom: -2.0 V   0.03 V   PASS
+        C 6      TH-4-8-      Meas:  0.01  Nom: -2.0 V   0.01 V   PASS
+        C 7      V-Stack_3    Meas:  0.76  Nom:  7.2 V   2.30 V   --F--
+        C 8      REF_Chrg     Meas:  0.00  Nom: -1.0 V   0.01 V   PASS
+        LTC 0    Vcc 3.42 V
+LTC 1, Conducting 3 sample(s) ...
+        C 1      V_Stack_2    Meas:  2.28  Nom:  7.2 V   6.91 V   PASS
+        C 2      NC           Meas:  0.04  Nom: -1.0 V   0.04 V   PASS
+        C 3      TH-2-6+      Meas:  0.03  Nom: -2.0 V   0.03 V   PASS
+        C 4      TH-2-6-      Meas:  0.03  Nom: -2.0 V   0.03 V   PASS
+        C 5      TH-1-5+      Meas:  0.03  Nom: -2.0 V   0.03 V   PASS
+        C 6      TH-1-5-      Meas:  0.02  Nom: -2.0 V   0.02 V   PASS
+        C 7      NC           Meas:  0.03  Nom: -1.0 V   0.03 V   PASS
+        C 8      V-Stack_1    Meas:  2.29  Nom:  7.2 V   6.94 V   PASS
+        LTC 1    Vcc 3.42 V
+LTC 2, Conducting 3 sample(s) ...
+        C 1      V_MPPT_XCtr  Meas:  2.70  Nom:  6.0 V   5.41 V   --F--
+        C 2      V_MPPT_XZ-   Meas:  2.56  Nom:  6.0 V   5.11 V   --F--
+        C 3      V_MPPT_Z+    Meas:  2.58  Nom:  6.0 V   5.15 V   --F--
+        C 4      NTC_XCtr     Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 5      NTC_YZ-      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 6      V_MPPT_YCtr  Meas:  2.57  Nom:  6.0 V   5.13 V   --F--
+        C 7      V_MPPT_YZ+   Meas:  2.55  Nom:  6.0 V   5.11 V   --F--
+        C 8      NTC_YCtr     Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        LTC 2    Vcc 3.42 V
+LTC 3, Conducting 3 sample(s) ...
+        C 1      V_Pnl_Y-Ctr  Meas:  0.38  Nom:  4.7 V   0.76 V   --F--
+        C 2      V_Pnl_Y-Z+   Meas:  0.00  Nom:  4.7 V   0.00 V   --F--
+        C 3      V_Pnl_Y-Z-   Meas:  0.38  Nom:  4.7 V   0.76 V   --F--
+        C 4      V_Pnl_X-Z-   Meas:  0.68  Nom:  4.7 V   1.36 V   --F--
+        C 5      NTC_YZ+      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 6      NTC_Drive    Meas:  0.00  Nom:  5.0 V   0.00 V   --F--
+        C 7      V_Pnl_X-Z+   Meas:  0.65  Nom:  4.7 V   1.31 V   --F--
+        C 8      V_Pnl_X-Ctr  Meas:  2.35  Nom:  4.7 V   4.70 V   PASS
+        LTC 3    Vcc 3.42 V
+LTC 4, Conducting 3 sample(s) ...
+        C 1      V_Pnl_X+Ctr  Meas:  1.03  Nom:  4.7 V   2.05 V   --F--
+        C 2      V_Pnl_X+Z+   Meas:  0.68  Nom:  4.7 V   1.36 V   --F--
+        C 3      V_Pnl_X+Z-   Meas:  0.73  Nom:  4.7 V   1.47 V   --F--
+        C 4      V_Pnl_Z+     Meas:  0.65  Nom:  4.7 V   1.29 V   --F--
+        C 5      V_Pnl_Y+Z-   Meas:  0.38  Nom:  4.7 V   0.75 V   --F--
+        C 6      V_Pnl_Y+Z+   Meas:  0.00  Nom:  4.7 V   0.00 V   --F--
+        C 7      V_Pnl_Y+Ctr  Meas:  0.38  Nom:  4.7 V   0.76 V   --F--
+        C 8      Pull-down    Meas:  0.00  Nom: -5.0 V   0.00 V   PASS
+        LTC 4    Vcc 3.42 V
+LTC 5, Conducting 3 sample(s) ...
+        C 1      NTC_XZ+      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 2      NTC_XZ-      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 3      NTC_Z+       Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 4      V_MPPT_XZ+   Meas:  2.58  Nom:  6.0 V   5.15 V   --F--
+        C 5      V_MPPT_YZ-   Meas:  2.53  Nom:  6.0 V   5.06 V   --F--
+        C 6      Pull-down    Meas:  0.00  Nom: -5.0 V   0.00 V   PASS
+        C 7      Pull-down    Meas:  0.00  Nom: -5.0 V   0.00 V   PASS
+        C 8      MPPT_Bus     Meas:  2.60  Nom:  5.9 V   5.19 V   --F--
+        LTC 5    Vcc 3.42 V
+
+E:\Q-PACE\Atollic\workspace\CubeSat-WTC\Test>py pyCommands.py
+Enter your commands below.
+Insert "exit" to leave the application.
+
+3.3 Rail and Regulator Voltage Test Begin
+        PASS:   3_3V_Rail is 3.290
+        PASS:   3.3Raw-1 is 3.475
+        PASS:   3.3Raw-1 is 3.395
+3.3 Rail and Regulator Voltage Test End:         True
+
+
+3.3 Rail and Regulator Current Test Begin
+        Imon_3.3-1 is 0.014
+        Imon_3.3-2 is 0.042
+                I_Total is ~0.056
+3.3 Rail and Regulator Current Test End
+
+
+12 Rail and Regulator Voltage Test Begin
+        Both regulators should be initally off:
+                PASS:   12V_Rail is 0.000
+        Regulator 1:
+                Turning 12V regulator(s) 1 ON:
+                        PASS:   12V_Rail is 6.360
+                Turning 12V regulator(s) 1 OFF:
+                        PASS:   12V_Rail is 0.060
+        Regulator 2:
+                Turning 12V regulator(s) 2 ON:
+                        PASS:   12V_Rail is 6.420
+                Turning 12V regulator(s) 2 OFF:
+                        PASS:   12V_Rail is 0.020
+        Both regulators should be off:
+                PASS:   12V_Rail is 0.060
+        Turning on both Regulators:
+                Turning 12V regulator(s) both ON:
+                        PASS:   12V_Rail is 6.260
+        Turning off both Regulators:
+                Turning 12V regulator(s) both OFF:
+                        PASS:   12V_Rail is 0.160
+12 Rail and Regulator Voltage Test End:          True
+
+
+5 Rail and Regulator Voltage Test Begin
+        Both regulators should be initally off:
+                PASS:   5V_Rail is 0.010
+        Regulator 1:
+                Turning 5V regulator(s) 1 ON:
+                        PASS:   5V_Rail is 4.510
+                Turning 5V regulator(s) 1 OFF:
+                        PASS:   5V_Rail is 0.060
+        Regulator 2:
+                Turning 5V regulator(s) 2 ON:
+                        FAIL:   5V_Rail is 4.440
+                Turning 5V regulator(s) 2 OFF:
+                        PASS:   5V_Rail is 0.050
+        Both regulators should be off:
+                PASS:   5V_Rail is 0.060
+        Turning on both Regulators:
+                Turning 5V regulator(s) both ON:
+                        PASS:   5V_Rail is 4.510
+        Turning off both Regulators:
+                Turning 5V regulator(s) both OFF:
+                        PASS:   5V_Rail is 0.140
+5 Rail and Regulator Voltage Test End:           False
+
+LTC 0, Conducting 3 sample(s) ...
+        C 1      V_Stack_4    Meas:  0.00  Nom:  7.2 V   0.00 V   --F--                 <- note that v stack is down
+        C 2      NC           Meas:  0.00  Nom: -1.0 V   0.00 V   PASS
+        C 3      TH-3-7+      Meas:  0.00  Nom: -2.0 V   0.00 V   PASS
+        C 4      TH-3-7-      Meas:  0.01  Nom: -2.0 V   0.01 V   PASS
+        C 5      TH-4-8+      Meas:  0.01  Nom: -2.0 V   0.01 V   PASS
+        C 6      TH-4-8-      Meas:  0.01  Nom: -2.0 V   0.01 V   PASS
+        C 7      V-Stack_3    Meas:  0.00  Nom:  7.2 V   0.01 V   --F--                 <- see above
+        C 8      REF_Chrg     Meas:  0.00  Nom: -1.0 V   0.00 V   PASS
+        LTC 0    Vcc 3.42 V
+LTC 1, Conducting 3 sample(s) ...
+        C 1      V_Stack_2    Meas:  2.28  Nom:  7.2 V   6.91 V   PASS
+        C 2      NC           Meas:  0.03  Nom: -1.0 V   0.03 V   PASS
+        C 3      TH-2-6+      Meas:  0.03  Nom: -2.0 V   0.03 V   PASS
+        C 4      TH-2-6-      Meas:  0.04  Nom: -2.0 V   0.04 V   PASS
+        C 5      TH-1-5+      Meas:  0.04  Nom: -2.0 V   0.04 V   PASS
+        C 6      TH-1-5-      Meas:  0.03  Nom: -2.0 V   0.03 V   PASS
+        C 7      NC           Meas:  0.02  Nom: -1.0 V   0.02 V   PASS
+        C 8      V-Stack_1    Meas:  2.29  Nom:  7.2 V   6.95 V   PASS
+        LTC 1    Vcc 3.42 V
+LTC 2, Conducting 3 sample(s) ...
+        C 1      V_MPPT_XCtr  Meas:  2.70  Nom:  6.0 V   5.41 V   --F--
+        C 2      V_MPPT_XZ-   Meas:  2.56  Nom:  6.0 V   5.12 V   --F--
+        C 3      V_MPPT_Z+    Meas:  2.58  Nom:  6.0 V   5.15 V   --F--
+        C 4      NTC_XCtr     Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 5      NTC_YZ-      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 6      V_MPPT_YCtr  Meas:  2.57  Nom:  6.0 V   5.13 V   --F--
+        C 7      V_MPPT_YZ+   Meas:  2.56  Nom:  6.0 V   5.11 V   --F--
+        C 8      NTC_YCtr     Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        LTC 2    Vcc 3.42 V
+LTC 3, Conducting 3 sample(s) ...
+        C 1      V_Pnl_Y-Ctr  Meas:  0.38  Nom:  4.7 V   0.76 V   --F--
+        C 2      V_Pnl_Y-Z+   Meas:  0.00  Nom:  4.7 V   0.00 V   --F--
+        C 3      V_Pnl_Y-Z-   Meas:  0.38  Nom:  4.7 V   0.76 V   --F--
+        C 4      V_Pnl_X-Z-   Meas:  0.68  Nom:  4.7 V   1.36 V   --F--
+        C 5      NTC_YZ+      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 6      NTC_Drive    Meas:  0.00  Nom:  5.0 V   0.00 V   --F--
+        C 7      V_Pnl_X-Z+   Meas:  0.65  Nom:  4.7 V   1.31 V   --F--
+        C 8      V_Pnl_X-Ctr  Meas:  2.35  Nom:  4.7 V   4.70 V   PASS
+        LTC 3    Vcc 3.42 V
+LTC 4, Conducting 3 sample(s) ...
+        C 1      V_Pnl_X+Ctr  Meas:  1.03  Nom:  4.7 V   2.06 V   --F--
+        C 2      V_Pnl_X+Z+   Meas:  0.68  Nom:  4.7 V   1.36 V   --F--
+        C 3      V_Pnl_X+Z-   Meas:  0.74  Nom:  4.7 V   1.47 V   --F--
+        C 4      V_Pnl_Z+     Meas:  0.65  Nom:  4.7 V   1.30 V   --F--
+        C 5      V_Pnl_Y+Z-   Meas:  0.38  Nom:  4.7 V   0.76 V   --F--
+        C 6      V_Pnl_Y+Z+   Meas:  0.00  Nom:  4.7 V   0.00 V   --F--
+        C 7      V_Pnl_Y+Ctr  Meas:  0.38  Nom:  4.7 V   0.76 V   --F--
+        C 8      Pull-down    Meas:  0.00  Nom: -5.0 V   0.00 V   PASS
+        LTC 4    Vcc 3.42 V
+LTC 5, Conducting 3 sample(s) ...
+        C 1      NTC_XZ+      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 2      NTC_XZ-      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 3      NTC_Z+       Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 4      V_MPPT_XZ+   Meas:  2.58  Nom:  6.0 V   5.15 V   --F--
+        C 5      V_MPPT_YZ-   Meas:  2.53  Nom:  6.0 V   5.06 V   --F--
+        C 6      Pull-down    Meas:  0.00  Nom: -5.0 V   0.00 V   PASS
+        C 7      Pull-down    Meas:  0.00  Nom: -5.0 V   0.00 V   PASS
+        C 8      MPPT_Bus     Meas:  2.60  Nom:  5.9 V   5.19 V   --F--
+        LTC 5    Vcc 3.42 V
+
+E:\Q-PACE\Atollic\workspace\CubeSat-WTC\Test>py pyCommands.py
+Enter your commands below.
+Insert "exit" to leave the application.
+
+3.3 Rail and Regulator Voltage Test Begin
+        PASS:   3_3V_Rail is 3.290
+        PASS:   3.3Raw-1 is 3.470
+        PASS:   3.3Raw-1 is 3.460
+3.3 Rail and Regulator Voltage Test End:         True
+
+
+3.3 Rail and Regulator Current Test Begin
+        Imon_3.3-1 is 0.024
+        Imon_3.3-2 is 0.024
+                I_Total is ~0.048
+3.3 Rail and Regulator Current Test End
+
+LTC 0, Conducting 3 sample(s) ...
+        C 1      V_Stack_4    Meas:  1.52  Nom:  7.2 V   4.61 V   --F--
+        C 2      NC           Meas:  0.02  Nom: -1.0 V   0.02 V   PASS
+        C 3      TH-3-7+      Meas:  0.01  Nom: -2.0 V   0.01 V   PASS
+        C 4      TH-3-7-      Meas:  0.01  Nom: -2.0 V   0.01 V   PASS
+        C 5      TH-4-8+      Meas:  0.01  Nom: -2.0 V   0.01 V   PASS
+        C 6      TH-4-8-      Meas:  0.02  Nom: -2.0 V   0.02 V   PASS
+        C 7      V-Stack_3    Meas:  0.00  Nom:  7.2 V   0.00 V   --F--
+        C 8      REF_Chrg     Meas:  0.00  Nom: -1.0 V   0.01 V   PASS
+        LTC 0    Vcc 3.42 V
+LTC 1, Conducting 3 sample(s) ...
+        C 1      V_Stack_2    Meas:  2.28  Nom:  7.2 V   6.91 V   PASS
+        C 2      NC           Meas:  0.04  Nom: -1.0 V   0.04 V   PASS
+        C 3      TH-2-6+      Meas:  0.02  Nom: -2.0 V   0.02 V   PASS
+        C 4      TH-2-6-      Meas:  0.02  Nom: -2.0 V   0.02 V   PASS
+        C 5      TH-1-5+      Meas:  0.03  Nom: -2.0 V   0.03 V   PASS
+        C 6      TH-1-5-      Meas:  0.02  Nom: -2.0 V   0.02 V   PASS
+        C 7      NC           Meas:  0.02  Nom: -1.0 V   0.02 V   PASS
+        C 8      V-Stack_1    Meas:  2.29  Nom:  7.2 V   6.95 V   PASS
+        LTC 1    Vcc 3.42 V
+LTC 2, Conducting 3 sample(s) ...
+        C 1      V_MPPT_XCtr  Meas:  2.70  Nom:  6.0 V   5.41 V   --F--
+        C 2      V_MPPT_XZ-   Meas:  2.56  Nom:  6.0 V   5.11 V   --F--
+        C 3      V_MPPT_Z+    Meas:  2.58  Nom:  6.0 V   5.15 V   --F--
+        C 4      NTC_XCtr     Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 5      NTC_YZ-      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 6      V_MPPT_YCtr  Meas:  2.57  Nom:  6.0 V   5.13 V   --F--
+        C 7      V_MPPT_YZ+   Meas:  2.56  Nom:  6.0 V   5.11 V   --F--
+        C 8      NTC_YCtr     Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        LTC 2    Vcc 3.42 V
+LTC 3, Conducting 3 sample(s) ...
+        C 1      V_Pnl_Y-Ctr  Meas:  0.38  Nom:  4.7 V   0.76 V   --F--
+        C 2      V_Pnl_Y-Z+   Meas:  0.00  Nom:  4.7 V   0.00 V   --F--
+        C 3      V_Pnl_Y-Z-   Meas:  0.38  Nom:  4.7 V   0.76 V   --F--
+        C 4      V_Pnl_X-Z-   Meas:  0.68  Nom:  4.7 V   1.36 V   --F--
+        C 5      NTC_YZ+      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 6      NTC_Drive    Meas:  0.00  Nom:  5.0 V   0.00 V   --F--
+        C 7      V_Pnl_X-Z+   Meas:  0.65  Nom:  4.7 V   1.31 V   --F--
+        C 8      V_Pnl_X-Ctr  Meas:  2.35  Nom:  4.7 V   4.70 V   PASS
+        LTC 3    Vcc 3.42 V
+LTC 4, Conducting 3 sample(s) ...
+        C 1      V_Pnl_X+Ctr  Meas:  1.03  Nom:  4.7 V   2.06 V   --F--
+        C 2      V_Pnl_X+Z+   Meas:  0.68  Nom:  4.7 V   1.36 V   --F--
+        C 3      V_Pnl_X+Z-   Meas:  0.74  Nom:  4.7 V   1.47 V   --F--
+        C 4      V_Pnl_Z+     Meas:  0.65  Nom:  4.7 V   1.30 V   --F--
+        C 5      V_Pnl_Y+Z-   Meas:  0.38  Nom:  4.7 V   0.76 V   --F--
+        C 6      V_Pnl_Y+Z+   Meas:  0.00  Nom:  4.7 V   0.00 V   --F--
+        C 7      V_Pnl_Y+Ctr  Meas:  0.38  Nom:  4.7 V   0.76 V   --F--
+        C 8      Pull-down    Meas:  0.00  Nom: -5.0 V   0.00 V   PASS
+        LTC 4    Vcc 3.42 V
+LTC 5, Conducting 3 sample(s) ...
+        C 1      NTC_XZ+      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 2      NTC_XZ-      Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 3      NTC_Z+       Meas:  0.00  Nom: -3.0 V   0.00 V   PASS
+        C 4      V_MPPT_XZ+   Meas:  2.58  Nom:  6.0 V   5.15 V   --F--
+        C 5      V_MPPT_YZ-   Meas:  2.53  Nom:  6.0 V   5.06 V   --F--
+        C 6      Pull-down    Meas:  0.00  Nom: -5.0 V   0.00 V   PASS
+        C 7      Pull-down    Meas:  0.00  Nom: -5.0 V   0.00 V   PASS
+        C 8      MPPT_Bus     Meas:  2.60  Nom:  5.9 V   5.19 V   --F--
+        LTC 5    Vcc 3.42 V

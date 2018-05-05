@@ -94,7 +94,7 @@ def dw(port, pin, state):
 		out = ser.read(4).decode('ascii')
 		# gets the output result and \r\n
 		out = ser.readline().decode("ascii").strip()
-		printf("the ret val was `%s`", out);
+		# printf("the ret val was `%s`", out);
 
 
 def dr(port, pin):
@@ -214,7 +214,7 @@ def printLTC_AVG(num, channel, samples):
 		factor  = ltc[i][3]
 		actV	= (1/factor)*avgLst[channel]
 
-		if(nomV < 0 or math.isclose(actV, nomV, rel_tol=nomV*tolerance)):
+		if(nomV < 0 or math.isclose(actV, nomV, rel_tol=tolerance)):
 			stRes = "PASS"
 			succeed = succeed & True;
 		else:
@@ -248,64 +248,183 @@ def check5V():
 	val = ar(13)/factor
 	return val
 
-def turnOn5V():
-	#try turning on rail 1
-	time.sleep(READ_DELAY)
-	dw('a','12',1)
+#  rail 1 or 2, 3 is both
+#  value is 0 for off and 1 for on
+# 		rail 1 is 5V_Rail_1_Enable		PA12
+# 		rail 2 is 5V_Rail_2_Enable		PH2
+def change5V(rail, value = 1):
+	succeed = True
+	target = 5.0 * value
+	tolerance = 0.10
 
-	if check5V() > 3:
-		return 1;
+	printf("\t\tTurning 5V regulator(s) %s %s:\n", str(rail) if (rail < 3)  else "both", "ON" if (value == 1) else "OFF")
+	if(rail == 1):
+		dw('a', 12, value)
+	elif(rail == 2):
+		dw('h', 2, value)
+	elif(rail == 3):
+		dw('a', 12, value)
+		dw('h', 2, value)
+
+	# give the regulator time to power up and stabilize
+	time.sleep(2.5)
+
+	rail = ar(13) * 10
+
+	if(value == 0 and math.isclose(rail, target, abs_tol=0.200)):
+		printf("\t\t\tPASS:\t")
+		succeed = succeed & True;
+	elif(value == 1 and math.isclose(rail, target, rel_tol=tolerance)):
+		printf("\t\t\tPASS:\t")
+		succeed = succeed & True;
 	else:
-		dw('a','12',0)
-		dw('h','2',1)
-		if check5V() > 3:
-			return 1;
-		else:
-			dw('a','1',0)
-			return 0;
+		printf("\t\t\tFAIL:\t")
+		succeed = False;
+	printf("5V_Rail is %4.3f\n", rail)
+
+	return succeed
 
 
 def check_5V():
 	succeed = True
-	target = 5
-	tolerance = 0.20
+	target = 5.0
+	tolerance = 0.10
 
-	printf("\n3.3 Rail and Regulator Voltage Test Begin\n")
+	printf("\n5 Rail and Regulator Voltage Test Begin\n")
 
 	# 	Name		:	ADC Name	:	ADC	:	Factor
 	#	3_3V_Rail 	:	_10X_Out_1	:	13	:	10
 
 	rail = ar(13) * 10
 
+	printf("\tBoth regulators should be initally off:\n")
 	# printf("3_3V_Rail is %4.3f\n", rail)
-	if(math.isclose(rail, target, rel_tol=target*tolerance)):
-		printf("\tPASS:\t")
+	if(math.isclose(rail, 0, abs_tol=0.200)):
+		printf("\t\tPASS:\t")
 		succeed = succeed & True;
 	else:
-		printf("\tFAIL:\t")
+		printf("\t\tFAIL:\t")
 		succeed = False;
-	printf("3_3V_Rail is %4.3f\n", rail)
+	printf("5V_Rail is %4.3f\n", rail)
 
-	if(math.isclose(ps1, target, rel_tol=target*tolerance)):
-		printf("\tPASS:\t")
+
+	printf("\tRegulator 1:\n")
+	succeed = succeed & change5V(1, 1)
+	succeed = succeed & change5V(1, 0)
+
+	printf("\tRegulator 2:\n")
+	succeed = succeed & change5V(2, 1)
+	succeed = succeed & change5V(2, 0)
+
+	rail = ar(13) * 10
+
+	printf("\tBoth regulators should be off:\n")
+	# printf("3_3V_Rail is %4.3f\n", rail)
+	if(math.isclose(rail, 0, abs_tol=0.200)):
+		printf("\t\tPASS:\t")
 		succeed = succeed & True;
 	else:
-		printf("\tFAIL:\t")
+		printf("\t\tFAIL:\t")
 		succeed = False;
-	printf("3.3Raw-1 is %4.3f\n", ps1)
+	printf("5V_Rail is %4.3f\n", rail)
 
-	if(math.isclose(ps2, target, rel_tol=target*tolerance)):
-		printf("\tPASS:\t")
-		succeed = succeed & True;
-	else:
-		printf("\tFAIL:\t")
-		succeed = False;
-	printf("3.3Raw-1 is %4.3f\n", ps2)
+	printf("\tTurning on both Regulators:\n")
+	succeed = succeed & change5V(3, 1)
 
-	printf("3.3 Rail and Regulator Voltage Test End:\t %s\n\n", succeed)
+	printf("\tTurning off both Regulators:\n")
+	succeed = succeed & change5V(3, 0)
+
+	printf("5 Rail and Regulator Voltage Test End:\t\t %s\n\n", succeed)
 
 	return succeed
 
+#  rail 1 or 2, 3 is both
+#  value is 0 for off and 1 for on
+# 		rail 1 is 12V_Rail_1_Enable		PC8
+# 		rail 2 is 12V_Rail_2_Enable		PC9
+def change12V(rail, value = 1):
+	succeed = True
+	target = 6.4 * value
+	tolerance = 0.10
+
+	printf("\t\tTurning 12V regulator(s) %s %s:\n", str(rail) if (rail < 3)  else "both", "ON" if (value == 1) else "OFF")
+	if(rail == 1):
+		dw('c', 8, value)
+	elif(rail == 2):
+		dw('c', 9, value)
+	elif(rail == 3):
+		dw('c', 8, value)
+		dw('c', 9, value)
+
+	# give the regulator time to power up and stabilize
+	time.sleep(3)
+
+	rail = ar(14) * 20
+	if(value == 0 and math.isclose(rail, target, abs_tol=0.200)):
+		printf("\t\t\tPASS:\t")
+		succeed = succeed & True;
+	elif(value == 1 and math.isclose(rail, target, rel_tol=tolerance)):
+		printf("\t\t\tPASS:\t")
+		succeed = succeed & True;
+	else:
+		printf("\t\t\tFAIL:\t")
+		succeed = False;
+	printf("12V_Rail is %4.3f\n", rail)
+
+	return succeed
+
+def check_12V():
+	succeed = True
+	target = 6.4
+	tolerance = 0.10
+
+	printf("\n12 Rail and Regulator Voltage Test Begin\n")
+
+	# 	Name		:	ADC Name	:	ADC	:	Factor
+	#	3_3V_Rail 	:	_10X_Out_1	:	13	:	10
+
+	rail = ar(14) * 20
+
+	printf("\tBoth regulators should be initally off:\n")
+	# printf("3_3V_Rail is %4.3f\n", rail)
+	if(math.isclose(rail, 0, abs_tol=0.200)):
+		printf("\t\tPASS:\t")
+		succeed = succeed & True;
+	else:
+		printf("\t\tFAIL:\t")
+		succeed = False;
+	printf("12V_Rail is %4.3f\n", rail)
+
+
+	printf("\tRegulator 1:\n")
+	succeed = succeed & change12V(1, 1)
+	succeed = succeed & change12V(1, 0)
+
+	printf("\tRegulator 2:\n")
+	succeed = succeed & change12V(2, 1)
+	succeed = succeed & change12V(2, 0)
+
+	rail = ar(14) * 20
+
+	printf("\tBoth regulators should be off:\n")
+	# printf("3_3V_Rail is %4.3f\n", rail)
+	if(math.isclose(rail, 0, abs_tol=0.200)):
+		printf("\t\tPASS:\t")
+		succeed = succeed & True;
+	else:
+		printf("\t\tFAIL:\t")
+		succeed = False;
+	printf("12V_Rail is %4.3f\n", rail)
+
+	printf("\tTurning on both Regulators:\n")
+	succeed = succeed & change12V(3, 1)
+
+	printf("\tTurning off both Regulators:\n")
+	succeed = succeed & change12V(3, 0)
+
+	printf("12 Rail and Regulator Voltage Test End:\t\t %s\n\n", succeed)
+
+	return succeed
 
 def checkWTC_3V():
 	succeed = True
@@ -324,7 +443,7 @@ def checkWTC_3V():
 	ps2 = ar(10) * 5
 
 	# printf("3_3V_Rail is %4.3f\n", rail)
-	if(math.isclose(rail, target, rel_tol=target*tolerance)):
+	if(math.isclose(rail, target, rel_tol=tolerance)):
 		printf("\tPASS:\t")
 		succeed = succeed & True;
 	else:
@@ -332,7 +451,7 @@ def checkWTC_3V():
 		succeed = False;
 	printf("3_3V_Rail is %4.3f\n", rail)
 
-	if(math.isclose(ps1, target, rel_tol=target*tolerance)):
+	if(math.isclose(ps1, target, rel_tol=tolerance)):
 		printf("\tPASS:\t")
 		succeed = succeed & True;
 	else:
@@ -340,7 +459,7 @@ def checkWTC_3V():
 		succeed = False;
 	printf("3.3Raw-1 is %4.3f\n", ps1)
 
-	if(math.isclose(ps2, target, rel_tol=target*tolerance)):
+	if(math.isclose(ps2, target, rel_tol=tolerance)):
 		printf("\tPASS:\t")
 		succeed = succeed & True;
 	else:
@@ -424,6 +543,11 @@ retval = 0
 while 1:
 	status = checkWTC_3V()
 	status = checkWTC_3I()
+
+
+	status = check_12V()
+
+	status = check_5V()
 
 	# ltcSampleAll(1, 10)
 	#print(ltcAverageAll(1,10,2))

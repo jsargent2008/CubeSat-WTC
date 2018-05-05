@@ -1,0 +1,32 @@
+QPACE Inital Test
+
+Date: 5/4/2018
+Tester: Clayton White
+
+Unboxed Stack
+	NOTE: 3.3 disable was in place
+Connected: JTAG, 70cm primary, and MPPT power through X-Center
+Removed 3.3 disable
+Attemped JTAG connection
+	Fail
+Added 3.3 disable
+Measured BT_Raw
+	0 volts
+
+Set supply to  4.9 V 700mA limits
+Connected to MPPT power conn
+	Immediate CC condition but voltage did not drop
+	Immediate manual disconnection
+Measured BT_Raw
+	5.4 volts
+
+Peliminary: batteries are discharged and chargers are trying to charge them
+	causing an excessive current draw from the MPPT. Will attempt with lower
+	current limit. Previous testing shows that the MPPT will not lower the 
+	voltage on the supply, aka over draw it. 
+
+Measuring Stack:
+3.3		0.160 V
+5		0.039 V
+BT_Raw	5.400 V
+12_Pwr	0.000 V
