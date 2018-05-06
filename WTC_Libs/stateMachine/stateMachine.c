@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#define DEPLOY_WAIT_DELAY_MINS 2
 //WTC Software Flow:
 //------------------
 //Initialization
@@ -46,16 +47,48 @@
 
 #include "stateMachine.h"
 
-void wtcSetup(ADC_HandleTypeDef *hadc) {
+/*****IMPORTANT*****
+ * MUST CALL HAL_RTC_GetTime and HAL_RTC_GetDate together
+ * or the RTC will not update!!!!
+ */
+
+void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleTypeDef *hrtc) {
 	//setup function for WTC, 3.3v power is on
 	// when disengaging from dispenser
-
+	char prompt[100] = { };
 	// RTC delay 30min
+	RTC_DateTypeDef sdatestructureget;
+	RTC_TimeTypeDef stimestructureget;
 
-	//check_3v_status
+	/* Get the RTC current Time */
+	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN);
+	/* Get the RTC current Date */
+	HAL_RTC_GetDate(hrtc, &sdatestructureget, RTC_FORMAT_BIN);
+
+	uint8_t mins = (stimestructureget.Minutes + DEPLOY_WAIT_DELAY_MINS) % 60;
+	uint8_t cmp = stimestructureget.Minutes;
+
+	while (mins != cmp) {
+
+		HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN);
+		HAL_RTC_GetDate(hrtc, &sdatestructureget, RTC_FORMAT_BIN);
+		cmp = stimestructureget.Minutes;
+
+		sprintf((char*) prompt, "%02d:%02d:%02d\r\n", stimestructureget.Hours,
+				stimestructureget.Minutes, stimestructureget.Seconds);
+		putS(huart, prompt);
+		prompt[0] = '\0';
+		stimestructureget.Seconds = -1;
+		HAL_Delay(100);
+	}
+
+	//end of 'DEPLOY_WAIT_DELAY_MINS' timer, deploy antenna
+	HAL_GPIO_TogglePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin);
+
+//
+//	//check_3v_status
 	//deploy_antenna
-
-	uint8_t deployStatus = depolyAntenna(hadc, 1);
+	//uint8_t deployStatus = depolyAntenna(hadc, 1);
 
 	//check deployment of antenna
 

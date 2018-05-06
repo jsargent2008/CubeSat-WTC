@@ -15,7 +15,7 @@ uint8_t initHandShake(UART_HandleTypeDef *huart) {
 	putS(huart, OK);
 	//wait for response back from pi
 
-	HAL_DELAY(1000);
+	HAL_Delay(1000);
 	// or use DMA interrupt
 
 	uint8_t aRxBuffer[20] = "";
@@ -30,6 +30,7 @@ uint8_t initHandShake(UART_HandleTypeDef *huart) {
 uint8_t sendCommand(UART_HandleTypeDef *huart, uint8_t command) {
 
 	uint8_t pi = piNum(huart);
+	return 0;
 }
 
 uint8_t piNum(UART_HandleTypeDef *huart) {

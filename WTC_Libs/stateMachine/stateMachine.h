@@ -15,10 +15,11 @@
 #include "stm32l1xx_hal_adc.h"
 #include "gpio/gpio.h"
 #include "adc/adc.h"
+#include "rtc/rtc.h"
 
 //function prototypes
 
-void wtcSetup(ADC_HandleTypeDef *hadc);
+void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleTypeDef *hrtc);
 uint8_t depolyAntenna(ADC_HandleTypeDef *hadc, uint8_t antenna);
 uint8_t deploymentSense(ADC_HandleTypeDef *hadc, uint8_t antenna, uint8_t thresholdV, float dplyV);
 void commsLoop();
