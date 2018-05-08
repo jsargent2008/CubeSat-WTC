@@ -99,6 +99,8 @@ void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleType
 	HAL_GPIO_WritePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin, GPIO_PIN_SET);
 	//check_3v_status
 	//deploy_antenna
+	uint8_t ant1_nAttempts = 0;
+	uint8_t ant2_nAttempts = 0;
 	uint8_t nAttempts = 0;
 	int8_t nAntenna = 1;
 	int8_t deployStatus = 0;
@@ -115,11 +117,12 @@ void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleType
 		//get deployment status (int)
 		deployStatus = deployAntenna(huart, hadc, hrtc, nAntenna, waitTime);
 
-		//print to UART
-		sprintf(prompt, "deploy: %d, attempt(s): %d, status: %d, reading %f V\r\n", (int) nAntenna,
-				(int) (nAttempts), (int) (deployStatus),
-				adcReadSingle(hadc, _70cm_AUX_ADC_Channel));
-		putS(huart, prompt);
+		if (nAntenna == 1) {
+			ant1_nAttempts++;
+		}
+		if (nAntenna == 2) {
+			ant1_nAttempts++;
+		}
 
 		if (deployStatus == 1 && ant1_hasBeenDeployed == FALSE) {
 			ant1_hasBeenDeployed = TRUE;
@@ -138,10 +141,19 @@ void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleType
 			} else if (nAntenna == 2 && ant1_hasBeenDeployed == FALSE) {
 				nAntenna = 1;
 			}
-
-			nAttempts = 0;
 		}
 
+		if (ant1_nAttempts >= attemptsLimit) {
+			nAntenna = 2;
+			if (ant2_nAttempts >= attemptsLimit) {
+				break;
+			}
+		} else if (ant2_nAttempts >= attemptsLimit) {
+			nAntenna = 1;
+			if (ant1_nAttempts >= attemptsLimit) {
+				break;
+			}
+		}
 		if (ant1_hasBeenDeployed == TRUE && ant2_hasBeenDeployed == TRUE) {
 			deployStatus = 3;
 		}
@@ -214,7 +226,7 @@ int8_t deployAntenna(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_Han
 	}
 
 	float tolerance = 0.20f;
-	//uint8_t startTime_sec = stimestructureget.Seconds;
+	uint8_t _70cm_AUX_ADC_Channel = 25;
 
 	/* Get the RTC current Time */
 	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN);
@@ -236,15 +248,16 @@ int8_t deployAntenna(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_Han
 //		sprintf(prompt, "\t\tstatus: %d\r\n", status);
 //		putS(huart, prompt);
 
-		sprintf(prompt, "On for %d seconds...\r", abs(curSec - tempS) % 60);
+		//print to UART
+		sprintf(prompt, "deploy: %d, status: %d, reading %f V, On for %d seconds...\r", (int) nAntenna,
+				(int) (status),
+				adcReadSingle(hadc, _70cm_AUX_ADC_Channel), abs(curSec - tempS) % 60);
 		putS(huart, prompt);
 
 		HAL_Delay(200);
 
 		//timeout
-		if (sec < stimestructureget.Seconds) {
-			sprintf(prompt, "timeout...\r\n");
-			putS(huart, prompt);
+		if (sec < curSec) {
 			//status = -2;
 			break;
 		}
