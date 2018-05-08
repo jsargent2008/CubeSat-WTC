@@ -1,0 +1,5 @@
+1.) Remove pin assignments from PA5, PA6, and PA7.
+2.) Enable SPI1, set mode to full-duplex master.
+3.) Assign PA11 GPIO_Output, with lable SD_CS.
+4.) In SPI1 configuration, GPIO settings tab, select SP1_MISO (PA6) and set GPIO pull-up/pull-down to pull-up.
+5.) Enable FATFS middleware.
