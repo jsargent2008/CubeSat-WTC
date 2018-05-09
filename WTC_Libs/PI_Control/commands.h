@@ -3,7 +3,7 @@
  *
  * Defines the commands used for bidirectional UART communication for the Raspberry PI.
  *
- *  Created on: Apr 23, 2018
+ *  Created on: April 23, 2018
  *      Author: Clayton White
  */
 
@@ -15,10 +15,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <myprintf/myprintf.h>
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_uart.h"
+#include "usart.h"
 #include "UART_IRQ/UART_IRQ.h"
-#include "PRINTF/printf.h"
 
 #define ACK 			"OK"
 #define OK				"OK"

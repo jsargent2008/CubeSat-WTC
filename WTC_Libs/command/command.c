@@ -14,7 +14,7 @@ void ltc(I2C_HandleTypeDef *hi2c, UART_HandleTypeDef *huart) {
 	// read all channels for 1 ltc device
 
 	putS(huart, "lt");
-	uint8_t aRxBuffer[20] = "";
+	char aRxBuffer[20] = "";
 	char prompt[20] = "";
 
 	getS(huart, aRxBuffer, 1);
@@ -93,13 +93,12 @@ void ltc(I2C_HandleTypeDef *hi2c, UART_HandleTypeDef *huart) {
 void ks(UART_HandleTypeDef *huart) {
 
 	putS(huart, "ks");
-	uint8_t aRxBuffer[20] = "";
-	char* prompt; //used for TX line
+	char aRxBuffer[20] = "";
+	char prompt[100] = { };
 
 	GPIO_TypeDef* port = NULL;
 	uint16_t pin = 0;
 	GPIO_PinState state = GPIO_PIN_SET;
-	prompt = mallocCharArray(20);
 	port = GPIOE;
 
 // get kill switch number
@@ -114,13 +113,11 @@ void ks(UART_HandleTypeDef *huart) {
 	} else {
 		sprintf(prompt, "denied\r\n");
 		putS(huart, prompt);
-		free(prompt);
 		return;
 	}
 
 	sprintf(prompt, "good bye\r\n");
 	putS(huart, prompt);
-	free(prompt);
 	writeDPin(port, pin, state);
 }
 
@@ -128,8 +125,8 @@ void ks(UART_HandleTypeDef *huart) {
 void dw(UART_HandleTypeDef *huart) {
 
 	putS(huart, "dw");
-	uint8_t aRxBuffer[20] = "";
-	char* prompt; //used for TX line
+	char aRxBuffer[20] = "";
+	char prompt[100] = { };
 
 	uint8_t flag = 0;
 	GPIO_TypeDef* port = NULL;
@@ -208,7 +205,6 @@ void dw(UART_HandleTypeDef *huart) {
 // size of return string should be consistent for every return
 // for easy script writing
 // ex. size of 5
-	prompt = mallocCharArray(20);
 // make sure not to access kill switch.
 	if (port == GPIOE) {
 		if (pin == Kill_Switch_1_Pin || pin == Kill_Switch_2_Pin || pin == GPIO_PIN_All) {
@@ -217,11 +213,10 @@ void dw(UART_HandleTypeDef *huart) {
 			flag = 4;
 			sprintf(prompt, ":f%d\r\n", flag);
 			putS(huart, prompt);
-			free(prompt);
 			return;
 		}
 	}
-	prompt = mallocCharArray(20);
+
 	if (flag == 0) {
 		writeDPin(port, pin, state);
 		// print "ok" or ":)"
@@ -232,15 +227,14 @@ void dw(UART_HandleTypeDef *huart) {
 	}
 
 	putS(huart, prompt);
-	free(prompt);
 
 }
 
 void dr(UART_HandleTypeDef *huart) {
 
 	putS(huart, "dr");
-	uint8_t aRxBuffer[20] = "";
-	char* prompt; //used for TX line
+	char aRxBuffer[20] = "";
+	char prompt[100] = { };
 
 	uint8_t flag = 0;
 	GPIO_TypeDef* port = NULL;
@@ -276,18 +270,18 @@ void dr(UART_HandleTypeDef *huart) {
 	}
 
 //TX received string.
-	putS(huart, (char*) aRxBuffer);
+	putS(huart,aRxBuffer);
 
 // get pin XX
 	getS(huart, aRxBuffer, 2);
 
 	if (flag == 0) {
 		if (isdigit(aRxBuffer[0]) && isdigit(aRxBuffer[1])) {
-			pin = atoi((char*) aRxBuffer);
+			pin = atoi(aRxBuffer);
 			if (0 <= pin && pin <= 15) {
 				pin = 1 << pin;
 			} else if (pin == 16) {
-				putS(huart, (char*) aRxBuffer);
+				putS(huart, aRxBuffer);
 				drAllport(huart, port);
 				//pin = GPIO_PIN_All;
 			} else {
@@ -300,10 +294,10 @@ void dr(UART_HandleTypeDef *huart) {
 
 	if (pin != 16) {
 		//TX received string.
-		putS(huart, (char*) aRxBuffer);
+		putS(huart, aRxBuffer);
 	}
 
-	prompt = mallocCharArray(5);
+
 	if (flag == 0) {
 		//read digital pin
 		state = HAL_GPIO_ReadPin(port, pin);
@@ -320,7 +314,6 @@ void dr(UART_HandleTypeDef *huart) {
 	}
 
 	putS(huart, prompt);
-	free(prompt);
 }
 
 //			analog write
@@ -335,7 +328,7 @@ void aw(UART_HandleTypeDef *huart) {
 void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 	putS(huart, "ar");
 	uint8_t flag = 0;
-	uint8_t aRxBuffer[20] = "";
+	char aRxBuffer[20] = "";
 	uint8_t baseChannel = ADC_CHANNEL_0;
 	uint16_t readChannel = 0;
 	char str[50] = "";
@@ -374,10 +367,10 @@ void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 	if (flag == 0) {
 		float f = adcReadSingle(hadc, readChannel);
 		sprintf(str, ":%02d-%.3f\r\n", readChannel, f);
-		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
+		putS(huart, str);
 	} else {
 		sprintf(str, ":f%d\r\n", flag); //decimal
-		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
+		putS(huart, str);
 	}
 }
 
@@ -389,7 +382,7 @@ void arAll(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 		float f = adcReadSingle(hadc, i);
 
 		sprintf(str, ":%02d-%.3f\r\n", i, f); //decimal
-		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
+		putS(huart, str);
 	}
 }
 
@@ -425,7 +418,7 @@ void drAllport(UART_HandleTypeDef *huart, GPIO_TypeDef* port) {
 			state = 0;
 		//prompt, ":%s\r\n", state ? "hi" : "lo");
 		sprintf(str, ":port%c_pin%02d-%s\r\n", i, pin, state ? "hi" : "lo");
-		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
+		putS(huart, str);
 	}
 }
 
@@ -433,22 +426,15 @@ void tt(UART_HandleTypeDef *huart, UART_HandleTypeDef *hout) {
 	putS(huart, "tt");
 	uint8_t packet_size = 12;
 
-	uint8_t aRxBuffer[20] = "";
-
-	HAL_UART_Receive(huart, (uint8_t *) aRxBuffer, packet_size, 0xFFFF);
-
-	aRxBuffer[packet_size] = '\r';
-	aRxBuffer[packet_size + 1] = '\n';
-
-	HAL_UART_Transmit(hout, (uint8_t *) aRxBuffer, (uint16_t) packet_size + 2, 0xFFFF);
+	char aRxBuffer[20] = "";
+	char prompt[20] = {};
+	getS(huart, aRxBuffer, packet_size);
+	sprintf(prompt, "%s\r\n", aRxBuffer);
+	putS(huart,aRxBuffer);
 
 	HAL_Delay(20);
 
-	HAL_UART_Receive(hout, (uint8_t *) aRxBuffer, packet_size, 5000);
-
-	aRxBuffer[packet_size] = '\r';
-	aRxBuffer[packet_size + 1] = '\n';
-
-	HAL_UART_Transmit(huart, (uint8_t *) aRxBuffer, (uint16_t) packet_size + 2, 0xFFFF);
-
+	getS(huart, aRxBuffer, packet_size);
+	sprintf(prompt, "%s\r\n", aRxBuffer);
+	putS(huart,aRxBuffer);
 }

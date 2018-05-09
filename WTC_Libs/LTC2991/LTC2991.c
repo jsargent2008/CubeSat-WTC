@@ -17,7 +17,6 @@ const float LTC2991_TEMPERATURE_lsb = 0.0625;
 //! Used to readback diode voltage when in temperature measurement mode.
 const float LTC2991_DIODE_VOLTAGE_lsb = 3.815E-05;
 
-
 LTC2991 *initLTC2991(I2C_HandleTypeDef *hi2c, uint8_t i2c_address) {
 	LTC2991 *ltc = malloc(sizeof(LTC2991));
 	ltc->hi2c = hi2c;
@@ -39,7 +38,6 @@ int8_t setupLTC(LTC2991 *ltc) {
 
 	return ack;
 }
-
 
 int8_t readChannelLTC(LTC2991 *ltc, UART_HandleTypeDef *myhuart, uint8_t channel) {
 
@@ -71,11 +69,11 @@ int8_t readChannelLTC(LTC2991 *ltc, UART_HandleTypeDef *myhuart, uint8_t channel
 //	  return;
 //	}
 //
-	if(channel <1 || channel > 10)
+	if (channel < 1 || channel > 10)
 		return 1;
 
 	int8_t ack = 0;
-	uint8_t user_command;
+	//uint8_t user_command;
 
 	int16_t code;
 	int8_t data_valid;
@@ -87,30 +85,33 @@ int8_t readChannelLTC(LTC2991 *ltc, UART_HandleTypeDef *myhuart, uint8_t channel
 	float temperature = 0;
 	char prompt[20] = { };
 
-	ack |=	setupLTC(ltc);
-    ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V1234_REG, 0x00, (LTC2991_V1_V2_DIFFERENTIAL_ENABLE | LTC2991_V3_V4_DIFFERENTIAL_ENABLE | LTC2991_V1_V2_TEMP_ENABLE | LTC2991_V3_V4_TEMP_ENABLE));
-	ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V5678_REG, 0x00, (LTC2991_V5_V6_DIFFERENTIAL_ENABLE | LTC2991_V7_V8_DIFFERENTIAL_ENABLE | LTC2991_V5_V6_TEMP_ENABLE | LTC2991_V7_V8_TEMP_ENABLE));
+	ack |= setupLTC(ltc);
+	ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V1234_REG, 0x00,
+			(LTC2991_V1_V2_DIFFERENTIAL_ENABLE | LTC2991_V3_V4_DIFFERENTIAL_ENABLE
+					| LTC2991_V1_V2_TEMP_ENABLE | LTC2991_V3_V4_TEMP_ENABLE));
+	ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V5678_REG, 0x00,
+			(LTC2991_V5_V6_DIFFERENTIAL_ENABLE | LTC2991_V7_V8_DIFFERENTIAL_ENABLE
+					| LTC2991_V5_V6_TEMP_ENABLE | LTC2991_V7_V8_TEMP_ENABLE));
 	// Reads and displays all single-ended voltages
 
-	if(channel >=1 && channel <= 8){
-		channel --;
-	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
-	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V1_MSB_REG + channel*2, &code, &data_valid, LTC2991_TIMEOUT);
-	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
+	if (channel >= 1 && channel <= 8) {
+		channel--;
+		// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+		ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V1_MSB_REG + channel * 2, &code, &data_valid,
+				LTC2991_TIMEOUT);
+		voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
 
-	sprintf(prompt, "\tV%d: %.4f V\r\n",channel+1, voltage);
-	putS(myhuart, prompt);
-	}
-	else if(channel == 9){
+		sprintf(prompt, "\tV%d: %.4f V\r\n", channel + 1, voltage);
+		putS(myhuart, prompt);
+	} else if (channel == 9) {
 		// Do temp reading
 		// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
-		ack |= LTC2991_adc_read_new_data(ltc, LTC2991_T_Internal_MSB_REG, &adc_code,
-				&data_valid, 1000);
+		ack |= LTC2991_adc_read_new_data(ltc, LTC2991_T_Internal_MSB_REG, &adc_code, &data_valid,
+				1000);
 		ack |= LTC2991_register_read(ltc, LTC2991_CONTROL_PWM_Tinternal_REG, &reg_data);
-		if (reg_data & LTC2991_INT_KELVIN_ENABLE){
+		if (reg_data & LTC2991_INT_KELVIN_ENABLE) {
 			isKelvin = 1;
-		}
-		else{
+		} else {
 			isKelvin = 0;
 		}
 
@@ -119,9 +120,10 @@ int8_t readChannelLTC(LTC2991 *ltc, UART_HandleTypeDef *myhuart, uint8_t channel
 		putS(myhuart, prompt);
 	}
 
-	else{//channel == 10, VCC reading
-		// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
-		ack |= LTC2991_adc_read_new_data(ltc, LTC2991_Vcc_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
+	else {		//channel == 10, VCC reading
+				// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
+		ack |= LTC2991_adc_read_new_data(ltc, LTC2991_Vcc_MSB_REG, &code, &data_valid,
+				LTC2991_TIMEOUT);
 		voltage = LTC2991_code_to_vcc_voltage(code, LTC2991_SINGLE_ENDED_lsb);
 
 		sprintf(prompt, "\tVcc: %.4f V\r\n", voltage);
@@ -134,16 +136,20 @@ int8_t readChannelLTC(LTC2991 *ltc, UART_HandleTypeDef *myhuart, uint8_t channel
 void readAllLTC(LTC2991 *ltc, UART_HandleTypeDef *myhuart) {
 
 	int8_t ack = 0;
-	uint8_t user_command;
+	//uint8_t user_command;
 
 	int16_t code;
 	int8_t data_valid;
 	float voltage;
 	char prompt[20] = { };
 
-	ack |=	setupLTC(ltc);
-    ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V1234_REG, 0x00, (LTC2991_V1_V2_DIFFERENTIAL_ENABLE | LTC2991_V3_V4_DIFFERENTIAL_ENABLE | LTC2991_V1_V2_TEMP_ENABLE | LTC2991_V3_V4_TEMP_ENABLE));
-	ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V5678_REG, 0x00, (LTC2991_V5_V6_DIFFERENTIAL_ENABLE | LTC2991_V7_V8_DIFFERENTIAL_ENABLE | LTC2991_V5_V6_TEMP_ENABLE | LTC2991_V7_V8_TEMP_ENABLE));
+	ack |= setupLTC(ltc);
+	ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V1234_REG, 0x00,
+			(LTC2991_V1_V2_DIFFERENTIAL_ENABLE | LTC2991_V3_V4_DIFFERENTIAL_ENABLE
+					| LTC2991_V1_V2_TEMP_ENABLE | LTC2991_V3_V4_TEMP_ENABLE));
+	ack |= LTC2991_register_set_clear_bits(ltc, LTC2991_CONTROL_V5678_REG, 0x00,
+			(LTC2991_V5_V6_DIFFERENTIAL_ENABLE | LTC2991_V7_V8_DIFFERENTIAL_ENABLE
+					| LTC2991_V5_V6_TEMP_ENABLE | LTC2991_V7_V8_TEMP_ENABLE));
 	// Reads and displays all single-ended voltages
 
 	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
@@ -154,7 +160,7 @@ void readAllLTC(LTC2991 *ltc, UART_HandleTypeDef *myhuart) {
 	putS(myhuart, prompt);
 
 	if (ack)
-	  return;
+		return;
 	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
 	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_V2_MSB_REG, &code, &data_valid, LTC2991_TIMEOUT);
 	voltage = LTC2991_code_to_single_ended_voltage(code, LTC2991_SINGLE_ENDED_lsb);
@@ -236,7 +242,6 @@ LTC2991 *test(LTC2991 *ltc, UART_HandleTypeDef *myhuart) {
 	sprintf(prompt, "hi\r\n");
 	putS(myhuart, prompt);
 
-
 	ack |= LTC2991_register_write(ltc, LTC2991_CHANNEL_ENABLE_REG,
 	LTC2991_ENABLE_ALL_CHANNELS);   //! Enables all channels
 	ack |= LTC2991_register_write(ltc, LTC2991_CONTROL_V1234_REG, 0x00); //! Sets registers to default starting values.
@@ -246,8 +251,7 @@ LTC2991 *test(LTC2991 *ltc, UART_HandleTypeDef *myhuart) {
 
 	// Do temp reading
 	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
-	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_T_Internal_MSB_REG, &adc_code,
-			&data_valid, 1000);
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_T_Internal_MSB_REG, &adc_code, &data_valid, 1000);
 	ack |= LTC2991_register_read(ltc, LTC2991_CONTROL_PWM_Tinternal_REG, &reg_data);
 	if (reg_data & LTC2991_INT_KELVIN_ENABLE)
 		isKelvin = 1;
@@ -264,8 +268,7 @@ LTC2991 *test(LTC2991 *ltc, UART_HandleTypeDef *myhuart) {
 	float voltage;
 
 	// Flush one ADC reading in case it is stale.  Then, take a new fresh reading.
-	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_Vcc_MSB_REG, &code, &data_valid,
-			1000);
+	ack |= LTC2991_adc_read_new_data(ltc, LTC2991_Vcc_MSB_REG, &code, &data_valid, 1000);
 	voltage = LTC2991_code_to_vcc_voltage(code, LTC2991_SINGLE_ENDED_lsb);
 
 	sprintf(prompt, "%.3fV\r\n", voltage);
@@ -314,8 +317,8 @@ int8_t LTC2991_adc_read(LTC2991 *ltc, uint8_t msb_register_address, int16_t *adc
 // Similar to LTC2991_adc_read except it repeats until the data_valid bit is set, it fails to receive an I2C acknowledge, or the timeout (in milliseconds)
 // expires. It keeps trying to read from the LTC2991 every millisecond until the data_valid bit is set (indicating new data since the previous
 // time this register was read) or until it fails to receive an I2C acknowledge (indicating an error on the I2C bus).
-int8_t LTC2991_adc_read_timeout(LTC2991 *ltc, uint8_t msb_register_address,
-		int16_t *adc_code, int8_t *data_valid, uint16_t timeout, uint8_t status_bit) {
+int8_t LTC2991_adc_read_timeout(LTC2991 *ltc, uint8_t msb_register_address, int16_t *adc_code,
+		int8_t *data_valid, uint16_t timeout, uint8_t status_bit) {
 	int8_t ack = 0;
 	uint8_t reg_data;
 	uint16_t timer_count;  // Timer count for data_valid
@@ -354,8 +357,8 @@ int8_t LTC2991_adc_read_timeout(LTC2991 *ltc, uint8_t msb_register_address,
 // to differential voltage mode, the data in the register may still correspond to the temperature reading immediately
 // after the mode change.  Flushing one reading and waiting for a new reading guarantees fresh data is received.
 // If the timeout is reached without valid data (*data_valid=1) the function exits.
-int8_t LTC2991_adc_read_new_data(LTC2991 *ltc, uint8_t msb_register_address,
-		int16_t *adc_code, int8_t *data_valid, uint16_t timeout) {
+int8_t LTC2991_adc_read_new_data(LTC2991 *ltc, uint8_t msb_register_address, int16_t *adc_code,
+		int8_t *data_valid, uint16_t timeout) {
 	int8_t ack = 0;
 
 	ack |= LTC2991_adc_read_timeout(ltc, msb_register_address, &(*adc_code), &(*data_valid),
@@ -387,8 +390,8 @@ int8_t LTC2991_register_write(LTC2991 *ltc, uint8_t register_address, uint8_t re
 
 // Used to set and clear bits in a control register.  bits_to_set will be bitwise OR'd with the register.
 // bits_to_clear will be inverted and bitwise AND'd with the register so that every location with a 1 will result in a 0 in the register.
-int8_t LTC2991_register_set_clear_bits(LTC2991 *ltc, uint8_t register_address,
-		uint8_t bits_to_set, uint8_t bits_to_clear) {
+int8_t LTC2991_register_set_clear_bits(LTC2991 *ltc, uint8_t register_address, uint8_t bits_to_set,
+		uint8_t bits_to_clear) {
 	uint8_t register_data;
 	int8_t ack = 0;
 

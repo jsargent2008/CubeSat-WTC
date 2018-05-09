@@ -9,14 +9,16 @@
 #define STATEMACHINE_STATEMACHINE_H_
 
 //includes
+#include <myadc/myadc.h>
+#include <mygpio/mygpio.h>
+#include <myrtc/myrtc.h>
 #include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include "float.h"
 #include "math.h"
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_adc.h"
-#include "gpio/gpio.h"
-#include "adc/adc.h"
-#include "rtc/rtc.h"
 #include "UART_IRQ/UART_IRQ.h"
 
 

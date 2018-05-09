@@ -105,7 +105,7 @@ void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleType
 	int8_t nAntenna = 1;
 	int8_t deployStatus = 0;
 	uint8_t waitTime = 10;  //example 10 seconds
-	uint32_t _70cm_AUX_ADC_Channel = 25; //does a macro exist?
+	//uint32_t _70cm_AUX_ADC_Channel = 25; //does a macro exist?
 
 	uint8_t ant1_hasBeenDeployed = FALSE;
 	uint8_t ant2_hasBeenDeployed = FALSE;
@@ -251,7 +251,7 @@ int8_t deployAntenna(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_Han
 		//print to UART
 		sprintf(prompt, "deploy: %d, status: %d, reading %f V, On for %d seconds...\r", (int) nAntenna,
 				(int) (status),
-				adcReadSingle(hadc, _70cm_AUX_ADC_Channel), abs(curSec - tempS) % 60);
+				adcReadSingle(hadc, _70cm_AUX_ADC_Channel), (int)(abs((int)(curSec - tempS)) % 60));
 		putS(huart, prompt);
 
 		HAL_Delay(200);

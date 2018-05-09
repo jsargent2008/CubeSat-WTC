@@ -62,19 +62,17 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include <myadc/myadc.h>
+#include <myprintf/myprintf.h>
+#include <myrtc/myrtc.h>
 #include "LTC2991/LTC2991.h"
 #include "UART_IRQ/UART_IRQ.h"
 #include "command/command.h"
-#include "PRINTF/printf.h"
-#include "adc/adc.h"
-#include "rtc/rtc.h"
 #include "memoryMap/memoryMap.h"
 #include "stateMachine/stateMachine.h"
 
 //huart4 is the 70cm primary
-#define DEBUG_UART 		huart4
-#define UART_Pi1		huart1
-#define UART_Pi2		huart3
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -154,38 +152,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 	if (huart == &UART_Pi1 || huart == &UART_Pi2) {
 		;
 	}
-}
-
-/**
- * @brief  Display the current time.
- * @param  showtime : pointer to buffer
- * @retval None
- */
-static void RTC_TimeShow(RTC_HandleTypeDef *rtc, uint8_t* showtime) {
-	RTC_DateTypeDef sdatestructureget;
-	RTC_TimeTypeDef stimestructureget;
-
-	/* Get the RTC current Time */
-	HAL_RTC_GetTime(rtc, &stimestructureget, RTC_FORMAT_BIN);
-	/* Get the RTC current Date */
-	HAL_RTC_GetDate(rtc, &sdatestructureget, RTC_FORMAT_BIN);
-	uint8_t fuc[100] = { };
-	/* Display time Format : hh:mm:ss */
-	sprintf((char*) fuc, "- %02d:%02d:%02d\r\n", stimestructureget.Hours, stimestructureget.Minutes,
-			stimestructureget.Seconds);
-
-	putS(&huart4, fuc);
-//
-//	/* Get the RTC current Time */
-//		HAL_RTC_GetTime(rtc, &stimestructureget, RTC_FORMAT_BIN);
-//		/* Get the RTC current Date */
-//		HAL_RTC_GetDate(rtc, &sdatestructureget, RTC_FORMAT_BIN);
-//
-//
-//		/* Display time Format : hh:mm:ss */
-//		sprintf((char*) showtime, "- %02d:%02d:%02d\r\n", stimestructureget.Hours,
-//				stimestructureget.Minutes, stimestructureget.Seconds);
-//		putS(&huart4, showtime);
 }
 
 //void HAL_RTC_AlarmIRQHandler(RTC_HandleTypeDef *hrtc) {
@@ -333,7 +299,7 @@ int main(void) {
 	//gpio port d pin 11 --> d11 is the yellow LED for testing (pwr enable pi 1)
 
 	for (;;) {
-		uint8_t aRxBuffer[20] = "";
+		char aRxBuffer[20] = "";
 
 //		//tx "Waiting for command..."
 		char prompt[100] = { };

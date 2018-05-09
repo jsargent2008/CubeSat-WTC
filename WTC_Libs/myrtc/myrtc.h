@@ -12,8 +12,10 @@
 #include "main.h"
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_def.h"
-#include  "stm32l1xx_hal_rtc.h"
+#include "stm32l1xx_hal_rtc.h"
+#include "rtc.h"
 #include "memoryMap\memoryMap.h"
+
 /* Includes ------------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
@@ -23,5 +25,8 @@ RTC_DateTypeDef sDate;
 /* Private function prototypes -----------------------------------------------*/
 void updateTimeFlash(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTime, RTC_DateTypeDef *sDate);
 void startRTCAlarm(RTC_HandleTypeDef *hrtc, RTC_AlarmTypeDef *sAlarm);
+void RTC_AlarmConfig(RTC_HandleTypeDef *RtcHandle, RTC_TimeTypeDef *stimestructure,RTC_DateTypeDef *sdatestructure);
+void SETUP_RTC_HandleTypeDef(RTC_HandleTypeDef *RtcHandle);
+void RTC_TimeShow(RTC_HandleTypeDef *RtcHandle, uint8_t* showtime);
 
 #endif /* RTC_H_ */

@@ -13,12 +13,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <myadc/myadc.h>
+#include <mygpio/mygpio.h>
+#include <myprintf/myprintf.h>
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_uart.h"
 #include "UART_IRQ/UART_IRQ.h"
-#include "gpio/gpio.h"
-#include "adc/adc.h"
-#include "PRINTF/printf.h"
 #include "LTC2991/LTC2991.h"
 
 #define ERROR_INVALID_PORT 1

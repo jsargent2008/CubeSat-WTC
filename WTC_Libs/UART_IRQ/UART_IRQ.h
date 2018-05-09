@@ -2,6 +2,9 @@
 #define __UART_IRQ_H__
 
 #include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "string.h"
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_uart.h"
 
@@ -10,7 +13,7 @@ void UART_printSOS(UART_HandleTypeDef *huart, uint32_t time);
 void UART_PUT(UART_HandleTypeDef *huart, char *str);
 
 void putS(UART_HandleTypeDef *huart, char* buf);
-void getS(UART_HandleTypeDef *huart, uint8_t * buf, uint8_t len);
+void getS(UART_HandleTypeDef *huart, char* buf, uint8_t len);
 
 // char array stuff, useful as supplementary functiosn for
 // the uart functions above ^^^

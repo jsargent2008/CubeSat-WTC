@@ -11,7 +11,7 @@
 
 // includes
 
-#include "gpio/gpio.h"
+#include <mygpio/mygpio.h>
 
 /* Private define ------------------------------------------------------------*/
 

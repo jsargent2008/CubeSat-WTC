@@ -5,8 +5,8 @@
  *      Author: Administrator
  */
 
-#ifndef ADC_ADC_H_
-#define ADC_ADC_H_
+#ifndef MYADC_MYADC_H_
+#define MYADC_MYADC_H_
 
 #include "main.h"
 #include "float.h"
@@ -41,4 +41,4 @@ float adcReadSingle(ADC_HandleTypeDef *hadc, uint32_t channel);
  */
 float adcToVoltage(ADC_HandleTypeDef *hadc);
 
-#endif /* ADC_ADC_H_ */
+#endif /* MYADC_MYADC_H_ */

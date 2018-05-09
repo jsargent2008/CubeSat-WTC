@@ -5,7 +5,7 @@
  *      Author: Administrator
  */
 
-#include "gpio/gpio.h"
+#include <mygpio/mygpio.h>
 #include "memoryMap/memoryMap.h"
 
 #define GPIO_FLASH_BASEADDR		((uint32_t)0x08080000)

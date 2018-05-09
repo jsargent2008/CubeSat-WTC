@@ -1,5 +1,4 @@
 #include "UART_IRQ.h"
-#include <stdlib.h>
 // The program was created by Theodore Cox
 // QPACE
 
@@ -136,11 +135,11 @@ void UART_PUT(UART_HandleTypeDef *huart, char *str) {
 	HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
 }
 
-void getS(UART_HandleTypeDef *huart, uint8_t * buf, uint8_t len) {
+void getS(UART_HandleTypeDef *huart, char *buf, uint8_t len) {
 	//HAL_UART_Receive(&huart3, (uint8_t *) buf, len, 0xFFFF);
 	//buf[strlen(buf)] = '\0';
 	HAL_UART_Receive(huart, (uint8_t *) buf, len + 1, 0xFFFF);
-	buf[strlen(buf) - 1] = '\0';
+	buf[strlen((buf)) - 1] = '\0';
 }
 
 void putS(UART_HandleTypeDef *huart, char* buf) {

@@ -30,9 +30,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <stdarg.h>
-#include <stdbool.h>
-#include "printf.h"
+#include "myprintf/myprintf.h"
 
 
 __attribute__ ((alias("iprintf"))) int printf(const char *fmt, ...);

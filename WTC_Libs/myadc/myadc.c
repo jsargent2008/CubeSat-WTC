@@ -5,7 +5,7 @@
  *      Author: Administrator
  */
 
-#include "adc.h"
+#include <myadc/myadc.h>
 
 /**
  * @brief  ADC measurement digital

@@ -140,10 +140,10 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <myprintf/myprintf.h>
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_uart.h"
 #include "UART_IRQ/UART_IRQ.h"
-#include "PRINTF/printf.h"
 
 /*! @name I2C_Addresses
  @{ */
