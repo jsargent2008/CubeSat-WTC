@@ -10,9 +10,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_def.h"
-#include "stm32l1xx_hal_rtc.h"
 #include "rtc.h"
 #include "memoryMap\memoryMap.h"
 
@@ -29,4 +26,5 @@ void RTC_AlarmConfig(RTC_HandleTypeDef *RtcHandle, RTC_TimeTypeDef *stimestructu
 void SETUP_RTC_HandleTypeDef(RTC_HandleTypeDef *RtcHandle);
 void RTC_TimeShow(RTC_HandleTypeDef *RtcHandle, uint8_t* showtime);
 
+#include "myrtc.c"
 #endif /* RTC_H_ */

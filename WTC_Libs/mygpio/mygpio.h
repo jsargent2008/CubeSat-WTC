@@ -9,9 +9,6 @@
 #define MYGPIO_MYGPIO_H_
 
 #include "main.h"
-#include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_gpio.h"
-#include "stm32l1xx_hal_gpio_ex.h"
 #include "gpio.h"
 
 
@@ -21,5 +18,5 @@ int readDPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 
 
 
-
+#include "mygpio.c"
 #endif /* MYGPIO_MYGPIO_H_ */

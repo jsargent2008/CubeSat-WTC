@@ -10,8 +10,7 @@
 
 #include "main.h"
 #include "float.h"
-#include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_adc.h"
+#include "adc.h"
 
 
 /* Private define ------------------------------------------------------------*/
@@ -41,4 +40,6 @@ float adcReadSingle(ADC_HandleTypeDef *hadc, uint32_t channel);
  */
 float adcToVoltage(ADC_HandleTypeDef *hadc);
 
+
+#include"myadc.c"
 #endif /* MYADC_MYADC_H_ */

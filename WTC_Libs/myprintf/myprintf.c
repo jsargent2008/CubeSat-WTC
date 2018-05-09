@@ -30,7 +30,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "myprintf/myprintf.h"
+#include "myprintf.h"
 
 
 __attribute__ ((alias("iprintf"))) int printf(const char *fmt, ...);

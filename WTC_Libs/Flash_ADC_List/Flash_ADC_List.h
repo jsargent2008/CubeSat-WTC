@@ -2230,6 +2230,7 @@ boolean clearBit(uint8_t* addr, uint8_t mask){
             7-  ....
 */
 
+#include "Flash_ADC_List.c"
 #endif /* __Flash_ADC_List_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

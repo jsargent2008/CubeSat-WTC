@@ -17,8 +17,6 @@
 #include <stdlib.h>
 #include "float.h"
 #include "math.h"
-#include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_adc.h"
 #include "UART_IRQ/UART_IRQ.h"
 
 
@@ -35,4 +33,5 @@ void operations();
 
 //uint8_t DEPLOYMENT_STATUS_BYTE;  might be useful
 
+#include "stateMachine.c"
 #endif /* STATEMACHINE_STATEMACHINE_H_ */

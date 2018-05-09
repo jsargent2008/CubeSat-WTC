@@ -1,12 +1,10 @@
 #ifndef __UART_IRQ_H__
 #define __UART_IRQ_H__
 
-#include "main.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "string.h"
-#include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_uart.h"
+#include "usart.h"
 
 void UART_IRQ(UART_HandleTypeDef *huart, uint8_t time);
 void UART_printSOS(UART_HandleTypeDef *huart, uint32_t time);
@@ -20,4 +18,13 @@ void getS(UART_HandleTypeDef *huart, char* buf, uint8_t len);
 char* mallocCharArray(uint32_t size);
 char* appendCharArrays(char* dest, char* src, uint32_t index);
 uint32_t arraylength(char* array);
+
+#if defined(STM32L0) // maps UART_HandleTypeDef->State to ->gState
+#define State gState
+#endif
+
+#include "UART_IRQ.c"
+
+#undef State
+
 #endif

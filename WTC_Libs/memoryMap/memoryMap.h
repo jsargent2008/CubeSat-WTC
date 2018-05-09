@@ -70,4 +70,6 @@
 uint8_t gpioAllDump();
 uint8_t gpioPortDump(char port);
 uint32_t gpioStatusRetrieve(char port);
+
+#include "memoryMap.c"
 #endif /* MEMORYMAP_MEMORYMAP_H_ */
