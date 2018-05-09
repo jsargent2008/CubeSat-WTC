@@ -2,7 +2,7 @@
  * stateMachine.h
  *
  *  Created on: Apr 27, 2018
- *      Author: Administrator
+ *      Author: Theodore Cox
  */
 
 #ifndef STATEMACHINE_STATEMACHINE_H_
@@ -20,19 +20,19 @@
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_adc.h"
 #include "UART_IRQ/UART_IRQ.h"
-
+#include "deployment.h"
+#include "myStructTypeDefs.h"
 
 //function prototypes
 
-void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleTypeDef *hrtc, RTC_AlarmTypeDef *sAlarm);
-int8_t deployAntenna(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleTypeDef *hrtc, uint8_t nAntenna, uint8_t waitTime);
-int8_t deploymentSense(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, float tolerance);
-void printDeploymentStatus(UART_HandleTypeDef *huart, int8_t status, char* tabs);
+void initWTCStatusStruct(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc,
+		RTC_HandleTypeDef *hrtc, RTC_AlarmTypeDef *sAlarm);
+void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleTypeDef *hrtc,
+		RTC_AlarmTypeDef *sAlarm);
 void commsLoop();
 void groundOps();
 void scienceInit();
 void operations();
-
-//uint8_t DEPLOYMENT_STATUS_BYTE;  might be useful
+void stateMachine_RTC_AlarmA();
 
 #endif /* STATEMACHINE_STATEMACHINE_H_ */

@@ -166,3 +166,60 @@ void RTC_TimeShow(RTC_HandleTypeDef *RtcHandle, uint8_t* showtime) {
 	sprintf((char*) showtime, "%02d:%02d:%02d", stimestructureget.Hours, stimestructureget.Minutes,
 			stimestructureget.Seconds);
 }
+
+//remove from stateMachine and add to print library
+// useful print time function
+void printTime(UART_HandleTypeDef *huart, RTC_HandleTypeDef *hrtc, RTC_AlarmTypeDef *sAlarm,
+		uint8_t printOption) {
+
+	/*
+	 * printOption =
+	 * 					0 - print current time
+	 * 					1 - print alarm time
+	 * 					2 - print both current and alarm times
+	 */
+	switch (printOption) {
+	case (0):
+		printTimeHelper(huart, hrtc, NULL);
+		break;
+	case (1):
+		printTimeHelper(huart, hrtc, sAlarm);
+		break;
+	case (2):
+		printTimeHelper(huart, hrtc, NULL);
+		printTimeHelper(huart, hrtc, sAlarm);
+		break;
+	default:
+		break;
+	}
+
+}
+
+void printTimeHelper(UART_HandleTypeDef *huart, RTC_HandleTypeDef *hrtc, RTC_AlarmTypeDef *sAlarm) {
+
+	char prompt[100] = { };
+
+	if (hrtc != NULL && sAlarm == NULL) {
+		//PRINT CURRENT TIME
+		RTC_DateTypeDef sdatestructureget;
+		RTC_TimeTypeDef stimestructureget;
+		HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN);
+		HAL_RTC_GetDate(hrtc, &sdatestructureget, RTC_FORMAT_BIN);
+
+		//print time to UART
+		sprintf((char*) prompt, "Current Time:\t\t%02d:%02d:%02d\r\n", stimestructureget.Hours,
+				stimestructureget.Minutes, stimestructureget.Seconds);
+		putS(huart, prompt);
+		return;
+	}
+	if (sAlarm != NULL && hrtc != NULL) {
+
+		//PRINT ALARM
+		HAL_RTC_GetAlarm(hrtc, sAlarm, RTC_ALARM_A, RTC_FORMAT_BIN);
+		//print time to UART
+		sprintf((char*) prompt, "Alarm Time:\t\t%02d:%02d:%02d\r\n", sAlarm->AlarmTime.Hours,
+				sAlarm->AlarmTime.Minutes, sAlarm->AlarmTime.Seconds);
+		putS(huart, prompt);
+		return;
+	}
+}

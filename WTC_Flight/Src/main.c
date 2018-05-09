@@ -164,6 +164,15 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
  * @retval None
  */
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc) {
+
+	//change alarm A to next alarm??
+
+	//reset time and date to allow alarmA to be used again
+	RTC_DateTypeDef sdatestructureget;
+	RTC_TimeTypeDef stimestructureget;
+	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(hrtc, &sdatestructureget, RTC_FORMAT_BIN);
+
 	//HAL_GPIO_TogglePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin);
 	// RTC delay 30min
 //	//*** working
@@ -290,12 +299,16 @@ int main(void) {
 //	putS(&huart4, prompt);
 
 //HAL_Alarm
-//	while (1) {
-////		wtcSetup(&huart4,&hadc, &hrtc, &sAlarm);
-////		RTC_TimeShow(&hrtc, prompt);
-////		putS(&huart4, prompt);
-//		HAL_Delay(500);
-//	}
+	int i=0;
+	while (1) {
+
+		printTime(&DEBUG_UART, &hrtc, &sAlarm, i++);
+
+//		wtcSetup(&huart4,&hadc, &hrtc, &sAlarm);
+//		RTC_TimeShow(&hrtc, prompt);
+//		putS(&huart4, prompt);
+		HAL_Delay(500);
+	}
 	//gpio port d pin 11 --> d11 is the yellow LED for testing (pwr enable pi 1)
 
 	for (;;) {
