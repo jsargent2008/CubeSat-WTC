@@ -16,8 +16,6 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <myprintf/myprintf.h>
-#include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_uart.h"
 #include "usart.h"
 #include "UART_IRQ/UART_IRQ.h"
 
@@ -39,4 +37,5 @@ uint8_t initHandShake(UART_HandleTypeDef *huart);
 uint8_t sendCommand(UART_HandleTypeDef *huart, uint8_t command);
 uint8_t piNum(UART_HandleTypeDef *huart);
 
+#include "commands.c"
 #endif /* PI_CONTROL_COMMANDS_H_ */

@@ -10,9 +10,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_def.h"
-#include "stm32l1xx_hal_rtc.h"
 #include "rtc.h"
 #include "memoryMap\memoryMap.h"
 
@@ -32,4 +29,5 @@ void printTime(UART_HandleTypeDef *huart, RTC_HandleTypeDef *hrtc, RTC_AlarmType
 void printTimeHelper(UART_HandleTypeDef *huart, RTC_HandleTypeDef *hrtc, RTC_AlarmTypeDef *sAlarm);
 
 
+#include "myrtc.c"
 #endif /* RTC_H_ */

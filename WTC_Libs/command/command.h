@@ -16,8 +16,6 @@
 #include <myadc/myadc.h>
 #include <mygpio/mygpio.h>
 #include <myprintf/myprintf.h>
-#include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_uart.h"
 #include "UART_IRQ/UART_IRQ.h"
 #include "LTC2991/LTC2991.h"
 
@@ -37,4 +35,5 @@ void arAll(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc);
 void tt(UART_HandleTypeDef *huart, UART_HandleTypeDef *hout);
 void ltc(I2C_HandleTypeDef *hi2c, UART_HandleTypeDef *huart);
 
+#include "command.c"
 #endif /* COMMAND_COMMAND_H_ */

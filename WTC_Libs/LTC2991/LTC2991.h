@@ -133,16 +133,14 @@
 #define __LTC2991_H__
 
 #include "main.h"
-#include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_i2c.h"
+#include "i2c.h"
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <myprintf/myprintf.h>
-#include "stm32l1xx_hal.h"
-#include "stm32l1xx_hal_uart.h"
+#include "usart.h"
 #include "UART_IRQ/UART_IRQ.h"
 
 /*! @name I2C_Addresses
@@ -358,6 +356,7 @@ float LTC2991_code_to_diode_voltage(int16_t adc_code, //!< code read from the ad
 		float LTC2991_diode_voltage_lsb //!< diode voltage LSB weight. If not calibrated, use LTC2991_DIODE_VOLTAGE_LSB
 		);
 
+#include "LTC2991.c"
 #endif  // LTC2991_H
 
 //NOTES:

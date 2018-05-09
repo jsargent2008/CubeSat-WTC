@@ -110,5 +110,5 @@ int snprintf(char* buffer, size_t count, const char* format, ...);
 }
 #endif
 
-
+#include "myprintf.c"
 #endif  // _PRINTF_H_
