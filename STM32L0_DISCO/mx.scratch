@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project>
+<ProjectName>C:\Users\clayt\Atollic\TrueSTUDIO\STM32_workspace_9.0\CubeSat-WTC\STM32L0_DISCO\\STM32L0_DISCO</ProjectName>
+<ProjectNature>C</ProjectNature> 
+<CMSIS>..\Drivers\CMSIS</CMSIS>
+<HAL_Driver>C:\Users\clayt\STM32Cube\Repository\STM32Cube_FW_L0_V1.10.0\Drivers\CMSIS</HAL_Driver>
+<Toolchain>TrueSTUDIO</Toolchain>
+<Version>0</Version>
+
+<filestoremove>
+    <file>
+    </file>
+</filestoremove>
+
+<inctoremove>
+	<Aincludes>
+	   <include></include>
+    </Aincludes>
+	<Cincludes>
+    </Cincludes>
+</inctoremove>
+
+<configs>
+  <config>
+    <name>STM32L0_DISCO</name>				
+    <device>STM32L053C8Tx</device>		 
+    <heapSize>0x200</heapSize>
+    <stackSize>0x400</stackSize>
+    
+    	<board>32L0538DISCOVERY</board>
+			
+    <usedDebug>true</usedDebug>
+    	<debugprobe>swd</debugprobe>
+    <optimization></optimization>
+    <icfloc>1</icfloc>
+    <Adefines>
+        <define></define>
+    </Adefines>   
+
+    <UsedFreeRTOS></UsedFreeRTOS>
+    <Aincludes>
+
+
+	    	<include></include>
+    </Aincludes>
+    <Cdefines>
+        <define>__weak=__attribute__((weak))</define>
+        <define>__packed=__attribute__((__packed__))</define>
+    </Cdefines>
+    <definestoremove>
+        <Adefines>
+            <define></define>
+        </Adefines>
+        <Cdefines>
+            <define>USE_FULL_LL_DRIVER</define>
+            <define>MBEDTLS_CONFIG_FILE=&quot;mbedtls_config.h&quot;</define>
+        </Cdefines>         
+    </definestoremove>
+    
+	<Cincludes>
+	   <include>..\Inc</include>
+	   <include>..\Drivers\STM32L0xx_HAL_Driver\Inc</include>
+	   <include>..\Drivers\STM32L0xx_HAL_Driver\Inc\Legacy</include>
+	   <include>..\Drivers\CMSIS\Device\ST\STM32L0xx\Include</include>
+	   <include>..\Drivers\CMSIS\Include</include>
+
+    </Cincludes>
+      </config>
+    </configs> 
+
+    <underRoot>true</underRoot>
+    	<copyAsReference>false</copyAsReference>
+ 
+	  		<sourceEntries>
+		    	<sourceEntry>
+		    		<name>Inc</name>
+		    	</sourceEntry>
+                <sourceEntry>
+                        <name>Src</name>
+                </sourceEntry>
+		    	<sourceEntry>
+		    		<name>Drivers</name>
+		    	</sourceEntry>
+		    </sourceEntries>
+
+</Project>
