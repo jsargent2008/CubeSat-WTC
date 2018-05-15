@@ -286,6 +286,42 @@ int main(void) {
 
 	//HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
 
+	// Delay to allow SD card to get set up internally.
+	HAL_Delay(1000);
+
+	// Common results variable for most of the FatFs function calls.
+	// FR_OK = 0, any other result is an error and non-zero.
+	FRESULT fres;
+
+	// Mount the SD card.
+	fres = f_mount(&USERFatFS, "", 1);
+	if (fres != FR_OK) {
+		while (1)
+			; // Fatal SD mounting error.
+	}
+
+
+	// Demo of grabbing individual packets. Right now, splits packets on 'es'
+	// so any time 'e' and 's' appear together, that marks the start of another
+	// packet. Can be changed to any byte value, even non-ASCII. This demo
+	// doesn't actually do anything with the data, just stores it in `packet`.
+	// To make sure it's working, breakpoint on the free(packet) line and inspect
+	// the local variable `*packet`, it should contain the bytes. Note that it will
+	// show more than the actual buffer size in the debug window, since there is no
+	// null terminator. Rest assured, the garbage after the correct values is expected
+	// and harmless.
+	int32_t p_size = 0, p_num = 1;
+	do {
+		uint8_t* packet = NULL;
+		p_size = get_packet(p_num++, &packet);
+		free(packet);
+	} while (p_size > 0);
+
+	// Unmount the SD card when finished.
+	// Not sure if we'll have to actually do this before the Pi can read and write to it?
+	// Or if we just have to ensure we're not also reading and writing while the Pi is.
+	f_mount(NULL, "", 0);
+
 //	RTC_TimeShow(&hrtc, prompt);
 //	putS(&huart4, prompt);
 
