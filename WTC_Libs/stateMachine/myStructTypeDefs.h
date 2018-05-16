@@ -8,6 +8,7 @@
 #ifndef STATEMACHINE_MYSTRUCTTYPEDEFS_H_
 #define STATEMACHINE_MYSTRUCTTYPEDEFS_H_
 
+#include "main.h"
 
 typedef struct DeployStatusStruct {
 

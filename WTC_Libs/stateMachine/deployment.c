@@ -5,7 +5,7 @@ DeployStatusStruct my_deployStruct;
 DeployStatusStruct *deployStruct = &my_deployStruct;
 
 
-void initDeployStatusStruct() {
+DeployStatusStruct *initDeployStatusStruct() {
 	deployStruct->deployWaitTimeMin = 45;
 	deployStruct->deployAttemptTimeMaxSec = 10;
 	deployStruct->deployMaxAttemptsPer = 2;
@@ -17,6 +17,8 @@ void initDeployStatusStruct() {
 	deployStruct->deployAttemptsAnt2 = 0;
 	deployStruct->deployStatus = 0;
 	deployStruct->deploySenseV = 0.0f;
+
+	return deployStruct;
 }
 
 uint8_t determineNextAntenna(WTCStatusStruct *wtc){
@@ -126,7 +128,7 @@ int8_t deployAntenna(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_Han
 		//print to UART
 		sprintf(prompt, "deploy: %d, status: %d, reading %f V, On for %d seconds...\r",
 				(int) nAntenna, (int) (status), adcReadSingle(hadc, _70cm_AUX_ADC_Channel),
-				(int) (abs((int) (curSec - tempS)) % 60));
+				(int) ((60 + abs((int) (curSec - tempS))) % 60));
 		putS(huart, prompt);
 
 		HAL_Delay(200);
@@ -141,7 +143,7 @@ int8_t deployAntenna(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_Han
 	sprintf(prompt, "\r\n");
 	putS(huart, prompt);
 	writeDPin(UHF_Deploy_1_GPIO_Port, UHF_Deploy_1_Pin, GPIO_PIN_RESET);
-	writeDPin(UHF_Deploy_1_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_RESET);
+	writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_RESET);
 	HAL_Delay(100);
 	return status;
 

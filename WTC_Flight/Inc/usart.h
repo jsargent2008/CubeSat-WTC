@@ -67,7 +67,8 @@ extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN Private defines */
-#define DEBUG_UART 		huart4
+#define UART_RF_PRIMARY huart4
+#define DEBUG_UART 		huart4 //usually 4
 #define UART_Pi1		huart1
 #define UART_Pi2		huart3
 /* USER CODE END Private defines */

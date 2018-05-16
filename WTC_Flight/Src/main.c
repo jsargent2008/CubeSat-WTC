@@ -173,6 +173,9 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc) {
 	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN);
 	HAL_RTC_GetDate(hrtc, &sdatestructureget, RTC_FORMAT_BIN);
 
+char goo[10] ={};
+	sprintf(goo, "5V %.2f \r\n",10*adcReadSingle(&hadc, 14));
+//	putS(&DEBUG_UART, goo);
 	//HAL_GPIO_TogglePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin);
 	// RTC delay 30min
 //	//*** working
@@ -299,15 +302,85 @@ int main(void) {
 //	putS(&huart4, prompt);
 
 //HAL_Alarm
+
+
+
+
+//	{
+//		HAL_GPIO_WritePin(UHF_Power_Enable_GPIO_Port, UHF_Power_Enable_Pin, GPIO_PIN_SET);
+//
+//		char *commands[] = {
+//				"\rES+R2200\r", //
+//				"\rES+W22003603\r",   //
+//				"\rES+R2200\r",      //
+//				"\rES+R2201\r",      //
+//				"\rES+W2201422F0A42\r", //
+//				"\rES+W22060000001E\r", //
+//				"\rES+R2201\r",      //
+//				"\rES+W220033A3\r"    //
+//				};
+//
+//
+//		uint8_t len = 8; //sizeof(commands) / sizeof(commands[0]);
+//
+//		char buf[500];
+//		//sprintf(buf, "len is %d\t\n\n", len);
+//		//putS(&RF_UART, buf);
+//		int x;
+//		for (x = 0; x < len; x++) {
+//			//    sprintf(buf, "SUP %d\r\n", x++);
+//			putS(&UART_RF_PRIMARY, commands[x]);
+//			HAL_Delay(100);
+//			HAL_UART_Receive(&UART_RF_PRIMARY, (uint8_t *) buf, 256, 1000);
+//		}
+//
+//		for(;;) {
+//			putS(&UART_RF_PRIMARY, "hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello");
+//			HAL_Delay(1000);
+//		}
+//
+//	}
+
 	int i=0;
-	while (1) {
+	while (0) {
+		{
+			putS(&DEBUG_UART, "5V on \r\n");
+			HAL_Delay(500);
+			HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_1_Enable_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(_5V_Rail_2_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_SET);
 
-		printTime(&DEBUG_UART, &hrtc, &sAlarm, i++);
+			HAL_Delay(1000);
 
-//		wtcSetup(&huart4,&hadc, &hrtc, &sAlarm);
+			putS(&DEBUG_UART, "Pi on \r\n");
+			HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin, GPIO_PIN_SET);
+
+			HAL_Delay(10000);
+
+			putS(&DEBUG_UART, "Pi off \r\n");
+			HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin, GPIO_PIN_RESET);
+
+			HAL_Delay(10000);
+
+			putS(&DEBUG_UART, "5V off \r\n");
+			HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_1_Enable_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(_5V_Rail_2_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_RESET);
+		}
+//
+//		HAL_GPIO_WritePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin, GPIO_PIN_SET);
+//		HAL_Delay(10000);
+//		writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_SET);
+//		HAL_Delay(10000);
+//		writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_RESET);
+//		HAL_Delay(10000);
+
+//		wtcSetup(&DEBUG_UART,&hadc, &hrtc, &sAlarm);
 //		RTC_TimeShow(&hrtc, prompt);
-//		putS(&huart4, prompt);
+		putS(&DEBUG_UART, message);
 		HAL_Delay(500);
+
+		for(;;){
+			;
+		}
 	}
 	//gpio port d pin 11 --> d11 is the yellow LED for testing (pwr enable pi 1)
 
@@ -346,7 +419,19 @@ int main(void) {
 			ltc(&hi2c2, &DEBUG_UART);
 		else if (strcmp((char *) aRxBuffer, "dp") == 0)
 			wtcSetup(&DEBUG_UART, &hadc, &hrtc, &sAlarm);
-		else {
+		else if (strcmp((char *) aRxBuffer, "5o") == 0) {
+			HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_1_Enable_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(_5V_Rail_2_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_SET);
+		} else if (strcmp((char *) aRxBuffer, "5f") == 0) {
+			HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_1_Enable_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(_5V_Rail_2_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_RESET);
+		} else if (strcmp((char *) aRxBuffer, "p1") == 0) {
+			HAL_GPIO_TogglePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin);
+			HAL_GPIO_WritePin(WTC_BUS_Switch_Pi_Select_GPIO_Port, WTC_BUS_Switch_Pi_Select_Pin, GPIO_PIN_SET);
+		} else if (strcmp((char *) aRxBuffer, "p2") == 0) {
+			HAL_GPIO_TogglePin(Pwr_En_Pi2_GPIO_Port, Pwr_En_Pi2_Pin);
+			HAL_GPIO_WritePin(WTC_BUS_Switch_Pi_Select_GPIO_Port, WTC_BUS_Switch_Pi_Select_Pin, GPIO_PIN_RESET);
+		}else {
 			sprintf((char*) prompt, "??\r\n");
 			putS(&DEBUG_UART, prompt);
 		}

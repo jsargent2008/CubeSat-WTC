@@ -13,12 +13,13 @@
 #define True 1
 #define False 0
 
+#include "myStructTypeDefs.h"
 #include "stateMachine.h"
 
 
 
 //function prototypes
-void initDeployStatusStruct();
+DeployStatusStruct *initDeployStatusStruct();
 uint8_t determineNextAntenna();
 int8_t deployAntenna(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleTypeDef *hrtc,
 		uint8_t nAntenna, uint8_t waitTime);

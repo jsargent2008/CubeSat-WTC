@@ -95,6 +95,7 @@ void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleType
 		RTC_AlarmTypeDef *sAlarm) {
 
 	putS(huart, "dp\r\n");
+	wtc->deployStruct = initDeployStatusStruct();
 
 	//setup function for WTC, 3.3v power is on
 	// when disengaging from dispenser
@@ -109,13 +110,23 @@ void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleType
 
 	uint8_t sec = (stimestructureget.Seconds + wtc->deployStruct->deployWaitTimeMin) % 60;
 
+	sprintf(prompt, "Will deploy at %d sec:", sec);
+	putS(huart, prompt);
 	printTime(huart, hrtc, sAlarm, 1);
 
 	//wait XX minutes to deloy space craft
 	while (sec != stimestructureget.Seconds) {
+		/* Get the RTC current Time */
+		HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN);
+		/* Get the RTC current Date */
+		HAL_RTC_GetDate(hrtc, &sdatestructureget, RTC_FORMAT_BIN);
+
 		printTime(huart, hrtc, sAlarm, 0);
 		HAL_Delay(200);
 	}
+
+	sprintf(prompt, "----DEPLOY----\r\n");
+	putS(huart, prompt);
 
 	//end of 'DEPLOY_WAIT_DELAY_MINS' timer, deploy antenna
 
@@ -125,6 +136,34 @@ void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleType
 	//check_3v_status
 	//deploy_antenna
 
+	sprintf(prompt, "-- DP 1\r\n");
+	putS(huart, prompt);
+	writeDPin(UHF_Deploy_1_GPIO_Port, UHF_Deploy_1_Pin, GPIO_PIN_SET);
+	HAL_Delay(5000);
+	writeDPin(UHF_Deploy_1_GPIO_Port, UHF_Deploy_1_Pin, GPIO_PIN_RESET);
+
+	sprintf(prompt, "-- End DP 1\r\n");
+	putS(huart, prompt);
+//	HAL_Delay(7000);
+
+	sprintf(prompt, "-- DP 2\r\n");
+	putS(huart, prompt);
+
+	writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_SET);
+	HAL_Delay(5000);
+	writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin,
+			GPIO_PIN_RESET);
+	sprintf(prompt, "-- End DP 2\r\n");
+	putS(huart, prompt);
+
+	HAL_RTC_DeactivateAlarm(hrtc, RTC_ALARM_A);
+	sprintf(prompt, "----END DEPLOY----\r\n");
+	putS(huart, prompt);
+	for(;;){
+
+	}
+// end clayton
 	uint8_t waitTime = 10;  //example 10 seconds
 	//uint32_t _70cm_AUX_ADC_Channel = 25; //does a macro exist?
 
@@ -132,7 +171,7 @@ void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleType
 
 		//Power considerations
 
-		if(determineNextAntenna() == 0){
+		if(determineNextAntenna(wtc) == 0){
 			//uh oh, too many attempts to deploy.
 		}
 		//get deployment status (int)
