@@ -163,39 +163,39 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
  * @param  hrtc : RTC handle
  * @retval None
  */
-void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc) {
-
-	//change alarm A to next alarm??
-
-	//reset time and date to allow alarmA to be used again
-	RTC_DateTypeDef sdatestructureget;
-	RTC_TimeTypeDef stimestructureget;
-	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN);
-	HAL_RTC_GetDate(hrtc, &sdatestructureget, RTC_FORMAT_BIN);
-
-char goo[10] ={};
-	sprintf(goo, "5V %.2f \r\n",10*adcReadSingle(&hadc, 14));
-//	putS(&DEBUG_UART, goo);
-	//HAL_GPIO_TogglePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin);
-	// RTC delay 30min
-//	//*** working
-//		RTC_DateTypeDef sdatestructureget;
-//		RTC_TimeTypeDef stimestructureget;
-//		HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN);
-//		HAL_RTC_GetDate(hrtc, &sdatestructureget, RTC_FORMAT_BIN);
+//void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc) {
 //
-//		//HAL_RTC_GetAlarm(hrtc, &fuk, RTC_ALARM_A, RTC_FORMAT_BCD);
+//	//change alarm A to next alarm??
 //
-//		sprintf((char*) prompt, "tick(sec) %02d:%02d:%02d\r\n", stimestructureget.Hours,
-//				stimestructureget.Minutes, stimestructureget.Seconds);
-//		putS(&huart4, prompt);
-//	//working *** //
-//	RTC_TimeShow(hrtc, prompt);
-//	RTC_TimeShow(prompt);
-//	putS(&huart4, (char *) prompt);
-//	HAL_GPIO_TogglePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin);
-//	putS(&huart4,  atick);
-}
+//	//reset time and date to allow alarmA to be used again
+//	RTC_DateTypeDef sdatestructureget;
+//	RTC_TimeTypeDef stimestructureget;
+//	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN);
+//	HAL_RTC_GetDate(hrtc, &sdatestructureget, RTC_FORMAT_BIN);
+//
+//char goo[10] ={};
+//	sprintf(goo, "5V %.2f \r\n",10*adcReadSingle(&hadc, 14));
+////	putS(&DEBUG_UART, goo);
+//	//HAL_GPIO_TogglePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin);
+//	// RTC delay 30min
+////	//*** working
+////		RTC_DateTypeDef sdatestructureget;
+////		RTC_TimeTypeDef stimestructureget;
+////		HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN);
+////		HAL_RTC_GetDate(hrtc, &sdatestructureget, RTC_FORMAT_BIN);
+////
+////		//HAL_RTC_GetAlarm(hrtc, &fuk, RTC_ALARM_A, RTC_FORMAT_BCD);
+////
+////		sprintf((char*) prompt, "tick(sec) %02d:%02d:%02d\r\n", stimestructureget.Hours,
+////				stimestructureget.Minutes, stimestructureget.Seconds);
+////		putS(&huart4, prompt);
+////	//working *** //
+////	RTC_TimeShow(hrtc, prompt);
+////	RTC_TimeShow(prompt);
+////	putS(&huart4, (char *) prompt);
+////	HAL_GPIO_TogglePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin);
+////	putS(&huart4,  atick);
+//}
 /* USER CODE END 0 */
 
 /**
@@ -203,7 +203,7 @@ char goo[10] ={};
  *
  * @retval None
  */
-int main(void) {
+	int main(void) {
 	/* USER CODE BEGIN 1 */
 
 	/* USER CODE END 1 */
@@ -242,6 +242,13 @@ int main(void) {
 	MX_SPI1_Init();
 	MX_FATFS_Init();
 	/* USER CODE BEGIN 2 */
+
+//	for(;;){
+//	HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_SET);
+//	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, GPIO_PIN_SET);
+////	HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_1_Enable_Pin, GPIO_PIN_SET);
+//	HAL_Delay(1000);
+//	}
 //	(uint32_t)0x08080000
 	//uint32_t data = gpioStatusRetrieve('A');
 	//gpioDump();
@@ -341,47 +348,99 @@ int main(void) {
 //
 //	}
 
-	int i=0;
-	while (0) {
-		{
-			putS(&DEBUG_UART, "5V on \r\n");
-			HAL_Delay(500);
-			HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_1_Enable_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(_5V_Rail_2_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_SET);
-
-			HAL_Delay(1000);
-
-			putS(&DEBUG_UART, "Pi on \r\n");
-			HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin, GPIO_PIN_SET);
-
-			HAL_Delay(10000);
-
-			putS(&DEBUG_UART, "Pi off \r\n");
-			HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin, GPIO_PIN_RESET);
-
-			HAL_Delay(10000);
-
-			putS(&DEBUG_UART, "5V off \r\n");
-			HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_1_Enable_Pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(_5V_Rail_2_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_RESET);
-		}
+//	for (;;) {
+//		  uint8_t Cmd[4] = {0b10101010, 0xFF,0x00,0xFF};
+//		  uint8_t data[4] = {0, 0, 0, 0};
+//		putS(&DEBUG_UART, "tick\r\n");
 //
-//		HAL_GPIO_WritePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin, GPIO_PIN_SET);
-//		HAL_Delay(10000);
-//		writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_SET);
-//		HAL_Delay(10000);
-//		writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_RESET);
-//		HAL_Delay(10000);
+////		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+//		  HAL_SPI_TransmitReceive(&hspi1, Cmd, data, 4, 0xFF);
+//		  HAL_Delay(100);
+//		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
+//		  D2 = ((uint16_t)data[1] << 16) | ((uint16_t)data[2] << 8) | ((uint16_t)data[3]);
 
+
+		// SD SCK
+//		putS(&DEBUG_UART, "SCK");
+//		putS(&DEBUG_UART, " ON");
+//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+//		HAL_Delay(1000);
+//		putS(&DEBUG_UART, "...OFF\r\n");
+//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+//		HAL_Delay(1000);
+//		// SD MISO
+//		putS(&DEBUG_UART, "MISO");
+//		putS(&DEBUG_UART, " ON");
+//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+//		HAL_Delay(1000);
+//		putS(&DEBUG_UART, "...OFF\r\n");
+//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+//		HAL_Delay(1000);
+//		// SD MOSI
+//		putS(&DEBUG_UART, "MOSI");
+//		putS(&DEBUG_UART, " ON");
+//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+//		HAL_Delay(1000);
+//		putS(&DEBUG_UART, "...OFF\r\n");
+//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+//		HAL_Delay(1000);
+//		// SD CS
+//		putS(&DEBUG_UART, "CS");
+//		putS(&DEBUG_UART, " ON");
+//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
+//		HAL_Delay(1000);
+//		putS(&DEBUG_UART, "...OFF\r\n");
+//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
+//		HAL_Delay(1000);
+//	}
+
+//for(;;){
+//	sprintf((char*) prompt, "foobar");
+//	putS(&UART_Pi2, prompt);
+//	putS(&UART_Pi1, prompt+3);
+//	HAL_Delay(500);
+//}
+//	int i=0;
+//	while (0) {
+////		{
+////			putS(&DEBUG_UART, "5V on \r\n");
+////			HAL_Delay(500);
+////			HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_1_Enable_Pin, GPIO_PIN_SET);
+////			HAL_GPIO_WritePin(_5V_Rail_2_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_SET);
+////
+////			HAL_Delay(1000);
+////
+////			putS(&DEBUG_UART, "Pi on \r\n");
+////			HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin, GPIO_PIN_SET);
+////
+////			HAL_Delay(10000);
+////
+////			putS(&DEBUG_UART, "Pi off \r\n");
+////			HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin, GPIO_PIN_RESET);
+////
+////			HAL_Delay(10000);
+////
+////			putS(&DEBUG_UART, "5V off \r\n");
+////			HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_1_Enable_Pin, GPIO_PIN_RESET);
+////			HAL_GPIO_WritePin(_5V_Rail_2_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_RESET);
+////		}
+////
+////		HAL_GPIO_WritePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin, GPIO_PIN_SET);
+////		HAL_Delay(10000);
+////		writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_SET);
+////		HAL_Delay(10000);
+////		writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_RESET);
+////		HAL_Delay(10000);
+//
 //		wtcSetup(&DEBUG_UART,&hadc, &hrtc, &sAlarm);
-//		RTC_TimeShow(&hrtc, prompt);
-		putS(&DEBUG_UART, message);
-		HAL_Delay(500);
-
-		for(;;){
-			;
-		}
-	}
+////		RTC_TimeShow(&hrtc, prompt);
+//		putS(&DEBUG_UART, message);
+//		HAL_Delay(500);
+//
+//		for(;;){
+//			;
+//		}
+//	}
 	//gpio port d pin 11 --> d11 is the yellow LED for testing (pwr enable pi 1)
 
 	for (;;) {
@@ -431,7 +490,29 @@ int main(void) {
 		} else if (strcmp((char *) aRxBuffer, "p2") == 0) {
 			HAL_GPIO_TogglePin(Pwr_En_Pi2_GPIO_Port, Pwr_En_Pi2_Pin);
 			HAL_GPIO_WritePin(WTC_BUS_Switch_Pi_Select_GPIO_Port, WTC_BUS_Switch_Pi_Select_Pin, GPIO_PIN_RESET);
-		}else {
+		} else if (strcmp((char *) aRxBuffer, "t1") == 0) {
+			putS(&DEBUG_UART, "t1\r\n");
+			sprintf((char*) prompt, "foobar");
+
+			putS(&UART_Pi1, prompt);
+			putS(&DEBUG_UART, "sent to pix \r\n\t");
+			HAL_UART_Receive(&UART_Pi1, (uint8_t *) aRxBuffer, 6, 10000);
+//			getS(&UART_Pi1, aRxBuffer, 6);
+			putS(&DEBUG_UART, aRxBuffer);
+		} else if (strcmp((char *) aRxBuffer, "t2") == 0) {
+			putS(&DEBUG_UART, "t2\r\n");
+			sprintf((char*) prompt, "foobar");
+			putS(&UART_Pi2, prompt);
+			putS(&DEBUG_UART, "sent to pix \r\n\t");
+			HAL_UART_Receive(&UART_Pi2, (uint8_t *) aRxBuffer,5, 10000);
+//			getS(&UART_Pi2, aRxBuffer, 6);
+			int q  = 0;
+			for(q =0;q<5;q++){
+				sprintf((char*) prompt, "%x ", aRxBuffer[q]);
+				putS(&DEBUG_UART, prompt);
+			}
+			putS(&DEBUG_UART, aRxBuffer);
+		} else {
 			sprintf((char*) prompt, "??\r\n");
 			putS(&DEBUG_UART, prompt);
 		}

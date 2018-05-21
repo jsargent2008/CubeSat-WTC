@@ -223,3 +223,16 @@ void printTimeHelper(UART_HandleTypeDef *huart, RTC_HandleTypeDef *hrtc, RTC_Ala
 		return;
 	}
 }
+
+
+/*
+ * ALARM A
+ * PURPOSE: act as the constant health of space craft Check.
+ */
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc) {
+
+	//check battery voltage
+
+
+}
+

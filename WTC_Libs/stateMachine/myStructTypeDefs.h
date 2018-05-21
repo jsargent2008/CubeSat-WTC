@@ -10,6 +10,22 @@
 
 #include "main.h"
 
+typedef struct BatteryStatusStruct {
+
+	uint8_t battery1_V;
+	uint8_t battery2_V;
+	uint8_t battery3_V;
+	uint8_t battery4_V;
+
+	uint8_t battery1_PGOOD;
+	uint8_t battery2_PGOOD;
+	uint8_t battery3_PGOOD;
+	uint8_t battery4_PGOOD;
+
+} BatteryStatusStruct;
+
+extern BatteryStatusStruct * batteryStruct;
+
 typedef struct DeployStatusStruct {
 
 	//deployment
@@ -66,6 +82,5 @@ typedef struct WTCStatusStruct {
 } WTCStatusStruct;
 
 extern WTCStatusStruct *wtc;
-
 
 #endif /* STATEMACHINE_MYSTRUCTTYPEDEFS_H_ */

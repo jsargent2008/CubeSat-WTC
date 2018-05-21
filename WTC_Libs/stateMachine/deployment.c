@@ -1,9 +1,7 @@
-
 #include "deployment.h"
 
 DeployStatusStruct my_deployStruct;
 DeployStatusStruct *deployStruct = &my_deployStruct;
-
 
 DeployStatusStruct *initDeployStatusStruct() {
 	deployStruct->deployWaitTimeMin = 45;
@@ -21,7 +19,7 @@ DeployStatusStruct *initDeployStatusStruct() {
 	return deployStruct;
 }
 
-uint8_t determineNextAntenna(WTCStatusStruct *wtc){
+uint8_t determineNextAntenna(WTCStatusStruct *wtc) {
 	//Check if the max deployment attempts for the antennas as been reached.
 	uint8_t nextAntennaDetermined = FALSE;
 	uint8_t infinitLoopFlag = RESET;
@@ -74,7 +72,7 @@ uint8_t determineNextAntenna(WTCStatusStruct *wtc){
 		}
 	}
 
-	if(nextAntennaDetermined == FALSE){
+	if (nextAntennaDetermined == FALSE) {
 		//go back to main, too many attempts at deployment. Comeback Later.
 		//return status.
 		return 0;
@@ -92,7 +90,7 @@ int8_t deployAntenna(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_Han
 //deployAntenna
 //UHF_Power_Enable
 
-	int8_t status;
+	int8_t status = 0;
 	uint8_t wantedStatus;
 	if (nAntenna == 1) {
 		writeDPin(UHF_Deploy_1_GPIO_Port, UHF_Deploy_1_Pin, GPIO_PIN_SET);
@@ -101,6 +99,8 @@ int8_t deployAntenna(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_Han
 		writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_SET);
 		wantedStatus = 2;
 	}
+
+	HAL_Delay(1000);
 
 	float tolerance = 0.20f;
 	uint8_t _70cm_AUX_ADC_Channel = 25;

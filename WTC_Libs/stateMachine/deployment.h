@@ -16,8 +16,6 @@
 #include "myStructTypeDefs.h"
 #include "stateMachine.h"
 
-
-
 //function prototypes
 DeployStatusStruct *initDeployStatusStruct();
 uint8_t determineNextAntenna();
