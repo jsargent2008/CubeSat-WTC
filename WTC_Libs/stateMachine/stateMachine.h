@@ -17,18 +17,18 @@
 #include <stdlib.h>
 #include "float.h"
 #include "math.h"
+#include "usart.h"
+#include "rtc.h"
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_adc.h"
 #include "UART_IRQ/UART_IRQ.h"
 #include "deployment.h"
+#include "wtcStruct.h"
 #include "myStructTypeDefs.h"
 
 //function prototypes
 
-void initWTCStatusStruct(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc,
-		RTC_HandleTypeDef *hrtc, RTC_AlarmTypeDef *sAlarm);
-void wtcSetup(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleTypeDef *hrtc,
-		RTC_AlarmTypeDef *sAlarm);
+void wtcSetup();
 void commsLoop();
 void groundOps();
 void scienceInit();

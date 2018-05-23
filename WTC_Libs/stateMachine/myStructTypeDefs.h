@@ -9,14 +9,24 @@
 #define STATEMACHINE_MYSTRUCTTYPEDEFS_H_
 
 #include "main.h"
+#include "usart.h"
+#include "rtc.h"
+#include "adc.h"
+#include "stateMachine.h"
 
 typedef struct BatteryStatusStruct {
+	// if battery rail is a combination of all voltage stacks
+	// battery rail threshold 5.2V, 5.8 before combining diodes
+	// endrosat can only operate with battery rail above 5.2
 
+	// experiment needs two available battery rails.
+	float minThreshold;
 	uint8_t battery1_V;
 	uint8_t battery2_V;
 	uint8_t battery3_V;
 	uint8_t battery4_V;
 
+	uint8_t workingStacks;
 	uint8_t battery1_PGOOD;
 	uint8_t battery2_PGOOD;
 	uint8_t battery3_PGOOD;
@@ -30,7 +40,7 @@ typedef struct DeployStatusStruct {
 
 	//deployment
 	uint8_t deployReady; 				// T or F
-	uint8_t deployWaitTimeMin;
+	uint8_t waitTimeMin;
 	uint8_t deployAttemptTimeMaxSec;
 	uint8_t deployedAnt1;				// T or F
 	uint8_t deployedAnt2;				// T or F
@@ -38,10 +48,10 @@ typedef struct DeployStatusStruct {
 	uint8_t deployAttemptsAnt2;
 	uint8_t deployDenyAnt1; 			// T or F
 	uint8_t deployDenyAnt2; 			// T or F
-	uint8_t deployMaxAttemptsPer;
-	uint8_t deployMaxAttemptsTotal;
-	uint8_t deployCurrentAntAttempted;
-	uint8_t deployStatus;
+	uint8_t deployMaxAttemptsPer;		//2?
+	uint8_t deployMaxAttemptsTotal;		//2?
+	uint8_t deployCurAntAttempted;
+	uint8_t deployStatus; // -1,0,1,2,or 3 IMPORTANT: deployStatus should be able to be overwritten if comms is successful to and from ground, regardless of the deployment sense voltage.
 	float deploySenseV;
 
 	// initial date-time deployed
@@ -82,5 +92,7 @@ typedef struct WTCStatusStruct {
 } WTCStatusStruct;
 
 extern WTCStatusStruct *wtc;
+
+
 
 #endif /* STATEMACHINE_MYSTRUCTTYPEDEFS_H_ */

@@ -8,20 +8,23 @@
 #ifndef STATEMACHINE_DEPLOYMENT_H_
 #define STATEMACHINE_DEPLOYMENT_H_
 
-#define TRUE 1
-#define FALSE 0
-#define True 1
-#define False 0
-
+#define ADC_Channel_70cm_AUX 25
+#include "main.h"
 #include "myStructTypeDefs.h"
 #include "stateMachine.h"
 
-//function prototypes
-DeployStatusStruct *initDeployStatusStruct();
-uint8_t determineNextAntenna();
-int8_t deployAntenna(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, RTC_HandleTypeDef *hrtc,
-		uint8_t nAntenna, uint8_t waitTime);
-int8_t deploymentSense(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc, float tolerance);
-void printDeploymentStatus(UART_HandleTypeDef *huart, int8_t status, char* tabs);
 
+//function prototypes
+/*
+ * AS of 5-22-18 use deploySimple(in conjunction with deploymentSense and deploymentStatusStruct to deploy antennas)
+ */
+void initDeployStatusStruct();
+int8_t deploymentSense(float tolerance);
+int8_t deploySimple();
+int8_t deploySimpleHelper();
+uint8_t waitToDeploy(uint8_t attempt);
+void printDeploymentStatus(int8_t status, char* tabs);
+
+uint8_t determineNextAntenna();
+int8_t deployAntenna(uint8_t nAntenna, uint8_t waitTime);
 #endif /* STATEMACHINE_DEPLOYMENT_H_ */
