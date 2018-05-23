@@ -60,6 +60,10 @@
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/
+#define TRUE 0
+#define true 0
+#define FALSE 1
+#define false 1
 
 #define EN_Chrg_1_Pin GPIO_PIN_3
 #define EN_Chrg_1_GPIO_Port GPIOE

@@ -64,7 +64,8 @@
 extern RTC_HandleTypeDef hrtc;
 
 /* USER CODE BEGIN Private defines */
-
+	//RTC_HandleTypeDef hrtc;
+	RTC_AlarmTypeDef sAlarm;
 /* USER CODE END Private defines */
 
 extern void _Error_Handler(char *, int);

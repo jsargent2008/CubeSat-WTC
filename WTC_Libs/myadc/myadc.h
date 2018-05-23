@@ -10,6 +10,7 @@
 
 #include "main.h"
 #include "float.h"
+#include "adc.h"
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_adc.h"
 
@@ -33,7 +34,7 @@
   ( (ADC_DATA) * VDD_THEORY / RANGE_12BITS)
 
 
-float adcReadSingle(ADC_HandleTypeDef *hadc, uint32_t channel);
+float adcReadSingle(uint32_t channel);
 /**
  * @brief  ADC measurement digital
  * @param	hadc: pointer to ADC_HandleTypeDef
