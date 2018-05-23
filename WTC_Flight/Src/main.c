@@ -286,6 +286,19 @@ int main(void) {
 
 	//HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
 
+	////////////////
+	// BEGIN SD DEMO
+	//
+	// Demo of grabbing individual packets. Right now, splits packets on 'es'
+	// so any time 'e' and 's' appear together, that marks the start of another
+	// packet. Can be changed to any byte value, even non-ASCII. This demo
+	// doesn't actually do anything with the data, just stores it in `packet`.
+	// To make sure it's working, breakpoint on the free(packet) line and inspect
+	// the local variable `*packet`, it should contain the bytes. Note that it will
+	// show more than the actual buffer size in the debug window, since there is no
+	// null terminator. Rest assured, the garbage after the correct values is expected
+	// and harmless.
+
 	// Delay to allow SD card to get set up internally.
 	HAL_Delay(1000);
 
@@ -300,27 +313,51 @@ int main(void) {
 			; // Fatal SD mounting error.
 	}
 
+	// Open up an existing test.txt file for reading.
+	FIL pifile;
+	fres = f_open(&pifile, "test.txt", FA_READ);
 
-	// Demo of grabbing individual packets. Right now, splits packets on 'es'
-	// so any time 'e' and 's' appear together, that marks the start of another
-	// packet. Can be changed to any byte value, even non-ASCII. This demo
-	// doesn't actually do anything with the data, just stores it in `packet`.
-	// To make sure it's working, breakpoint on the free(packet) line and inspect
-	// the local variable `*packet`, it should contain the bytes. Note that it will
-	// show more than the actual buffer size in the debug window, since there is no
-	// null terminator. Rest assured, the garbage after the correct values is expected
-	// and harmless.
-	int32_t p_size = 0, p_num = 1;
+	// This part shows off dumping the entire file. If you break on the if-statement,
+	// you can watch the value of `packet` in the variables debugging window change.
+	// If using the demo test.txt file, you'll see the value between the two +'s
+	// increment from 0 to 9, then from 'a' to 'z'. In the actual flight code, the
+	// transmission code would go after the packet size is tested for non-zero-ness,
+	// but before it is free'd from memory.
+	int32_t p_size = 0;
 	do {
 		uint8_t* packet = NULL;
-		p_size = get_packet(p_num++, &packet);
+		p_size = get_next_packet(&pifile, &packet);
+		if (p_size <= 0 || packet == NULL)
+			break; // memory wasn't allocated, don't need to free
 		free(packet);
 	} while (p_size > 0);
+
+	// This part shows off pulling specific packets. I've crafted a 36 line
+	// demo file, with psuedo-identifiers in the test packets. There is a
+	// character in between two +'s, if you step through this loop watching
+	// the `packet` value in memory, you should see packets +0+, +2+, +4+, +6+,
+	// +b+, +e+, +n+, and +z+. When `i` increments to 8, and attempts to pull
+	// the 37th packet, it will return a value <= 0, since there is no 37th
+	// packet. Since this loop breaks, the 42th packet is never even attempted.
+	uint8_t p_num[] = { 1, 3, 5, 7, 12, 15, 24, 36, 37, 42 };
+	for(int i = 0; i < sizeof p_num; i++) {
+		uint8_t* packet = NULL;
+		p_size = get_packet_num(p_num[i], &pifile, &packet);
+		if (p_size <= 0 || packet == NULL)
+			break; // memory wasn't allocated, don't need to free
+		free(packet);
+	}
+
+	f_close(&pifile);
 
 	// Unmount the SD card when finished.
 	// Not sure if we'll have to actually do this before the Pi can read and write to it?
 	// Or if we just have to ensure we're not also reading and writing while the Pi is.
 	f_mount(NULL, "", 0);
+
+	//
+	// END SD DEMO
+	//////////////
 
 //	RTC_TimeShow(&hrtc, prompt);
 //	putS(&huart4, prompt);
