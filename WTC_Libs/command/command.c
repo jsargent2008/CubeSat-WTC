@@ -365,7 +365,7 @@ void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 //		sprintf(str, "\r\n" PRINTF_BINARY_PATTERN_INT32  , PRINTF_BYTE_TO_BINARY_INT32(ADC_CHANNEL_10));
 //		HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
 	if (flag == 0) {
-		float f = adcReadSingle(hadc, readChannel);
+		float f = adcReadSingle(readChannel);
 		sprintf(str, ":%02d-%.3f\r\n", readChannel, f);
 		putS(huart, str);
 	} else {
@@ -379,7 +379,7 @@ void arAll(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 	int nADCchannels = 32;
 
 	for (int i = 0; i < nADCchannels; i++) {
-		float f = adcReadSingle(hadc, i);
+		float f = adcReadSingle(i);
 
 		sprintf(str, ":%02d-%.3f\r\n", i, f); //decimal
 		putS(huart, str);

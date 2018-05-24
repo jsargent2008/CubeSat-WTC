@@ -17,10 +17,10 @@
 #define designatorPi1 0b00000001
 #define designatorPi2 0b00000010
 //flag types
-#define invalidDesignator 0b00000001
+#define invalidDesignator 0
 
-//Structure
-typedef struct CommsPacketStruct {
+//Structures
+typedef struct CommsRxPacketStruct {
 	// where the packet goes to. GS, Pi, or WTC. Reject if not recognized.
 	uint8_t designator;			//001 byte
 	// time stamp, serialization of the packets (packet ID)
@@ -31,42 +31,34 @@ typedef struct CommsPacketStruct {
 	//to monitor ongoing transmission
 	uint8_t flag;
 
-} CommsPacketStruct;
+} CommsRxPacketStruct;
 
-extern CommsPacketStruct * commsPacketStruct;
+extern CommsRxPacketStruct * commsRxPacketStruct;
 
-uint8_t initCommsPacketStruct(/*x,y,z*/) {
-	//missing parameter (data from ground)
-	//commsPacketStruct->designator = x;
-	//commsPacketStruct->miscInteger = y;
-	//commsPacketStruct->data = z;
-	//commsPacketStruct->flag;
+typedef struct CommsTxPacketStruct {
+	uint8_t data[128];			//128 bytes
+	// use EOF(ASCII#26) to mark end of a file transmission
 
-	return 0;
-}
+	//to monitor ongoing transmission
+	uint8_t flag;
 
-uint8_t isValid_designator() {
+} CommsTxPacketStruct;
 
-	switch (commsPacketStruct->designator) {
-	case (designatorWTC):
-		//go to WTC transmission code
-		break;
-	case (designatorPi1):
-		//go to Pi1 transmission code
-		break;
-	case (designatorPi2):
-		//go to Pi2 transmission code
-		break;
-	default:
-		//ask to re-send packet
-		return invalidDesignator;
-	}
+extern CommsTxPacketStruct * commsTxPacketStruct;
 
-	return 0;
-}
+void commsLoop(uint8_t* buffer);
+void helloGround(uint8_t* buffer);
+void commsToGround(uint8_t* buffer);
+void commsFromGround(uint8_t* buffer);
+void commsToWTC(uint8_t* buffer);
+void commsToPis(uint8_t* buffer, uint8_t pi);
+void commsFromPis(uint8_t* buffer);
 
-void commsLoop();
-void commsGround();
-void groundPis();
+
+/*
+ * helper function prototypes
+ */
+uint8_t isValid_designator();
+
 
 #endif /* STATEMACHINE_COMMS_H_ */
