@@ -60,10 +60,6 @@
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/
-#define TRUE 0
-#define true 0
-#define FALSE 1
-#define false 1
 
 #define EN_Chrg_1_Pin GPIO_PIN_3
 #define EN_Chrg_1_GPIO_Port GPIOE
@@ -190,6 +186,19 @@
 #define USART_PI1 huart1
 #define USART_UHF huart2
 #define USART_PI2 huart3
+
+#define TRUE 1
+#define true 1
+#define FALSE 0
+#define false 0
+
+#define packetSize_IT 8//128
+char DMABUFFER[packetSize_IT];
+/**
+ * remove before flight
+ */
+// only set to 1687 if ready to release deployment
+#define DEPLOYACCESSCODE 1 /*1687*/
 
 /* USER CODE END Private defines */
 

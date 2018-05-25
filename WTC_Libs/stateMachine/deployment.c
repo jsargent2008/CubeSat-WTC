@@ -4,6 +4,7 @@ DeployStatusStruct my_deployStruct;
 DeployStatusStruct *deployStruct = &my_deployStruct;
 
 void initDeployStatusStruct() {
+	DeployStatusStruct *deployStruct = malloc(sizeof(DeployStatusStruct));
 	deployStruct->waitTimeMin = 45;
 	deployStruct->deployAttemptTimeMaxSec = 10;
 	deployStruct->deployMaxAttemptsPer = 2;
@@ -21,14 +22,46 @@ void initDeployStatusStruct() {
 /*
  * Call deploySimple initially once. If the return value is not 3 (meaning both antennas are
  */
-int8_t deploySimple() {
+int8_t deploySimple(uint8_t deplyAntNum) {
+
+	char prompt[100] = { };
+
+	if (DEPLOYACCESSCODE != 1687) {
+		sprintf(prompt, "DEPLOYACCESSCODE IS 1687\r\n");
+		putS(&DEBUG_UART, prompt);
+		return 3;
+
+	} else {
+		//enable deployment rail
+		HAL_GPIO_WritePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin,
+				GPIO_PIN_SET);
+		HAL_Delay(1000);
+
+		if (deplyAntNum == 1 && DEPLOYACCESSCODE == 1687) {
+			writeDPin(UHF_Deploy_1_GPIO_Port, UHF_Deploy_1_Pin, GPIO_PIN_SET);
+			HAL_Delay(1000);
+		} else if (deplyAntNum == 2 && DEPLOYACCESSCODE == 1687) {
+			writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_SET);
+			HAL_Delay(1000);
+		}
+	}
+	HAL_GPIO_WritePin(Deployment_Power_Enable_GPIO_Port, Deployment_Power_Enable_Pin,
+			GPIO_PIN_RESET);
+	writeDPin(UHF_Deploy_1_GPIO_Port, UHF_Deploy_1_Pin, GPIO_PIN_RESET);
+	writeDPin(UHF_Deploy_2_GPIO_Port, UHF_Deploy_2_Pin, GPIO_PIN_RESET);
+
+	return deploymentSense(0.20f);
+
+}
+
+int8_t deploy() {
 	if (batteryStruct->workingStacks > 1) {
-		return deploySimpleHelper(deployStruct);
+		return deployHelper();
 	}
 
 	return -2;
 }
-int8_t deploySimpleHelper() {
+int8_t deployHelper() {
 
 	char prompt[100] = { };
 	//while battery status good!!! <- don't forget to implement
@@ -188,27 +221,37 @@ uint8_t waitToDeploy(uint8_t attempt) {
 	/* Get the RTC current Date */
 	HAL_RTC_GetDate(&hrtc, &sdatestructureget, RTC_FORMAT_BIN);
 
-	uint8_t sec = (stimestructureget.Seconds + wtc->deployStruct->waitTimeMin) % 60;
-
-	sprintf(prompt, "Will deploy at %d sec:", sec);
-	putS(&DEBUG_UART, prompt);
-	printTime(1);
+	uint8_t waitMin = 59;
+	uint8_t mins = (stimestructureget.Minutes + waitMin) % 60;
+	uint8_t minsActual = stimestructureget.Minutes;
 
 	//wait XX minutes to deploy space craft
-	while (sec != stimestructureget.Seconds) {
+	while (mins != minsActual) {
 		/* Get the RTC current Time */
 		HAL_RTC_GetTime(&hrtc, &stimestructureget, RTC_FORMAT_BIN);
 		/* Get the RTC current Date */
 		HAL_RTC_GetDate(&hrtc, &sdatestructureget, RTC_FORMAT_BIN);
 
-		printTime(0);
+//			if(minsActual != stimestructureget.Minutes){
+		sprintf(prompt, "T-Minus %02d:%02d until deployment\r", waitMin + (mins - minsActual),
+				59 - stimestructureget.Seconds);
+		putS(&DEBUG_UART, prompt);
+//			}
+		minsActual = stimestructureget.Minutes;
+
 		HAL_Delay(200);
 	}
+	sprintf(prompt, "\r\n");
+	putS(&DEBUG_UART, prompt);
 
-	sprintf(prompt, "----DEPLOY----\r\n");
+	sprintf(prompt, "----ATTEMPT TO DEPLOY----\r\n");
 	putS(&DEBUG_UART, prompt);
 
 	return 0;
+}
+
+void secureDeploy(uint8_t antenna) {
+
 }
 
 void printDeploymentStatus(int8_t status, char* tabs) {

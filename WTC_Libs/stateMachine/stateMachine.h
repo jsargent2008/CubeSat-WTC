@@ -22,9 +22,11 @@
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_adc.h"
 #include "UART_IRQ/UART_IRQ.h"
+#include "batteryStack.h"
 #include "deployment.h"
 #include "wtcStruct.h"
 #include "myStructTypeDefs.h"
+
 
 //function prototypes
 

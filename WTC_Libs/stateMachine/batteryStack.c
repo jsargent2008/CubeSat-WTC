@@ -34,6 +34,16 @@ float checkBatteryVoltage(uint8_t nBat) {
 
 uint8_t isBatteryStackGood() {
 
+	/*
+	 * remove before flight
+	 */
+
+	uint8_t deploycode = DEPLOYACCESSCODE;
+	if (deploycode != 1687) {
+		return 4;
+	}
+
+	//continue
 	batteryStruct->minThreshold = 5.8f; //see battery struct (mystructTypeDef header file.)
 	batteryStruct->workingStacks = 4; //1-4
 	// first check battery stack voltages

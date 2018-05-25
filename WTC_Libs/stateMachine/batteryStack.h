@@ -7,7 +7,7 @@
 
 #ifndef STATEMACHINE_BATTERYSTACK_H_
 #define STATEMACHINE_BATTERYSTACK_H_
-#include "main.h"
+//#include "main.h"
 #include "myStructTypeDefs.h"
 #include "stateMachine.h"
 

@@ -1,51 +1,50 @@
-
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * This notice applies to any and all portions of this file
-  * that are not between comment pairs USER CODE BEGIN and
-  * USER CODE END. Other portions of this file, whether 
-  * inserted by the user or by software development tools
-  * are owned by their respective copyright owners.
-  *
-  * Copyright (c) 2018 STMicroelectronics International N.V. 
-  * All rights reserved.
-  *
-  * Redistribution and use in source and binary forms, with or without 
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice, 
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other 
-  *    contributors to this software may be used to endorse or promote products 
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this 
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under 
-  *    this license is void and will automatically terminate your rights under 
-  *    this license. 
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS" 
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT 
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT 
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * This notice applies to any and all portions of this file
+ * that are not between comment pairs USER CODE BEGIN and
+ * USER CODE END. Other portions of this file, whether
+ * inserted by the user or by software development tools
+ * are owned by their respective copyright owners.
+ *
+ * Copyright (c) 2018 STMicroelectronics International N.V.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted, provided that the following conditions are met:
+ *
+ * 1. Redistribution of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of STMicroelectronics nor the names of other
+ *    contributors to this software may be used to endorse or promote products
+ *    derived from this software without specific written permission.
+ * 4. This software, including modifications and/or derivative works of this
+ *    software, must execute solely and exclusively on microcontroller or
+ *    microprocessor devices manufactured by or for STMicroelectronics.
+ * 5. Redistribution and use of this software other than as permitted under
+ *    this license is void and will automatically terminate your rights under
+ *    this license.
+ *
+ * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
+ * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT
+ * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************
+ */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32l1xx_hal.h"
@@ -62,6 +61,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <math.h>
 #include <myadc/myadc.h>
 #include <myprintf/myprintf.h>
@@ -84,7 +84,7 @@ I2C_HandleTypeDef hi2c1;
 //RTC_TimeTypeDef sTime;
 //RTC_DateTypeDef sDate;
 //RTC_AlarmTypeDef sAlarm;
-
+__IO ITStatus UartReady = RESET;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -131,7 +131,8 @@ uint8_t aTxStartMessage[] =
 uint8_t aTxEndMessage[] = "\n\r Example Finished\n\r";
 uint8_t atick[] = "\n\r TICK \n\r";
 
-uint8_t aRxBuffer[10];
+//int8_t packetSize_IT = 128;
+//uint8_t aRxBuffer[packetSize_IT];
 uint8_t prompt[100] = { };
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
@@ -141,18 +142,34 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 ////	sprintf(prompt, "rdone");
 //	HAL_UART_Transmit(&huart1, (uint8_t *) aRxBuffer, (uint16_t) strlen(aRxBuffer), 0xFFFF);
 //
-	//check if pi interrupt
-	if (huart == &UART_Pi1 || huart == &UART_Pi2) {
-		;
+//	//check if pi interrupt
+//	if (huart == &UART_Pi1 || huart == &UART_Pi2) {
+//		;
+//	}
+
+	putS(&DEBUG_UART, "got interrupt\r\n");
+	UartReady = SET;
+
+	if(huart == &DEBUG_UART){
+		if (HAL_UART_Receive_DMA(huart, (uint8_t *)DMABUFFER, packetSize_IT) != HAL_OK) {
+			Error_Handler();
+		}
+		//print back to console
+		sprintf(prompt, "%s\r\n",DMABUFFER);
+		putS(&huart4, prompt);
+		//make sure packet is readable
+		commsFromGround((uint8_t *)DMABUFFER);
 	}
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 
-	//check if pi interrupt
-	if (huart == &UART_Pi1 || huart == &UART_Pi2) {
-		;
-	}
+//	//check if pi interrupt
+//	if (huart == &UART_Pi1 || huart == &UART_Pi2) {
+//		;
+//	}
+	putS(&DEBUG_UART, "sent interrupt\r\n");
+	UartReady = SET;
 }
 
 //void HAL_RTC_AlarmIRQHandler(RTC_HandleTypeDef *hrtc) {
@@ -203,13 +220,12 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  *
-  * @retval None
-  */
-int main(void)
-{
-  /* USER CODE BEGIN 1 */
+ * @brief  The application entry point.
+ *
+ * @retval None
+ */
+int main(void) {
+	/* USER CODE BEGIN 1 */
 
 //	DeployStatusStruct my_deployStruct;
 //	DeployStatusStruct *deployStruct = &my_deployStruct;
@@ -220,42 +236,135 @@ int main(void)
 //	DeployStatusStruct deployStruct;
 //	BatteryStatusStruct batteryStruct;
 //	WTCStatusStruct wtc;
-  /* USER CODE END 1 */
+	/* USER CODE END 1 */
 
-  /* MCU Configuration----------------------------------------------------------*/
+	/* MCU Configuration----------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
 
-  /* USER CODE BEGIN Init */
+	/* USER CODE BEGIN Init */
 
 	HAL_StatusTypeDef hal = HAL_Init();
 	if (hal == HAL_ERROR) {
 
 	}
 
-  /* USER CODE END Init */
+	/* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+	/* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+	/* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_DMA_Init();
-  MX_UART4_Init();
-  MX_USART1_UART_Init();
-  MX_USART2_UART_Init();
-  MX_I2C2_Init();
-  MX_ADC_Init();
-  MX_USART3_UART_Init();
-  MX_RTC_Init();
-  MX_SPI1_Init();
-  MX_FATFS_Init();
-  /* USER CODE BEGIN 2 */
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_DMA_Init();
+	MX_UART4_Init();
+	MX_USART1_UART_Init();
+	MX_USART2_UART_Init();
+	MX_I2C2_Init();
+	MX_ADC_Init();
+	MX_USART3_UART_Init();
+	MX_RTC_Init();
+	MX_SPI1_Init();
+	MX_FATFS_Init();
+	/* USER CODE BEGIN 2 */
+
+	while (0) {
+		HAL_GPIO_WritePin(UHF_Power_Enable_GPIO_Port, UHF_Power_Enable_Pin, GPIO_PIN_SET);
+		HAL_Delay(200);
+		HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_1_Enable_Pin, GPIO_PIN_SET);
+		HAL_Delay(200);
+		HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_SET);
+		HAL_Delay(200);
+		//            char *commands[] = {
+		//                    "\rES+R2200\r", //
+		//                    "\rES+W22003603\r",   //
+		//                    "\rES+R2200\r",      //
+		//                    "\rES+R2201\r",      //
+		//                    "\rES+W2201422F0A42\r", //
+		//                    "\rES+W22060000001E\r", //
+		//                    "\rES+R2201\r",      //
+		//                    "\rES+W220033A3\r"    //
+		//                    };
+
+		char *commands[] = { "\rES+R2200\r", //
+				"\rES+W22003603\r",   //
+				"\rES+R2200\r",      //
+				"\rES+R2201\r",      //
+				"\rES+W2201422F0A42\r", //
+				"\rES+W22060000001E\r", //
+				"\rES+R2201\r",      //
+				"\rES+W220033A3\r"    //
+				};
+
+		uint8_t len = 8; //sizeof(commands) / sizeof(commands[0]);
+
+		char buf[500] = { };
+		//sprintf(buf, "len is %d\t\n\n", len);
+
+		int x;
+		for (x = 0; x < len; x++) {
+			//    sprintf(buf, "SUP %d\r\n", x++);
+			putS(&huart4, commands[x]);
+			HAL_Delay(100);
+			HAL_UART_Receive(&huart4, (uint8_t *) buf, 256, 500);
+		}
+
+		for (x = 0; x < 200; x++) {
+			HAL_UART_Transmit(&huart4, "hellohellohellohello", 20, 1000);
+			HAL_Delay(100);
+		}
+
+		for (;;) {
+			HAL_UART_Receive(&huart4, (uint8_t *) buf, 10, 10000);
+			HAL_UART_Transmit(&huart4, buf, 10, 1000);
+			x = 1;
+		}
+
+		//            for (;;) {
+		//                putS(&huart1, ">");
+		//                HAL_UART_Receive(&huart4, (uint8_t *) buf, 50, 1000);
+		//                buf[257] = '\0';
+		//                putS(&huart1, buf);
+		//                putS(&huart1, "<\r\n");
+		////                HAL_Delay(100);
+		//            }
+
+	}
+
+	HAL_UART_Receive_DMA(&DEBUG_UART, (uint8_t *)DMABUFFER, packetSize_IT);
+
+	for(;;){
+		HAL_Delay(100);
+	}
+	for (;;) {
+
+		wtcSetup();
+	}
+		/*##-3- Wait for the end of the transfer ###################################*/
+		/* While waiting for message to come from the other board, LED2 is
+		 blinking according to the following pattern: a double flash every half-second */
+
+//	putS(&DEBUG_UART, "waiting for interrupt\r\n");
+//	while (UartReady != SET)
+//	{
+//		putS(&DEBUG_UART, "*");
+//		HAL_Delay(100);
+//		putS(&DEBUG_UART, "*");
+//		HAL_Delay(100);
+//		putS(&DEBUG_UART, "*");
+//		HAL_Delay(100);
+//		putS(&DEBUG_UART, "\r\n");
+//		HAL_Delay(500);
+//	}
+//
+//	putS(&DEBUG_UART, "interrupt received\r\n");
+//	HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+//	HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
 
 //	for(;;){
 //	HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_SET);
@@ -375,7 +484,8 @@ int main(void)
 	HAL_GPIO_WritePin(_5V_Rail_1_Enable_GPIO_Port, _5V_Rail_1_Enable_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(_5V_Rail_2_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(WTC_BUS_Switch_Pi_Select_GPIO_Port, WTC_BUS_Switch_Pi_Select_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(WTC_BUS_Switch_Pi_Select_GPIO_Port, WTC_BUS_Switch_Pi_Select_Pin,
+			GPIO_PIN_SET);
 
 	for (;;) {
 		char aRxBuffer[20] = "";
@@ -420,10 +530,12 @@ int main(void)
 			HAL_GPIO_WritePin(_5V_Rail_2_Enable_GPIO_Port, _5V_Rail_2_Enable_Pin, GPIO_PIN_RESET);
 		} else if (strcmp((char *) aRxBuffer, "p1") == 0) {
 			HAL_GPIO_TogglePin(Pwr_En_Pi1_GPIO_Port, Pwr_En_Pi1_Pin);
-			HAL_GPIO_WritePin(WTC_BUS_Switch_Pi_Select_GPIO_Port, WTC_BUS_Switch_Pi_Select_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(WTC_BUS_Switch_Pi_Select_GPIO_Port, WTC_BUS_Switch_Pi_Select_Pin,
+					GPIO_PIN_SET);
 		} else if (strcmp((char *) aRxBuffer, "p2") == 0) {
 			HAL_GPIO_TogglePin(Pwr_En_Pi2_GPIO_Port, Pwr_En_Pi2_Pin);
-			HAL_GPIO_WritePin(WTC_BUS_Switch_Pi_Select_GPIO_Port, WTC_BUS_Switch_Pi_Select_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(WTC_BUS_Switch_Pi_Select_GPIO_Port, WTC_BUS_Switch_Pi_Select_Pin,
+					GPIO_PIN_RESET);
 		} else if (strcmp((char *) aRxBuffer, "t1") == 0) {
 			putS(&DEBUG_UART, "t1\r\n");
 			sprintf((char*) prompt, "foobar");
@@ -438,10 +550,10 @@ int main(void)
 			sprintf((char*) prompt, "foobar");
 			putS(&UART_Pi2, prompt);
 			putS(&DEBUG_UART, "sent to pix \r\n\t");
-			HAL_UART_Receive(&UART_Pi2, (uint8_t *) aRxBuffer,5, 10000);
+			HAL_UART_Receive(&UART_Pi2, (uint8_t *) aRxBuffer, 5, 10000);
 //			getS(&UART_Pi2, aRxBuffer, 6);
-			int q  = 0;
-			for(q =0;q<5;q++){
+			int q = 0;
+			for (q = 0; q < 5; q++) {
 				sprintf((char*) prompt, "%x ", aRxBuffer[q]);
 				putS(&DEBUG_UART, prompt);
 			}
@@ -460,10 +572,10 @@ int main(void)
 		if (index >= 100)
 			index = 0;
 	}
-  /* USER CODE END 2 */
+	/* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
+	/* Infinite loop */
+	/* USER CODE BEGIN WHILE */
 	while (1) {
 
 		/*******
@@ -480,9 +592,9 @@ int main(void)
 		 * JON END HERE
 		 */
 	}
-  /* USER CODE END WHILE */
+	/* USER CODE END WHILE */
 
-  /* USER CODE BEGIN 3 */
+	/* USER CODE BEGIN 3 */
 	for (;;) {
 
 //	  HAL_ADC
@@ -497,71 +609,67 @@ int main(void)
 //	  EN_Chrg_1_GPIO_Port
 	}
 
-  /* USER CODE END 3 */
+	/* USER CODE END 3 */
 
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void) {
 
-  RCC_OscInitTypeDef RCC_OscInitStruct;
-  RCC_ClkInitTypeDef RCC_ClkInitStruct;
-  RCC_PeriphCLKInitTypeDef PeriphClkInit;
+	RCC_OscInitTypeDef RCC_OscInitStruct;
+	RCC_ClkInitTypeDef RCC_ClkInitStruct;
+	RCC_PeriphCLKInitTypeDef PeriphClkInit;
 
-    /**Configure the main internal regulator output voltage 
-    */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+	/**Configure the main internal regulator output voltage
+	 */
+	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
-    /**Initializes the CPU, AHB and APB busses clocks 
-    */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = 16;
-  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL3;
-  RCC_OscInitStruct.PLL.PLLDIV = RCC_PLL_DIV3;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
+	/**Initializes the CPU, AHB and APB busses clocks
+	 */
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_LSI;
+	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+	RCC_OscInitStruct.HSICalibrationValue = 16;
+	RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL3;
+	RCC_OscInitStruct.PLL.PLLDIV = RCC_PLL_DIV3;
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+		_Error_Handler(__FILE__, __LINE__);
+	}
 
-    /**Initializes the CPU, AHB and APB busses clocks 
-    */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+	/**Initializes the CPU, AHB and APB busses clocks
+	 */
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1
+			| RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
+	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
+		_Error_Handler(__FILE__, __LINE__);
+	}
 
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
-  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
+	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+	PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+	if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
+		_Error_Handler(__FILE__, __LINE__);
+	}
 
-    /**Configure the Systick interrupt time 
-    */
-  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
+	/**Configure the Systick interrupt time
+	 */
+	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
 
-    /**Configure the Systick 
-    */
-  HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+	/**Configure the Systick
+	 */
+	HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
-  /* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+	/* SysTick_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
 /* USER CODE BEGIN 4 */
@@ -569,43 +677,42 @@ void SystemClock_Config(void)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @param  file: The file name as string.
-  * @param  line: The line in file as a number.
-  * @retval None
-  */
-void _Error_Handler(char *file, int line)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
+ * @brief  This function is executed in case of error occurrence.
+ * @param  file: The file name as string.
+ * @param  line: The line in file as a number.
+ * @retval None
+ */
+void _Error_Handler(char *file, int line) {
+	/* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
 	while (1) {
 	}
-  /* USER CODE END Error_Handler_Debug */
+	/* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t* file, uint32_t line)
-{ 
-  /* USER CODE BEGIN 6 */
+{
+	/* USER CODE BEGIN 6 */
 	/* User can add his own implementation to report the file name and line number,
 	 tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
+	/* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

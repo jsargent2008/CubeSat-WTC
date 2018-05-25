@@ -57,7 +57,9 @@
  */
 
 void wtcSetup() {
-	putS(&DEBUG_UART, "dp\r\n");
+
+	char prompt[100] = { };
+	//putS(&DEBUG_UART, "dp\r\n");
 	initWTCStatusStruct();
 	initDeployStatusStruct();
 
@@ -65,27 +67,42 @@ void wtcSetup() {
 	// when disengaging from dispenser
 	//attempt to deploy
 	uint8_t attempt = 0;
+	int8_t deployStatus = 0;
+	uint8_t antenna = 0;
 	do {
-		//timer compressed into the function below
+		//1 hour wait timer compressed into the function below
 		waitToDeploy(attempt);
+		if(isBatteryStackGood() > 0){
+			deployStatus = deploySimple(antenna + 1);
+			antenna ^= 1; //toggle between atenna 1 & 2
+		}
 		// end of 'DEPLOY_WAIT_DELAY_MINS' timer, deploy antenna
 		// ALSO break if communication has been received by ground.
 		attempt++;
-	} while (deploySimple() != 3);
 
+		if(deployStruct->deployedAnt1 == true && deployStruct->deployedAnt2 == false){
+			break;
+		}
+	} while (deployStatus != 3);
+
+	sprintf(prompt, "--Antennas Deployed--\r\n");
+	putS(&DEBUG_UART, prompt);
+
+	// turn_on_xceiver
 	for (;;) {
+	// listen, break when RX buffer full
 	}
 
-// turn_on_xceiver
-// listen
-// get_signal
-// print('Hello Earth!' + status)
-// check_battery
+	// get_signal
+
+	// print('Hello Earth!' + status)
+	// check_battery
 }
 
 void scienceInit() {
 
 }
+
 void operations() {
 
 }

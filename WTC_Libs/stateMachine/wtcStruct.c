@@ -13,6 +13,7 @@ WTCStatusStruct *wtc = &my_wtc;
 
 void initWTCStatusStruct() {
 
+	WTCStatusStruct *wtc = malloc(sizeof(WTCStatusStruct));
 //INITIALIZE STRUCTS
 	wtc->huartDebug = &DEBUG_UART;
 	wtc->hadc = &hadc;

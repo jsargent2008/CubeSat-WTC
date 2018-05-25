@@ -13,9 +13,9 @@
 //Defines
 
 //designator byte
-#define designatorWTC 0b11111111
-#define designatorPi1 0b00000001
-#define designatorPi2 0b00000010
+#define DESIGNATOR_WTC 0b11111111
+#define DESIGNATOR_Pi1 0b00000001
+#define DESIGNATOR_Pi2 0b00000010
 //flag types
 #define invalidDesignator 0
 
@@ -59,6 +59,7 @@ void commsFromPis(uint8_t* buffer);
  * helper function prototypes
  */
 uint8_t isValid_designator();
+uint8_t fromBinary(uint8_t *s);
 
 
 #endif /* STATEMACHINE_COMMS_H_ */

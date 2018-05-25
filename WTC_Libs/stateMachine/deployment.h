@@ -13,15 +13,17 @@
 #include "myStructTypeDefs.h"
 #include "stateMachine.h"
 
-
 //function prototypes
 /*
  * AS of 5-22-18 use deploySimple(in conjunction with deploymentSense and deploymentStatusStruct to deploy antennas)
  */
 void initDeployStatusStruct();
 int8_t deploymentSense(float tolerance);
-int8_t deploySimple();
-int8_t deploySimpleHelper();
+
+int8_t deploySimple(uint8_t deplyAntNum);
+
+int8_t deploy();
+int8_t deployHelper();
 uint8_t waitToDeploy(uint8_t attempt);
 void printDeploymentStatus(int8_t status, char* tabs);
 

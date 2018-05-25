@@ -61,6 +61,9 @@ void DMA1_Channel5_IRQHandler(void);
 void USART1_IRQHandler(void);
 void USART3_IRQHandler(void);
 void RTC_Alarm_IRQHandler(void);
+void UART4_IRQHandler(void);
+void DMA2_Channel3_IRQHandler(void);
+void DMA2_Channel5_IRQHandler(void);
 
 #ifdef __cplusplus
 }
