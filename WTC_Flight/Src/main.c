@@ -65,6 +65,7 @@
 #include <myadc/myadc.h>
 #include <myprintf/myprintf.h>
 #include <myrtc/myrtc.h>
+#include <mysd/mysd.h>
 #include "LTC2991/LTC2991.h"
 #include "UART_IRQ/UART_IRQ.h"
 #include "command/command.h"
@@ -327,7 +328,7 @@ int main(void) {
 	do {
 		uint8_t* packet = NULL;
 		p_size = get_next_packet(&pifile, &packet);
-		if (p_size <= 0 || packet == NULL)
+		if (p_size <= 0)
 			break; // memory wasn't allocated, don't need to free
 		free(packet);
 	} while (p_size > 0);
@@ -343,7 +344,7 @@ int main(void) {
 	for(int i = 0; i < sizeof p_num; i++) {
 		uint8_t* packet = NULL;
 		p_size = get_packet_num(p_num[i], &pifile, &packet);
-		if (p_size <= 0 || packet == NULL)
+		if (p_size <= 0)
 			break; // memory wasn't allocated, don't need to free
 		free(packet);
 	}
