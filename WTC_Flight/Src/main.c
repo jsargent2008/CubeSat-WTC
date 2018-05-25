@@ -290,15 +290,12 @@ int main(void) {
 	////////////////
 	// BEGIN SD DEMO
 	//
-	// Demo of grabbing individual packets. Right now, splits packets on 'es'
-	// so any time 'e' and 's' appear together, that marks the start of another
-	// packet. Can be changed to any byte value, even non-ASCII. This demo
-	// doesn't actually do anything with the data, just stores it in `packet`.
-	// To make sure it's working, breakpoint on the free(packet) line and inspect
-	// the local variable `*packet`, it should contain the bytes. Note that it will
-	// show more than the actual buffer size in the debug window, since there is no
-	// null terminator. Rest assured, the garbage after the correct values is expected
-	// and harmless.
+	// Demo of grabbing individual packets. Right now, splits packets on '_.,_'
+	// so any time '_', '.', ',', and '_' appear together, that marks the start of
+	// another packet. Can be changed to any byte value, even non-ASCII. This demo
+	// stores the retrieved packet in the `packet` buffer, expends it three bytes,
+	// adds a carriage return, a new line, and a null terminator, then prints the
+	// resulting string over USART1.
 
 	// Delay to allow SD card to get set up internally.
 	HAL_Delay(1000);
@@ -327,10 +324,24 @@ int main(void) {
 	int32_t p_size = 0;
 	do {
 		uint8_t* packet = NULL;
+
 		p_size = get_next_packet(&pifile, &packet);
 		if (p_size <= 0)
 			break; // memory wasn't allocated, don't need to free
-		free(packet);
+
+		uint8_t* re_packet = realloc(packet, p_size + 3);
+		if(re_packet == NULL) {
+			free(packet); // reallocation failed, re_packet is invalid
+			break;
+		}
+
+		re_packet[p_size - 2] = '\r';
+		re_packet[p_size - 1] = '\n';
+		re_packet[p_size] = '\0';
+
+		HAL_UART_Transmit(&huart1, re_packet, strlen((char*)re_packet), 0xFFFF);
+
+		free(re_packet); // `packet` was invalidated upon successful realloc
 	} while (p_size > 0);
 
 	// This part shows off pulling specific packets. I've crafted a 36 line
@@ -343,10 +354,24 @@ int main(void) {
 	uint8_t p_num[] = { 1, 3, 5, 7, 12, 15, 24, 36, 37, 42 };
 	for(int i = 0; i < sizeof p_num; i++) {
 		uint8_t* packet = NULL;
+
 		p_size = get_packet_num(p_num[i], &pifile, &packet);
 		if (p_size <= 0)
 			break; // memory wasn't allocated, don't need to free
-		free(packet);
+
+		uint8_t* re_packet = realloc(packet, p_size + 3);
+		if(re_packet == NULL) {
+			free(packet); // reallocation failed, re_packet is invalid
+			break;
+		}
+
+		re_packet[p_size - 2] = '\r';
+		re_packet[p_size - 1] = '\n';
+		re_packet[p_size] = '\0';
+
+		HAL_UART_Transmit(&huart1, re_packet, strlen((char*)re_packet), 0xFFFF);
+
+		free(re_packet); // `packet` was invalidated upon successful realloc
 	}
 
 	f_close(&pifile);
