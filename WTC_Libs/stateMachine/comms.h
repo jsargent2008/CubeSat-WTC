@@ -52,7 +52,7 @@ void commsToGround(uint8_t* buffer);
 void commsFromGround(uint8_t* buffer);
 void commsToWTC(uint8_t* buffer);
 void commsToPis(uint8_t* buffer, uint8_t pi);
-void commsFromPis(uint8_t* buffer);
+void commsFromPis(uint8_t* buffer, uint8_t pi);
 
 
 /*

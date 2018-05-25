@@ -93,6 +93,7 @@ void commsFromGround(uint8_t* buffer) {
 	 * ...pass buffer accordingly
 	 */
 	char prompt[100] = { };
+	char promptToGround[100] = { };
 	commsRx->designator = fromBinary((uint8_t*)DMABUFFER[1]);
 
 	sprintf(prompt, "%02x\t%02x",(uint8_t*)DMABUFFER[1], (uint8_t*)commsRx->designator);
@@ -128,7 +129,9 @@ void commsFromGround(uint8_t* buffer) {
 		// the first byte you received was not corrected.
 		// ignore/dump buffer and tell ground.
 
+
 		sprintf(prompt, "\r\nInvalid designator. Please resend packet number XXX");
+		strcpy((char *__restrict)promptToGround, prompt);
 		putS(&DEBUG_UART, prompt);
 
 		commsToGround((uint8_t*) prompt);
@@ -144,12 +147,38 @@ void commsToWTC(uint8_t* buffer) {
 }
 
 void commsToPis(uint8_t* buffer, uint8_t pi) {
+	char prompt[100] = { };
+	char commandFromPi[100] = { };
+	char stopPipeCommand[100] = { };
+	sprintf(commandFromPi, "\0");
+	sprintf(stopPipeCommand, "W");
+
+	UART_HandleTypeDef huart;
+	switch (pi) {
+	case (1):
+		huart = UART_Pi1;
+		break;
+	case (2):
+		huart = UART_Pi2;
+		break;
+	default:
+		return;
+	}
+
+	while(strcmp((char *)commandFromPi,(char *)stopPipeCommand) != 0){
+		//gets from ground
+		//puts from pis
+		putS(&huart, prompt);
+	}
+}
+
+void commsFromPis(uint8_t* buffer, uint8_t pi) {
+
+	//buffer 128 bytes
 
 }
 
-void commsFromPis(uint8_t* buffer) {
 
-}
 
 /*
  * helper functions
