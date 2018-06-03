@@ -152,6 +152,23 @@ void putS(UART_HandleTypeDef *huart, char* buf) {
 	//
 	// sizeof DOESNT NOT WORK!!!!!!!!!
 	// HAL_UART_Transmit(&huart3, (uint8_t *) buf, (uint16_t) sizeof(buf), 0xFFFF);
-	HAL_UART_Transmit(huart, (uint8_t *) buf, (uint16_t) size, 0xFFFF);
+	HAL_UART_Transmit(huart, (uint8_t *) buf, (uint16_t) size, 1000/*0xFFFF*/);
 
+}
+
+/*
+ * 	puts for binary
+ *	used when not trusting the '\0' character for ending the buffer
+ *
+ *	len - total bytes
+ */
+void putB(UART_HandleTypeDef *huart, char* buf, uint16_t len) {
+
+	HAL_UART_Transmit(huart, (uint8_t *) buf, len, 0xFFFF);
+}
+
+void getB(UART_HandleTypeDef *huart, char *buf, uint8_t len) {
+	//HAL_UART_Receive(&huart3, (uint8_t *) buf, len, 0xFFFF);
+	//buf[strlen(buf)] = '\0';
+	HAL_UART_Receive(huart, (uint8_t *) buf, len, 1000);
 }

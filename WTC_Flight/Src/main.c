@@ -71,6 +71,8 @@
 #include "command/command.h"
 #include "memoryMap/memoryMap.h"
 #include "stateMachine/stateMachine.h"
+#include "PI_Control/SS_Pi_Comms.h"
+#include "PI_Control/commands.h"
 
 //huart4 is the 70cm primary
 
@@ -150,15 +152,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	putS(&DEBUG_UART, "got interrupt\r\n");
 	UartReady = SET;
 
-	if(huart == &DEBUG_UART){
-		if (HAL_UART_Receive_DMA(huart, (uint8_t *)DMABUFFER, packetSize_IT) != HAL_OK) {
+	if (huart == &DEBUG_UART) {
+		if (HAL_UART_Receive_DMA(huart, (uint8_t *) DMABUFFER, packetSize_IT) != HAL_OK) {
 			Error_Handler();
 		}
 		//print back to console
-		sprintf(prompt, "%s\r\n",DMABUFFER);
+		sprintf(prompt, "%s\r\n", DMABUFFER);
 		putS(&huart4, prompt);
 		//make sure packet is readable
-		commsFromGround((uint8_t *)DMABUFFER);
+		commsFromGround((uint8_t *) DMABUFFER);
 	}
 }
 
@@ -273,6 +275,33 @@ int main(void) {
 	MX_FATFS_Init();
 	/* USER CODE BEGIN 2 */
 
+	uint8_t packet[128] =
+			"|-----------32-BYTES-----------||-----------32-BYTES-----------||-----------32-BYTES-----------||-----------32-BYTES-----------|";
+	uint8_t attempt = 0;
+	while (1) {
+		char pdata[20] = "";
+		//attempt++;
+		//testPiComms(attempt, &huart2, &UART_Pi1);
+//		putS(&huart1, "1");
+//		HAL_Delay(100);
+//		putS(&huart2, "2");
+//		HAL_Delay(100);
+//		putS(&huart3, "3");;
+//		HAL_Delay(100);
+//		putS(&huart4, "4");
+//		HAL_Delay(100);
+//		HAL_UART_Transmit(&UART_Pi1, "OK", 2,1000);
+//		//HAL_UART_Receive(&UART_Pi1, pdata, 3,1000);
+//		getS(&huart1, pdata,2);
+//		HAL_UART_Transmit(&UART_Pi1, "OK", 2,1000);
+//		getS(&huart1, pdata,2);
+//		HAL_UART_Transmit(&huart2, pdata, 3,1000);
+		HAL_Delay(200);
+		//SS_GndToPi(1, packet, 0, 0);
+
+		SS_PiToSD(1, packet, 0, 0, 0);
+	}
+
 	while (0) {
 		HAL_GPIO_WritePin(UHF_Power_Enable_GPIO_Port, UHF_Power_Enable_Pin, GPIO_PIN_SET);
 		HAL_Delay(200);
@@ -322,7 +351,6 @@ int main(void) {
 		for (;;) {
 			HAL_UART_Receive(&huart4, (uint8_t *) buf, 10, 10000);
 			HAL_UART_Transmit(&huart4, buf, 10, 1000);
-			x = 1;
 		}
 
 		//            for (;;) {
@@ -336,18 +364,18 @@ int main(void) {
 
 	}
 
-	HAL_UART_Receive_DMA(&DEBUG_UART, (uint8_t *)DMABUFFER, packetSize_IT);
+	HAL_UART_Receive_DMA(&DEBUG_UART, (uint8_t *) DMABUFFER, packetSize_IT);
 
-	for(;;){
+	for (;;) {
 		HAL_Delay(100);
 	}
 	for (;;) {
 
 		wtcSetup();
 	}
-		/*##-3- Wait for the end of the transfer ###################################*/
-		/* While waiting for message to come from the other board, LED2 is
-		 blinking according to the following pattern: a double flash every half-second */
+	/*##-3- Wait for the end of the transfer ###################################*/
+	/* While waiting for message to come from the other board, LED2 is
+	 blinking according to the following pattern: a double flash every half-second */
 
 //	putS(&DEBUG_UART, "waiting for interrupt\r\n");
 //	while (UartReady != SET)
@@ -365,7 +393,6 @@ int main(void) {
 //	putS(&DEBUG_UART, "interrupt received\r\n");
 //	HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
 //	HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
-
 //	for(;;){
 //	HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_SET);
 //	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, GPIO_PIN_SET);
