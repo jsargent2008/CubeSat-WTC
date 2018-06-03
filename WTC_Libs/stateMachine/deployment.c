@@ -10,8 +10,8 @@ void initDeployStatusStruct() {
 	deployStruct->deployMaxAttemptsPer = 2;
 	deployStruct->deployMaxAttemptsTotal = 4;
 	deployStruct->deployCurAntAttempted = 0;
-	deployStruct->deployedAnt1 = FALSE;
-	deployStruct->deployedAnt2 = FALSE;
+	deployStruct->deployedAnt1 = false;
+	deployStruct->deployedAnt2 = false;
 	deployStruct->deployAttemptsAnt1 = 0;
 	deployStruct->deployAttemptsAnt2 = 0;
 	deployStruct->deployStatus = 0;
@@ -75,7 +75,7 @@ int8_t deployHelper() {
 	 * ***ANTENNA 1***
 	 */
 	//check to see if antenna #1 has already been deployed before entering while-loop (STATUS BIT)
-	while (deployStruct->deployedAnt1 != TRUE) {
+	while (deployStruct->deployedAnt1 != true) {
 
 		sprintf(prompt, "-- DP 1\r\n");
 		putS(&DEBUG_UART, prompt);
@@ -111,7 +111,7 @@ int8_t deployHelper() {
 	 */
 	attempts = 0;
 	//check to see if antenna #2 has already been deployed before entering while-loop (STATUS BIT)
-	while (deployStruct->deployedAnt2 != TRUE) {
+	while (deployStruct->deployedAnt2 != true) {
 
 		sprintf(prompt, "-- DP 2\r\n");
 		putS(&DEBUG_UART, prompt);
@@ -191,18 +191,18 @@ int8_t deploymentSense(float tolerance) {
 		return 0;
 	} else if (dplyV >= deployed1 - tolerance && dplyV < deployed2 - tolerance) {
 		// antenna #1 deployed
-		deployStruct->deployedAnt1 = TRUE;
+		deployStruct->deployedAnt1 = true;
 		deployStruct->deployStatus = 1;
 		return 1;
 	} else if (dplyV >= deployed2 - tolerance && dplyV < deployedAll - tolerance) {
 		// antenna #2 deployed
-		deployStruct->deployedAnt2 = TRUE;
+		deployStruct->deployedAnt2 = true;
 		deployStruct->deployStatus = 2;
 		return 2;
 	} else if (dplyV >= deployedAll - tolerance) {
 		// antenna #1 & #2 deployed
-		deployStruct->deployedAnt1 = TRUE;
-		deployStruct->deployedAnt2 = TRUE;
+		deployStruct->deployedAnt1 = true;
+		deployStruct->deployedAnt2 = true;
 		deployStruct->deployStatus = 3;
 		return 3;
 	} else {

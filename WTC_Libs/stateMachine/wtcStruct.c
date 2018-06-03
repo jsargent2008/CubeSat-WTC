@@ -40,5 +40,5 @@ void initWTCStatusStruct() {
 	wtc->startSeconds = stimestructureget.Seconds;
 
 	//start deployment Alarm
-	wtc->deployStruct->deployAlarmSet = FALSE;
+	wtc->deployStruct->deployAlarmSet = false;
 }

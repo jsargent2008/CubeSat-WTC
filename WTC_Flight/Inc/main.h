@@ -125,8 +125,8 @@
 #define WTC_BUS_Switch_Pi_Select_GPIO_Port GPIOD
 #define Pi_Heartbeat_Pi2_Pin GPIO_PIN_14
 #define Pi_Heartbeat_Pi2_GPIO_Port GPIOD
-#define Pi_Heartbeat_Pi2D15_Pin GPIO_PIN_15
-#define Pi_Heartbeat_Pi2D15_GPIO_Port GPIOD
+#define Pi_Heartbeat_Pi1_Pin GPIO_PIN_15
+#define Pi_Heartbeat_Pi1_GPIO_Port GPIOD
 #define _12V_1_Enable_Pin GPIO_PIN_8
 #define _12V_1_Enable_GPIO_Port GPIOC
 #define _12V_2_Enable_Pin GPIO_PIN_9
@@ -187,10 +187,10 @@
 #define USART_UHF huart2
 #define USART_PI2 huart3
 
-#define TRUE 1
-#define true 1
-#define FALSE 0
-#define false 0
+//#define TRUE 1
+//#define true 1
+//#define FALSE 0
+//#define false 0
 
 #define packetSize_IT 8//128
 char DMABUFFER[packetSize_IT];

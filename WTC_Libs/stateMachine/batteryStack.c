@@ -48,28 +48,28 @@ uint8_t isBatteryStackGood() {
 	batteryStruct->workingStacks = 4; //1-4
 	// first check battery stack voltages
 	if (adcReadSingle(V_Stack_1_Meas_Channel) < batteryStruct->minThreshold) {
-		batteryStruct->battery1_PGOOD = FALSE;
+		batteryStruct->battery1_PGOOD = false;
 		batteryStruct->workingStacks--;
 	} else {
-		batteryStruct->battery1_PGOOD = TRUE;
+		batteryStruct->battery1_PGOOD = true;
 	}
 	if (adcReadSingle(V_Stack_2_Meas_Channel) < batteryStruct->minThreshold) {
-		batteryStruct->battery2_PGOOD = FALSE;
+		batteryStruct->battery2_PGOOD = false;
 		batteryStruct->workingStacks--;
 	} else {
-		batteryStruct->battery2_PGOOD = TRUE;
+		batteryStruct->battery2_PGOOD = true;
 	}
 	if (adcReadSingle(V_Stack_3_Meas_Channel) < batteryStruct->minThreshold) {
-		batteryStruct->battery3_PGOOD = FALSE;
+		batteryStruct->battery3_PGOOD = false;
 		batteryStruct->workingStacks--;
 	} else {
-		batteryStruct->battery3_PGOOD = TRUE;
+		batteryStruct->battery3_PGOOD = true;
 	}
 	if (adcReadSingle(V_Stack_4_Meas_Channel) < batteryStruct->minThreshold) {
-		batteryStruct->battery4_PGOOD = FALSE;
+		batteryStruct->battery4_PGOOD = false;
 		batteryStruct->workingStacks--;
 	} else {
-		batteryStruct->battery4_PGOOD = TRUE;
+		batteryStruct->battery4_PGOOD = true;
 	}
 
 	// necessary for program execution
