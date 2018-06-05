@@ -78,11 +78,11 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define FCLK_SLOW() { hspi1.Instance->I2SPR = 256; }	/* Set SCLK = slow */
+#define FCLK_SLOW() { hspi1.Instance->I2SPR = 128; }	/* Set SCLK = slow */
 #define FCLK_FAST() { hspi1.Instance->I2SPR = 16; }	/* Set SCLK = fast */
 
-#define CS_HIGH()	{HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_SET);}
-#define CS_LOW()	{HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_RESET);}
+#define CS_HIGH()	{HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_RESET);}
+#define CS_LOW()	{HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_SET);}
 
 /* MMC/SD command */
 #define CMD0	(0)			/* GO_IDLE_STATE */
@@ -226,7 +226,7 @@ static volatile DSTATUS Stat = STA_NOINIT;
   {
   	CS_LOW();		/* Set CS# low */
   	xchg_spi(0xFF);	/* Dummy clock (force DO enabled) */
-  	if (wait_ready(500)) return 1;	/* Wait for card ready */
+  	if (wait_ready(1000)) return 1;	/* Wait for card ready */
 
   	despiselect();
   	return 0;	/* Timeout */
@@ -387,7 +387,7 @@ DSTATUS USER_initialize (
 
 	ty = 0;
 	if (send_cmd(CMD0, 0) == 1) {			/* Put the card SPI/Idle state */
-		SPI_Timer_On(3000);					/* Initialization timeout = 1 sec */
+		SPI_Timer_On(5000);					/* Initialization timeout = 1 sec */
 		if (send_cmd(CMD8, 0x1AA) == 1) {	/* SDv2? */
 			for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF);	/* Get 32 bit return value of R7 resp */
 			if (ocr[2] == 0x01 && ocr[3] == 0xAA) {				/* Is the card supports vcc of 2.7-3.6V? */
