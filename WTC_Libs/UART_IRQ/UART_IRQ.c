@@ -3,36 +3,13 @@
 // QPACE
 
 /**
- * @brief  best way to initialize a char array
- * @param  size
- * return char*
- */
-
-char* mallocCharArray(uint32_t size) {
-	char* str = malloc(sizeof(char) * (size + 1));
-	for (int i = 0; i <= size; i++)
-		str[i] = '\0';
-
-	return str;
-}
-
-uint32_t arraylength(char* array) {
-	if (array == 0)
-		return 0;
-
-	uint32_t i = 0;
-	while (array[i] != 0)
-		i++;
-
-	return i;
-}
-/**
  * @brief  best way to insert char to a string
  * @param  dest where string will be copied to
  * @param 	src the string to append to the dest string at index 'index'
  * @param	index start location of appending.
  * return  result of the concatenated strings.
  */
+/*
 char* appendCharArrays(char* dest, char* src, uint32_t index) {
 	uint8_t destLen = 0;
 	uint8_t srcLen = 0;
@@ -73,6 +50,8 @@ char* appendCharArrays(char* dest, char* src, uint32_t index) {
 
 	return result;
 }
+*/
+
 
 /**
  * @brief  This function is executed when waiting for a UART Interrupt
@@ -135,40 +114,22 @@ void UART_PUT(UART_HandleTypeDef *huart, char *str) {
 	HAL_UART_Transmit(huart, (uint8_t *) str, (uint16_t) sizeof(str), 0xFFFF);
 }
 
-void getS(UART_HandleTypeDef *huart, char *buf, uint8_t len) {
-	//HAL_UART_Receive(&huart3, (uint8_t *) buf, len, 0xFFFF);
-	//buf[strlen(buf)] = '\0';
-	HAL_UART_Receive(huart, (uint8_t *) buf, len + 1, 0xFFFF);
-	buf[strlen((buf)) - 1] = '\0';
+void getS(UART_HandleTypeDef *huart, char *buf, uint16_t max_len) {
+	for(uint16_t i = 0; i < max_len; i++) {
+		HAL_UART_Receive(huart, (uint8_t*)(buf + i), 1, 0xFFFF);
+		if(buf[i] == '\0')
+			break;
+	}
 }
 
 void putS(UART_HandleTypeDef *huart, char* buf) {
-
-	uint8_t size = 0;
-
-	while (buf[size] != 0)
-		size++;
-
-	//
-	// sizeof DOESNT NOT WORK!!!!!!!!!
-	// HAL_UART_Transmit(&huart3, (uint8_t *) buf, (uint16_t) sizeof(buf), 0xFFFF);
-	HAL_UART_Transmit(huart, (uint8_t *) buf, (uint16_t) size, 1000/*0xFFFF*/);
-
+	HAL_UART_Transmit(huart, (uint8_t *)buf, strlen(buf), 0xFFFF);
 }
 
-/*
- * 	puts for binary
- *	used when not trusting the '\0' character for ending the buffer
- *
- *	len - total bytes
- */
 void putB(UART_HandleTypeDef *huart, char* buf, uint16_t len) {
-
 	HAL_UART_Transmit(huart, (uint8_t *) buf, len, 0xFFFF);
 }
 
-void getB(UART_HandleTypeDef *huart, char *buf, uint8_t len) {
-	//HAL_UART_Receive(&huart3, (uint8_t *) buf, len, 0xFFFF);
-	//buf[strlen(buf)] = '\0';
-	HAL_UART_Receive(huart, (uint8_t *) buf, len, 1000);
+void getB(UART_HandleTypeDef *huart, char *buf, uint16_t len) {
+	HAL_UART_Receive(huart, (uint8_t *)buf, len, 0xFFFF);
 }
