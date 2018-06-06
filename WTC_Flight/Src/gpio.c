@@ -87,7 +87,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, WTC_V_Stack_Pin|Pwr_En_Pi1_Pin|Pwr_En_Pi2_Pin|WTC_BUS_Switch_Pi_Select_Pin 
-                          |Pi_Heartbeat_Pi2_Pin|Pi_Heartbeat_Pi2D15_Pin|_70cm_Primary_TR_Pin|EN_MPPT_Z__Pin 
+                          |Pi_Heartbeat_Pi2_Pin|Pi_Heartbeat_Pi1_Pin|_70cm_Primary_TR_Pin|EN_MPPT_Z__Pin 
                           |EN_MPPT_YZ__Pin|EN_MPPT_YCtr_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -124,7 +124,7 @@ void MX_GPIO_Init(void)
                            PDPin PDPin PDPin PDPin 
                            PDPin PDPin */
   GPIO_InitStruct.Pin = WTC_V_Stack_Pin|Pwr_En_Pi1_Pin|Pwr_En_Pi2_Pin|WTC_BUS_Switch_Pi_Select_Pin 
-                          |Pi_Heartbeat_Pi2_Pin|Pi_Heartbeat_Pi2D15_Pin|_70cm_Primary_TR_Pin|EN_MPPT_Z__Pin 
+                          |Pi_Heartbeat_Pi2_Pin|Pi_Heartbeat_Pi1_Pin|_70cm_Primary_TR_Pin|EN_MPPT_Z__Pin 
                           |EN_MPPT_YZ__Pin|EN_MPPT_YCtr_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
