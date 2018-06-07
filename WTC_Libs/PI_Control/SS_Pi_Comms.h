@@ -40,7 +40,7 @@ uint8_t SS_PiToSD(uint8_t pi, uint8_t *packet, uint8_t timeStart, uint8_t timeSt
 		uint8_t interrupt);
 UART_HandleTypeDef *switchUART(uint8_t num);
 
-uint8_t *packetize(char *parition);
-uint8_t *unpacketize(uint8_t *packet);
+uint8_t* packetize(char *parition);
+uint8_t** unpacketize(uint8_t *packet);
 
 #endif /* PI_CONTROL_SS_PI_COMMS_H_ */

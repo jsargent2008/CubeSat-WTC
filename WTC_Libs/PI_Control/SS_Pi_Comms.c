@@ -16,7 +16,7 @@
 uint8_t SS_GndToPi(uint8_t pi, uint8_t *packet, uint8_t timeStart, uint8_t timeStop) {
 
 	uint8_t numOfPartitions = 4;
-	char prompt[100] = "";
+//	char prompt[100] = "";
 	//char ack[] = "OK"; //char ack[] = "OK";
 	char rxAck[20] = "";
 	uint8_t ackLen = strlen((char *) ack);
@@ -158,7 +158,7 @@ uint8_t SS_PiToSD(uint8_t pi, uint8_t *packet, uint8_t timeStart, uint8_t timeSt
 	memcpy(rxTemp,rxPacket,128);
 	putS(&huart2, rxTemp);
 	//uint8_t partition[4] = unpacketize(rxPacket);
-	SS_GndToPi(1, rxPacket, 0, 0);
+	SS_GndToPi(1, (uint8_t*)rxPacket, 0, 0);
 	return 0;
 }
 
@@ -174,12 +174,20 @@ uint8_t checkStartStopByte(uint8_t * buf) {
 		return 0;
 	}
 
+	// TODO: Is this supposed to just be one byte? The macros SS_Pi_[START|STOP]_BYTE are just single bytes,
+	//       not a buffer of 8 bytes. If so, the code should become:
+
+	/*tempStartByte = buf[0];
+	tempStopByte = buf[127];*/
+
+	// Or even better, ditch the temp variables and use the buf[x] calls directly.
+
 	memcpy(tempStartByte, buf, 8);
 	memcpy(tempStartByte, buf + 120, 8);
 
-	if (memcmp(SS_Pi_START_BYTE, tempStartByte, 1) != 0) {
+	if (*tempStartByte != SS_Pi_START_BYTE) {
 		return FLAG_ERR_Pi_START_BYTE;
-	} else if (memcmp(SS_Pi_STOP_BYTE, tempStopByte, 1) != 0) {
+	} else if (*tempStopByte != SS_Pi_STOP_BYTE) {
 		return FLAG_ERR_Pi_STOP_BYTE;
 	}
 	return true;
@@ -234,9 +242,9 @@ uint8_t *packetize(char *partition) {
 
 	uint8_t *packet = malloc(sizeof(uint8_t) * 128);
 
-	uint8_t partSize = 32;
+	const uint8_t partSize = 32;
 	for (int i = 0; i < 4; i++) {
-		memcpy(packet + i * partSize, partition + (32 * i), 32);
+		memcpy(packet + i * partSize, partition + (partSize * i), partSize);
 	}
 
 	return packet;
@@ -245,8 +253,8 @@ uint8_t *packetize(char *partition) {
 /*
  * 128-bytes to 4 32-byte packets
  */
-uint8_t *unpacketize(uint8_t *packet) {
-	uint8_t *partition[4];
+uint8_t** unpacketize(uint8_t *packet) {
+	uint8_t** partition = malloc(sizeof(uint8_t*) * 4);
 	for (int i = 0; i < 4; i++) {
 		partition[i] = malloc(sizeof(uint8_t) * 32); //should point to the 4 tx Packet partitions
 	}

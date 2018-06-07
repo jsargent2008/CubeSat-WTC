@@ -6,6 +6,7 @@
  */
 
 #include "commands.h"
+#include "mygpio/mygpio.h"
 
 uint8_t piRequests(UART_HandleTypeDef *huart, char cmd[4]) {
 
