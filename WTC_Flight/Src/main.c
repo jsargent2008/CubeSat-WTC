@@ -73,6 +73,8 @@
 #include "stateMachine/stateMachine.h"
 #include "PI_Control/SS_Pi_Comms.h"
 #include "PI_Control/commands.h"
+#include "stateMachine/comms.h"
+#include "mygpio/mygpio.h"
 
 //huart4 is the 70cm primary
 
@@ -157,10 +159,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 			Error_Handler();
 		}
 		//print back to console
-		sprintf(prompt, "%s\r\n", DMABUFFER);
-		putS(&huart4, prompt);
+		sprintf((char*)prompt, "%s\r\n", DMABUFFER);
+		putS(&huart4, (char*)prompt);
 		//make sure packet is readable
-		commsFromGround((uint8_t *) DMABUFFER);
+		commsFromGround((uint8_t*)DMABUFFER);
 	}
 }
 
@@ -277,9 +279,9 @@ int main(void) {
 
 	uint8_t packet[128] =
 			"|-----------32-BYTES-----------||-----------32-BYTES-----------||-----------32-BYTES-----------||-----------32-BYTES-----------|";
-	uint8_t attempt = 0;
+//	uint8_t attempt = 0;
 	while (1) {
-		char pdata[20] = "";
+//		char pdata[20] = "";
 		//attempt++;
 		//testPiComms(attempt, &huart2, &UART_Pi1);
 //		putS(&huart1, "1");
@@ -344,13 +346,13 @@ int main(void) {
 		}
 
 		for (x = 0; x < 200; x++) {
-			HAL_UART_Transmit(&huart4, "hellohellohellohello", 20, 1000);
+			HAL_UART_Transmit(&huart4, (uint8_t*)"hellohellohellohello", 20, 1000);
 			HAL_Delay(100);
 		}
 
 		for (;;) {
 			HAL_UART_Receive(&huart4, (uint8_t *) buf, 10, 10000);
-			HAL_UART_Transmit(&huart4, buf, 10, 1000);
+			HAL_UART_Transmit(&huart4, (uint8_t*)buf, 10, 1000);
 		}
 
 		//            for (;;) {

@@ -94,9 +94,9 @@ void commsFromGround(uint8_t* buffer) {
 	 */
 	char prompt[100] = { };
 	char promptToGround[100] = { };
-	commsRx->designator = fromBinary((uint8_t*)DMABUFFER[1]);
+	commsRx->designator = fromBinary((uint8_t*)(DMABUFFER + 1));
 
-	sprintf(prompt, "%02x\t%02x",(uint8_t*)DMABUFFER[1], (uint8_t*)commsRx->designator);
+	sprintf(prompt, "%02x\t%02x", DMABUFFER[1], (uint8_t)commsRx->designator);
 	putS(&DEBUG_UART, prompt);
 	switch (commsRx->designator) {
 	case (DESIGNATOR_WTC):
@@ -147,10 +147,9 @@ void commsToWTC(uint8_t* buffer) {
 }
 
 void commsToPis(uint8_t* buffer, uint8_t pi) {
-	char prompt[100] = { };
-	char commandFromPi[100] = { };
-	char stopPipeCommand[100] = { };
-	sprintf(commandFromPi, "\0");
+	char prompt[100] = { 0 };
+	char commandFromPi[100] = { 0 };
+	char stopPipeCommand[100] = { 0 };
 	sprintf(stopPipeCommand, "W");
 
 	UART_HandleTypeDef huart;

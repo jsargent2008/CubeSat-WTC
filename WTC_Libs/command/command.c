@@ -168,7 +168,7 @@ void dw(UART_HandleTypeDef *huart) {
 	if (flag == 0) {
 		if (isdigit(aRxBuffer[0]) && isdigit(aRxBuffer[1])) {
 			pin = atoi((char*) aRxBuffer);
-			if (0 <= pin && pin <= 15) {
+			if (pin <= 15) {
 				pin = 1 << pin;
 			} else if (pin == 16) {
 				pin = GPIO_PIN_All;
@@ -278,7 +278,7 @@ void dr(UART_HandleTypeDef *huart) {
 	if (flag == 0) {
 		if (isdigit(aRxBuffer[0]) && isdigit(aRxBuffer[1])) {
 			pin = atoi(aRxBuffer);
-			if (0 <= pin && pin <= 15) {
+			if (pin <= 15) {
 				pin = 1 << pin;
 			} else if (pin == 16) {
 				putS(huart, aRxBuffer);
@@ -339,7 +339,7 @@ void ar(UART_HandleTypeDef *huart, ADC_HandleTypeDef *hadc) {
 	if (flag == 0) {
 		if (isdigit(aRxBuffer[0]) && isdigit(aRxBuffer[1])) {
 			readChannel = atoi((char*) aRxBuffer);
-			if (0 <= readChannel && readChannel <= 31) {
+			if (readChannel <= 31) {
 				readChannel = baseChannel + readChannel;
 			} else if (readChannel == 32) {
 				//use flag to prevent reading Channel 32
